@@ -1,0 +1,15 @@
+services:
+  resume-site:
+    image: ghcr.io/${GITHUB_REPOSITORY:-alison-brisance/portifolio}:latest
+    container_name: resume-site
+    restart: unless-stopped
+    environment:
+      VIRTUAL_HOST: alisonrafael.me,www.alisonrafael.me
+      LETSENCRYPT_HOST: alisonrafael.me,www.alisonrafael.me
+      LETSENCRYPT_EMAIL: armg.alison@gmail.com
+    networks:
+      - nginx-proxy
+
+networks:
+  nginx-proxy:
+    external: true
