@@ -1,4 +1,12 @@
-import { Antenna, Code2, Languages as LanguagesIcon, ShieldCheck, Sparkles, Users } from 'lucide-react'
+import {
+  BrainCircuit,
+  Braces,
+  Code2,
+  Languages as LanguagesIcon,
+  Layers,
+  ShieldCheck,
+  Sparkles,
+} from 'lucide-react'
 import type { LanguageSkill } from '../content/types'
 import { Reveal } from './Reveal'
 
@@ -9,8 +17,9 @@ interface SkillsProps {
 }
 
 const skillIcons: Record<string, typeof Sparkles> = {
-  'Telecommunications Engineering': Antenna,
-  'Cross-functional Collaborations': Users,
+  'AI-Native Development': BrainCircuit,
+  'Functional Programming': Braces,
+  'Full-Stack Engineering': Layers,
   'Site Reliability Engineering': ShieldCheck,
 }
 

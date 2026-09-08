@@ -42,8 +42,9 @@ export const en: ResumeContent = {
     contact: 'Get in Touch',
   },
   topSkills: [
-    'Telecommunications Engineering',
-    'Cross-functional Collaborations',
+    'AI-Native Development',
+    'Functional Programming',
+    'Full-Stack Engineering',
     'Site Reliability Engineering',
   ],
   // Concrete technologies pulled from the experience/certification text above,
