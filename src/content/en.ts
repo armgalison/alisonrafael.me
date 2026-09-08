@@ -59,8 +59,8 @@ export const en: ResumeContent = {
     { label: 'Observability', items: ['Datadog', 'LogRocket' ] },
   ],
   languages: [
-    { name: 'Portuguese', level: 'Native or Bilingual' },
     { name: 'English', level: 'Full Professional' },
+    { name: 'Portuguese', level: 'Native or Bilingual' },
   ],
   certifications: [
     'Testing Angular 4 (previously Angular 2) Apps with Jasmine',
@@ -150,6 +150,6 @@ export const en: ResumeContent = {
     },
   ],
   footer: {
-    rights: 'Built with React, Tailwind, and a healthy dose of caffeine.',
+    rights: 'Built with React, Tailwind, Claude Code, and a healthy dose of caffeine.',
   },
 }

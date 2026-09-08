@@ -31,9 +31,7 @@ export function Nav({ content }: NavProps) {
       >
         <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
           <a href="#top" className="flex items-center gap-2 font-semibold tracking-tight text-ink">
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent/15 font-mono text-sm text-accent">
-              AG
-            </span>
+            <img src="/avatar.png" alt="" className="h-8 w-8 shrink-0 rounded-lg object-cover" />
             <span className="hidden sm:inline">Alison Gonçalves</span>
           </a>
 
