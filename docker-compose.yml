@@ -1,6 +1,6 @@
 services:
   resume-site:
-    image: ghcr.io/${GITHUB_REPOSITORY:-alison-brisance/portifolio}:latest
+    image: ghcr.io/armgalison/alisonrafael.me:latest
     container_name: resume-site
     restart: unless-stopped
     environment:
