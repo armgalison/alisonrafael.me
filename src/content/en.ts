@@ -50,9 +50,13 @@ export const en: ResumeContent = {
   // Concrete technologies pulled from the experience/certification text above,
   // not a separate LinkedIn field — surfaced for recruiters scanning for stack fit.
   technologyGroups: [
-    { label: 'Languages', items: ['JavaScript'] },
-    { label: 'Frameworks & Testing', items: ['Angular', 'Jasmine'] },
-    { label: 'Protocols', items: ['HTTP', 'MQTT', 'CoAP'] },
+    { label: 'Languages', items: ['JavaScript', 'TypeScript'] },
+    { label: 'Frameworks', items: ['Angular', 'NestJS', 'Vue.js', 'Express.js', 'pdfjs-dist' ] },
+    { label: 'Protocols', items: ['HTTP', 'MQTT', 'CoAP', 'OPC UA'] },
+    { label: 'Databases', items: ['PostgreSQL', 'MongoDB'] },
+    { label: 'Cloud & DevOps', items: ['AWS', 'Docker', 'Kubernetes'] },
+    { label: 'Other Tools', items: ['Git', 'Jest', 'Playwright'] },
+    { label: 'Observability', items: ['Datadog', 'LogRocket' ] },
   ],
   languages: [
     { name: 'Portuguese', level: 'Native or Bilingual' },
