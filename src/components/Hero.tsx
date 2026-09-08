@@ -18,16 +18,6 @@ const item = {
   show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: easeOut } },
 }
 
-function initials(name: string) {
-  const words = name.split(' ').filter((word) => word.length > 2)
-  const first = words[0]
-  const last = words[words.length - 1]
-  return [first, last]
-    .filter(Boolean)
-    .map((word) => word[0])
-    .join('')
-}
-
 function useTypewriter(text: string, speed = 32) {
   const [count, setCount] = useState(0)
 
@@ -109,9 +99,11 @@ export function Hero({ content }: HeroProps) {
       >
         <div>
           <motion.div variants={item} className="mb-8 flex items-center gap-4">
-            <div className="relative flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-accent to-violet font-mono text-lg font-bold text-surface shadow-[0_0_30px_-8px_rgba(110,231,194,0.6)]">
-              {initials(content.meta.name)}
-            </div>
+            <img
+              src="/avatar.png"
+              alt={content.meta.name}
+              className="bg-white h-16 w-16 shrink-0 rounded-2xl object-cover shadow-[0_0_30px_-8px_rgba(110,231,194,0.6)]"
+            />
             <span className="inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-3 py-1 text-xs font-medium text-accent">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-accent" />
               Open to new opportunities
