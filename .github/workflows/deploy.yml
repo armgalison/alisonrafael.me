@@ -48,6 +48,21 @@ jobs:
     needs: build-and-push
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+
+      # docker compose pull/up on the droplet only ever reads whatever
+      # docker-compose.yml is already sitting in DROPLET_APP_DIR — this repo
+      # is not cloned there, so without this step the droplet silently kept
+      # running the old single-service file forever.
+      - name: Sync docker-compose.yml to the droplet
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.DROPLET_HOST }}
+          username: ${{ secrets.DROPLET_USER }}
+          key: ${{ secrets.DROPLET_SSH_KEY }}
+          source: 'docker-compose.yml'
+          target: ${{ secrets.DROPLET_APP_DIR }}
+
       - name: Pull and restart on the droplet
         uses: appleboy/ssh-action@v1
         with:
