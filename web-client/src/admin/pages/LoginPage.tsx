@@ -1,10 +1,15 @@
+import { motion } from 'framer-motion'
+import { LayoutDashboard, LogIn } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { ApiError } from '../api'
 import { useAuth } from '../AuthContext'
+import { useAdminContent } from '../i18n'
+import { easeOut } from '../../lib/motion'
 
 export function LoginPage() {
   const { token, login } = useAuth()
+  const content = useAdminContent()
   const navigate = useNavigate()
   const location = useLocation()
   const [email, setEmail] = useState('')
@@ -25,22 +30,32 @@ export function LoginPage() {
       await login(email, password)
       navigate('/admin/posts', { replace: true })
     } catch (err) {
-      setError(err instanceof ApiError && err.status === 401 ? 'Email ou senha incorretos.' : 'Falha ao entrar. Tente novamente.')
+      setError(err instanceof ApiError && err.status === 401 ? content.login.invalidCredentials : content.login.genericError)
     } finally {
       setSubmitting(false)
     }
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-surface px-6 text-ink">
-      <form
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-surface px-6 text-ink">
+      <div className="bg-grid pointer-events-none absolute inset-0" />
+      <motion.form
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: easeOut }}
         onSubmit={handleSubmit}
-        className="w-full max-w-sm rounded-xl border border-line bg-surface-raised p-8"
+        className="relative w-full max-w-sm rounded-2xl border border-line bg-surface-raised p-8 shadow-2xl shadow-black/40"
       >
-        <h1 className="mb-6 font-mono text-lg text-accent">Admin Panel</h1>
+        <div className="mb-6 flex flex-col items-center text-center">
+          <span className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-accent/10 text-accent">
+            <LayoutDashboard size={22} />
+          </span>
+          <h1 className="font-mono text-lg text-ink">{content.login.title}</h1>
+          <p className="mt-1 text-sm text-ink-dim">{content.login.subtitle}</p>
+        </div>
 
         <label className="mb-1 block text-sm text-ink-dim" htmlFor="email">
-          Email
+          {content.login.emailLabel}
         </label>
         <input
           id="email"
@@ -53,7 +68,7 @@ export function LoginPage() {
         />
 
         <label className="mb-1 block text-sm text-ink-dim" htmlFor="password">
-          Senha
+          {content.login.passwordLabel}
         </label>
         <input
           id="password"
@@ -70,11 +85,12 @@ export function LoginPage() {
         <button
           type="submit"
           disabled={submitting}
-          className="w-full rounded-md bg-accent px-4 py-2 text-sm font-medium text-surface transition-opacity hover:opacity-90 disabled:opacity-50"
+          className="flex w-full items-center justify-center gap-2 rounded-full bg-accent px-4 py-2.5 text-sm font-semibold text-surface transition-opacity hover:opacity-90 disabled:opacity-50"
         >
-          {submitting ? 'Entrando…' : 'Entrar'}
+          <LogIn size={15} />
+          {submitting ? content.login.submitting : content.login.submit}
         </button>
-      </form>
+      </motion.form>
     </div>
   )
 }

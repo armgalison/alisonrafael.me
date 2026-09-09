@@ -1,28 +1,10 @@
-import {
-  BlockTypeSelect,
-  BoldItalicUnderlineToggles,
-  CreateLink,
-  headingsPlugin,
-  imagePlugin,
-  InsertImage,
-  linkDialogPlugin,
-  linkPlugin,
-  listsPlugin,
-  ListsToggle,
-  markdownShortcutPlugin,
-  MDXEditor,
-  quotePlugin,
-  thematicBreakPlugin,
-  toolbarPlugin,
-  UndoRedo,
-  type MDXEditorMethods,
-} from '@mdxeditor/editor'
-import '@mdxeditor/editor/style.css'
-import { useEffect, useRef, useState, type FormEvent } from 'react'
-import ReactMarkdown from 'react-markdown'
+import MDEditor, { type ICommand } from '@uiw/react-md-editor'
+import { ImagePlus, Save, X } from 'lucide-react'
+import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { api, ApiError } from '../api'
 import { useAuth } from '../AuthContext'
+import { useAdminContent } from '../i18n'
 
 function slugify(title: string): string {
   return title
@@ -33,25 +15,30 @@ function slugify(title: string): string {
     .replace(/^-+|-+$/g, '')
 }
 
-type EditorMode = 'rich-text' | 'markdown'
-
 export function PostEditorPage() {
   const { id } = useParams()
   const isEditing = Boolean(id)
   const { token } = useAuth()
+  const copy = useAdminContent()
   const navigate = useNavigate()
-  const editorRef = useRef<MDXEditorMethods>(null)
 
   const [title, setTitle] = useState('')
   const [slug, setSlug] = useState('')
   const [slugTouched, setSlugTouched] = useState(false)
   const [excerpt, setExcerpt] = useState('')
   const [content, setContent] = useState('')
-  const [mode, setMode] = useState<EditorMode>('rich-text')
   const [published, setPublished] = useState(false)
   const [loading, setLoading] = useState(isEditing)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  // Keeps the latest markdown reachable from paste/drop handlers, whose
+  // upload promise resolves after `content` may have moved on — reading
+  // React state directly there would close over a stale value.
+  const contentRef = useRef(content)
+  useEffect(() => {
+    contentRef.current = content
+  }, [content])
 
   useEffect(() => {
     if (!isEditing || !token || !id) return
@@ -63,28 +50,75 @@ export function PostEditorPage() {
         setSlugTouched(true)
         setExcerpt(post.excerpt)
         setContent(post.content)
-        editorRef.current?.setMarkdown(post.content)
       })
-      .catch(() => setError('Falha ao carregar o post.'))
+      .catch(() => setError(copy.editor.loadError))
       .finally(() => setLoading(false))
-  }, [isEditing, token, id])
-
-  // MDXEditor is uncontrolled — its own `onChange` is what keeps `content`
-  // in sync while typing in rich-text mode. Switching *into* rich-text mode
-  // needs the reverse push, but <MDXEditor> is unmounted while in markdown
-  // mode (editorRef.current is null then), so the push has to happen in an
-  // effect that runs *after* it remounts, not synchronously on click.
-  useEffect(() => {
-    if (mode === 'rich-text') editorRef.current?.setMarkdown(content)
-    // Only re-sync on a mode switch, not on every `content` keystroke —
-    // that would fight the user's typing inside the rich-text editor itself.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mode])
+  }, [isEditing, token, id, copy.editor.loadError])
 
   function handleTitleChange(value: string) {
     setTitle(value)
     if (!slugTouched) setSlug(slugify(value))
   }
+
+  const insertUploadedImage = useCallback(
+    async (file: File, cursorPos: number) => {
+      if (!token) return
+      try {
+        const { url } = await api.uploadImage(token, file)
+        const current = contentRef.current
+        const insertion = `![](${url})`
+        setContent(current.slice(0, cursorPos) + insertion + current.slice(cursorPos))
+      } catch {
+        // A dropped/pasted image that fails to upload just doesn't get
+        // inserted — the admin still has the toolbar button to retry.
+      }
+    },
+    [token],
+  )
+
+  function handlePaste(e: React.ClipboardEvent<HTMLTextAreaElement>) {
+    const file = Array.from(e.clipboardData?.files ?? []).find((f) => f.type.startsWith('image/'))
+    if (!file) return
+    e.preventDefault()
+    void insertUploadedImage(file, e.currentTarget.selectionStart ?? contentRef.current.length)
+  }
+
+  function handleDrop(e: React.DragEvent<HTMLTextAreaElement>) {
+    const file = Array.from(e.dataTransfer?.files ?? []).find((f) => f.type.startsWith('image/'))
+    if (!file) return
+    e.preventDefault()
+    void insertUploadedImage(file, e.currentTarget.selectionStart ?? contentRef.current.length)
+  }
+
+  // Swap the toolbar's default "image" button (which just inserts
+  // placeholder syntax) for one that opens a file picker and uploads
+  // through our own API, matching the paste/drop behavior above.
+  const commandsFilter = useCallback(
+    (command: ICommand, isExtra: boolean): ICommand | false => {
+      if (isExtra || command.keyCommand !== 'image' || !token) return command
+      return {
+        ...command,
+        icon: <ImagePlus size={12} />,
+        execute: (_state, textApi) => {
+          const input = document.createElement('input')
+          input.type = 'file'
+          input.accept = 'image/*'
+          input.onchange = async () => {
+            const file = input.files?.[0]
+            if (!file) return
+            try {
+              const { url } = await api.uploadImage(token, file)
+              textApi.replaceSelection(`![](${url})`)
+            } catch {
+              // Same as paste/drop: fail silently, toolbar button stays usable.
+            }
+          }
+          input.click()
+        },
+      }
+    },
+    [token],
+  )
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -99,21 +133,21 @@ export function PostEditorPage() {
       }
       navigate('/admin/posts')
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Falha ao salvar o post.')
+      setError(err instanceof ApiError ? err.message : copy.editor.saveError)
     } finally {
       setSaving(false)
     }
   }
 
-  if (loading) return <p className="text-sm text-ink-dim">Carregando…</p>
+  if (loading) return <p className="text-sm text-ink-dim">{copy.common.loading}</p>
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-      <h1 className="text-xl font-semibold">{isEditing ? 'Editar post' : 'Novo post'}</h1>
+      <h1 className="text-xl font-semibold">{isEditing ? copy.editor.editPostHeading : copy.editor.newPostHeading}</h1>
 
       <div>
         <label className="mb-1 block text-sm text-ink-dim" htmlFor="title">
-          Título
+          {copy.editor.titleLabel}
         </label>
         <input
           id="title"
@@ -126,7 +160,7 @@ export function PostEditorPage() {
 
       <div>
         <label className="mb-1 block text-sm text-ink-dim" htmlFor="slug">
-          Slug
+          {copy.editor.slugLabel}
         </label>
         <input
           id="slug"
@@ -143,7 +177,7 @@ export function PostEditorPage() {
 
       <div>
         <label className="mb-1 block text-sm text-ink-dim" htmlFor="excerpt">
-          Resumo
+          {copy.editor.excerptLabel}
         </label>
         <textarea
           id="excerpt"
@@ -155,82 +189,20 @@ export function PostEditorPage() {
         />
       </div>
 
-      <div>
-        <div className="mb-1 flex items-center justify-between">
-          <span className="block text-sm text-ink-dim">Conteúdo</span>
-          <div className="flex rounded-md border border-line p-0.5 text-xs">
-            <button
-              type="button"
-              onClick={() => setMode('rich-text')}
-              className={`rounded px-2.5 py-1 transition-colors ${
-                mode === 'rich-text' ? 'bg-surface-raised text-ink' : 'text-ink-dim hover:text-ink'
-              }`}
-            >
-              Rich Text
-            </button>
-            <button
-              type="button"
-              onClick={() => setMode('markdown')}
-              className={`rounded px-2.5 py-1 transition-colors ${
-                mode === 'markdown' ? 'bg-surface-raised text-ink' : 'text-ink-dim hover:text-ink'
-              }`}
-            >
-              Markdown
-            </button>
-          </div>
-        </div>
-
-        {mode === 'markdown' ? (
-          <div className="grid grid-cols-2 gap-3">
-            <textarea
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              placeholder="# Escreva markdown aqui…"
-              className="min-h-64 rounded-md border border-line bg-surface-raised p-3 font-mono text-sm outline-none focus:border-accent-dim"
-            />
-            <div className="prose prose-invert max-w-none min-h-64 overflow-auto rounded-md border border-line px-3 py-2">
-              <ReactMarkdown>{content}</ReactMarkdown>
-            </div>
-          </div>
-        ) : (
-          <div className="overflow-hidden rounded-md border border-line">
-            <MDXEditor
-              ref={editorRef}
-              markdown=""
-              className="dark-theme"
-              contentEditableClassName="prose prose-invert max-w-none min-h-64 px-3 py-2"
-              onChange={setContent}
-              plugins={[
-                headingsPlugin(),
-                listsPlugin(),
-                quotePlugin(),
-                thematicBreakPlugin(),
-                linkPlugin(),
-                linkDialogPlugin(),
-                imagePlugin({
-                  imageUploadHandler: async (file: File) => {
-                    if (!token) throw new Error('Not authenticated')
-                    const { url } = await api.uploadImage(token, file)
-                    return url
-                  },
-                }),
-                markdownShortcutPlugin(),
-                toolbarPlugin({
-                  toolbarContents: () => (
-                    <>
-                      <UndoRedo />
-                      <BoldItalicUnderlineToggles />
-                      <BlockTypeSelect />
-                      <ListsToggle />
-                      <CreateLink />
-                      <InsertImage />
-                    </>
-                  ),
-                }),
-              ]}
-            />
-          </div>
-        )}
+      <div data-color-mode="dark">
+        <span className="mb-1 block text-sm text-ink-dim">{copy.editor.contentLabel}</span>
+        <MDEditor
+          value={content}
+          onChange={(value) => setContent(value ?? '')}
+          preview="live"
+          height={420}
+          commandsFilter={commandsFilter}
+          textareaProps={{
+            placeholder: copy.editor.markdownPlaceholder,
+            onPaste: handlePaste,
+            onDrop: handleDrop,
+          }}
+        />
       </div>
 
       <label className="flex items-center gap-2 text-sm">
@@ -240,7 +212,7 @@ export function PostEditorPage() {
           onChange={(e) => setPublished(e.target.checked)}
           className="size-4 accent-[var(--color-accent)]"
         />
-        Publicado
+        {copy.editor.publishedLabel}
       </label>
 
       {error && <p className="text-sm text-red-400">{error}</p>}
@@ -249,16 +221,18 @@ export function PostEditorPage() {
         <button
           type="submit"
           disabled={saving}
-          className="rounded-md bg-accent px-4 py-2 text-sm font-medium text-surface transition-opacity hover:opacity-90 disabled:opacity-50"
+          className="inline-flex items-center gap-1.5 rounded-full bg-accent px-4 py-2 text-sm font-semibold text-surface transition-opacity hover:opacity-90 disabled:opacity-50"
         >
-          {saving ? 'Salvando…' : 'Salvar'}
+          <Save size={14} />
+          {saving ? copy.editor.saving : copy.editor.save}
         </button>
         <button
           type="button"
           onClick={() => navigate('/admin/posts')}
-          className="rounded-md border border-line px-4 py-2 text-sm text-ink-dim transition-colors hover:text-ink"
+          className="inline-flex items-center gap-1.5 rounded-full border border-line px-4 py-2 text-sm text-ink-dim transition-colors hover:text-ink"
         >
-          Cancelar
+          <X size={14} />
+          {copy.editor.cancel}
         </button>
       </div>
     </form>

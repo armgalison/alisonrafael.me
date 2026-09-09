@@ -1,5 +1,4 @@
 @import 'tailwindcss';
-@plugin '@tailwindcss/typography';
 
 @theme {
   --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
@@ -58,6 +57,44 @@ body {
     linear-gradient(to bottom, color-mix(in srgb, var(--color-line) 60%, transparent) 1px, transparent 1px);
   background-size: 44px 44px;
   mask-image: radial-gradient(ellipse 60% 50% at 50% 0%, black 40%, transparent 100%);
+}
+
+/* Repaint @uiw/react-md-editor's GitHub-dark palette with this site's own
+   theme tokens, so the Admin Panel's markdown editor doesn't look like a
+   visitor from a different app. */
+[data-color-mode='dark'] .wmde-markdown,
+[data-color-mode='dark'] .wmde-markdown-var,
+[data-color-mode='dark'] .w-md-editor {
+  --color-canvas-default: var(--color-surface-raised);
+  --color-canvas-subtle: var(--color-surface);
+  --color-border-default: var(--color-line);
+  --color-border-muted: var(--color-line);
+  --color-fg-default: var(--color-ink);
+  --color-fg-muted: var(--color-ink-dim);
+  --color-accent-fg: var(--color-accent);
+  --color-accent-emphasis: var(--color-accent-dim);
+}
+
+.w-md-editor {
+  background-color: var(--color-surface-raised) !important;
+  border: 1px solid var(--color-line) !important;
+  border-radius: 0.5rem !important;
+  box-shadow: none !important;
+}
+
+.w-md-editor-toolbar {
+  background-color: var(--color-surface) !important;
+  border-bottom: 1px solid var(--color-line) !important;
+}
+
+.w-md-editor-toolbar li > button {
+  color: var(--color-ink-dim) !important;
+}
+
+.w-md-editor-toolbar li > button:hover,
+.w-md-editor-toolbar li.active > button {
+  color: var(--color-accent) !important;
+  background-color: var(--color-accent-soft) !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
