@@ -34,6 +34,16 @@ export interface RankedTrend extends Trend {
   relevance: string
 }
 
+// One saved "Get top trends" run — see CONTEXT.md's Trend definition and
+// ADR 0007's persistence addendum. Unlike a bare Trend, this row *is*
+// persisted, specifically so revisiting /admin/trends doesn't need to pay
+// for a fresh search every time.
+export interface TrendSearch {
+  id: string
+  trends: RankedTrend[]
+  createdAt: string
+}
+
 export interface DraftResult {
   topic: string
   status: 'created' | 'failed'
@@ -72,7 +82,12 @@ async function request<T>(path: string, options: RequestInit = {}, token?: strin
   }
 
   if (res.status === 204) return undefined as T
-  return (await res.json()) as T
+  // NestJS sends an empty body (not literal "null") for a null/undefined
+  // return value — res.json() throws on that, so check for content first
+  // rather than assuming every 2xx response has a parseable body.
+  const text = await res.text()
+  if (!text) return null as T
+  return JSON.parse(text) as T
 }
 
 export const api = {
@@ -110,7 +125,9 @@ export const api = {
     return request<{ url: string }>('/uploads', { method: 'POST', body: formData }, token)
   },
 
-  discoverTrends: (token: string) => request<RankedTrend[]>('/trends/discover', { method: 'POST' }, token),
+  getLatestTrendSearch: (token: string) => request<TrendSearch | null>('/trends/searches/latest', {}, token),
+
+  discoverTrends: (token: string) => request<TrendSearch>('/trends/discover', { method: 'POST' }, token),
 
   createDrafts: (token: string, trends: Trend[]) =>
     request<DraftResult[]>('/trends/drafts', { method: 'POST', body: JSON.stringify({ trends }) }, token),

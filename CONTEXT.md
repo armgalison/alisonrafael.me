@@ -36,8 +36,12 @@ An image file the Admin embeds in a Post's markdown `content`, added by dragging
 _Avoid_: Asset, media, attachment — this codebase's term is Upload.
 
 **Trend**:
-A candidate blog topic the Admin Panel surfaces by asking Claude to search the web for what's currently drawing attention in software development, then filtering that list against the Tech Stack. Deliberately light at this stage — just a topic and a one-line summary, plus (once filtered) a relevance rationale; no deep write-up. Entirely ephemeral: discovered fresh every time the Admin clicks "Get top trends," never written to the database — a Trend only becomes real (and only then gets a full agent-written text, synthesized, not a scraped source article) once the Admin selects it to turn into a Post (see [ADR 0007](./docs/adr/0007-anthropic-api-for-trend-discovery.md)).
+A candidate blog topic — a topic and a one-line summary, plus (once ranked) a relevance rationale — that a Trend Search surfaces. Deliberately light: no deep write-up at this stage. A Trend only gets a full agent-written text (synthesized, not a scraped source article) once the Admin selects it to turn into a Post (see [ADR 0007](./docs/adr/0007-anthropic-api-for-trend-discovery.md)).
 _Avoid_: Article, topic (bare), suggestion — Trend is this project's term for a not-yet-a-Post candidate.
+
+**Trend Search**:
+One run of "Get top trends": Claude searches the web for what's currently drawing attention in software development, then ranks that list against the Tech Stack, producing up to 10 Trends. Unlike a bare Trend, a Trend Search *is* persisted (one row per run, see ADR 0007's persistence addendum) — specifically so opening `/admin/trends` shows the last run's results for free, and a fresh (paid) search only happens when the Admin presses "New search." The Admin Panel only ever shows the single most recent Trend Search; older ones stay in the table but aren't browsable from the UI today.
+_Avoid_: Discovery, search results (bare) — Trend Search is this project's term for one saved run.
 
 **Tech Stack**:
 Alison's own professional skill list — the `technologyGroups` shown in the public Skills section (`en.ts`, sourced from the `shared/` workspace) — used to judge which Trends are worth writing about. This is his career-wide toolbox (includes things like Angular, AWS, Kubernetes from past roles), **not** this repository's own implementation stack, which is a different, narrower list documented in `CLAUDE.md`'s Stack section.

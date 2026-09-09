@@ -1,4 +1,4 @@
-import { BadGatewayException, Body, Controller, Logger, Post, UseGuards } from '@nestjs/common';
+import { BadGatewayException, Body, Controller, Get, Logger, Post, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import { CreateDraftsDto } from './dto/create-drafts.dto.js';
 import { TrendsService } from './trends.service.js';
@@ -9,6 +9,13 @@ export class TrendsController {
   private readonly logger = new Logger(TrendsController.name);
 
   constructor(private readonly trends: TrendsService) {}
+
+  // The most recently saved search, if any — never triggers a new (paid)
+  // Claude call. The Admin decides when that happens via POST /discover.
+  @Get('searches/latest')
+  getLatestSearch() {
+    return this.trends.getLatestSearch();
+  }
 
   @Post('discover')
   async discover() {

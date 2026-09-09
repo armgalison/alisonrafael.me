@@ -2,7 +2,10 @@ import Anthropic from '@anthropic-ai/sdk';
 import { techStackGroups } from '@portifolio/shared';
 import { ConflictException, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { BlogService } from '../blog/blog.service.js';
+import { TrendSearch } from './entities/trend-search.entity.js';
 import { slugify } from './slugify.js';
 import type { DraftResult, RankedTrend, Trend } from './trend.interface.js';
 
@@ -23,17 +26,24 @@ export class TrendsService {
   constructor(
     config: ConfigService,
     private readonly blog: BlogService,
+    @InjectRepository(TrendSearch) private readonly searches: Repository<TrendSearch>,
   ) {
     this.client = new Anthropic({ apiKey: config.getOrThrow<string>('ANTHROPIC_API_KEY') });
   }
 
   // Agent 1 + Agent 2, chained: ~15 candidates down to the 10 most
-  // relevant to the Tech Stack. Nothing here is persisted — see the Trend
-  // definition in CONTEXT.md. Deliberately cheap: no deep-dive writing
-  // happens until a topic is actually selected (see createOneDraft).
-  async discover(): Promise<RankedTrend[]> {
+  // relevant to the Tech Stack. Deliberately cheap: no deep-dive writing
+  // happens until a topic is actually selected (see createOneDraft). The
+  // result is saved as a TrendSearch row so a later page visit can show it
+  // again via getLatestSearch() without paying for a new run.
+  async discover(): Promise<TrendSearch> {
     const candidates = await this.findTrendingTopics();
-    return this.filterByStack(candidates);
+    const trends = await this.filterByStack(candidates);
+    return this.searches.save(this.searches.create({ trends }));
+  }
+
+  getLatestSearch(): Promise<TrendSearch | null> {
+    return this.searches.findOne({ where: {}, order: { createdAt: 'DESC' } });
   }
 
   // Agent 3, once per selected Trend. Best-effort (see ADR 0007): one

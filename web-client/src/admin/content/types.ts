@@ -35,6 +35,10 @@ export interface AdminContent {
     heading: string
     subtitle: string
     backToPosts: string
+    lastSearchedPrefix: string
+    noSearchYet: string
+    searchNow: string
+    newSearch: string
     discovering: string
     discoverError: string
     empty: string
@@ -42,7 +46,6 @@ export interface AdminContent {
     selectedCount: (count: number) => string
     createPosts: string
     creating: string
-    resultsHeading: string
     created: string
     failed: string
     viewPost: string
