@@ -1,0 +1,38 @@
+# Local development database ONLY — nothing else.
+#
+# The app (web-client + server) runs on the host, outside containers, with
+# env from `.envrc` (direnv). This file just gives that host process a
+# MariaDB to talk to, with port 3306 published to localhost — the main
+# `docker-compose.yml` keeps mariadb on an internal network with no host
+# port, which is why it can't be used for host-side `npm run dev:api`.
+#
+# Usage (vars come from the direnv-exported shell env, same names as .envrc):
+#   docker compose -f docker-compose.local.yml up -d
+#   docker compose -f docker-compose.local.yml down        # keeps data
+#   docker compose -f docker-compose.local.yml down -v     # wipes data
+#
+# Its volume (portifolio_mariadb-local-data) is separate from the main
+# stack's, so running this never touches deploy data.
+
+services:
+  mariadb:
+    image: mariadb:11
+    container_name: mariadb-local
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-devroot}
+      MARIADB_DATABASE: ${DB_NAME:-alisonrafael}
+      MARIADB_USER: ${DB_USER:-alisonrafael}
+      MARIADB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is unset — run `direnv allow` so .envrc exports it}
+    volumes:
+      - mariadb-local-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mariadb-local-data:
