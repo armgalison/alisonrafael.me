@@ -11,5 +11,8 @@ import { Post } from './entities/post.entity.js';
   imports: [TypeOrmModule.forFeature([Post]), AuthModule],
   controllers: [BlogController],
   providers: [BlogService],
+  // TrendsModule reuses BlogService to save generated drafts, rather than
+  // duplicating slug-collision/publishedAt logic.
+  exports: [BlogService],
 })
 export class BlogModule {}

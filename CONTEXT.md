@@ -34,3 +34,11 @@ The content type this Admin manages: a list of Posts, publicly readable, admin-w
 **Upload**:
 An image file the Admin embeds in a Post's markdown `content`, added by dragging/pasting it into the Admin Panel's editor. Stored as a plain file on the droplet's own disk (not object storage — see [ADR 0004](./docs/adr/0004-local-disk-image-storage.md)), referenced by URL from the Post text. Deleting a Post or removing an image from its content does **not** delete the Upload — orphaned files are an accepted, unaddressed cost at this scale, not a bug.
 _Avoid_: Asset, media, attachment — this codebase's term is Upload.
+
+**Trend**:
+A candidate blog topic the Admin Panel surfaces by asking Claude to search the web for what's currently drawing attention in software development, then filtering that list against the Tech Stack. Has a topic, a summary, and a full agent-written text (a synthesized write-up, not a scraped source article). Entirely ephemeral: discovered fresh every time the Admin clicks "Get top trends," never written to the database — a Trend only becomes real once the Admin turns it into a Post (see [ADR 0007](./docs/adr/0007-anthropic-api-for-trend-discovery.md)).
+_Avoid_: Article, topic (bare), suggestion — Trend is this project's term for a not-yet-a-Post candidate.
+
+**Tech Stack**:
+Alison's own professional skill list — the `technologyGroups` shown in the public Skills section (`en.ts`, sourced from the `shared/` workspace) — used to judge which Trends are worth writing about. This is his career-wide toolbox (includes things like Angular, AWS, Kubernetes from past roles), **not** this repository's own implementation stack, which is a different, narrower list documented in `CLAUDE.md`'s Stack section.
+_Avoid_: "my stack" / "the stack" unqualified — always say Tech Stack (career-wide) vs. this repo's own stack when the distinction matters.

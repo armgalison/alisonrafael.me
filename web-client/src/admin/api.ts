@@ -20,6 +20,26 @@ export interface PostInput {
   published: boolean
 }
 
+// A Trend only ever lives in these request/response bodies — never
+// persisted (see CONTEXT.md and ADR 0007).
+export interface Trend {
+  topic: string
+  summary: string
+  fullText: string
+}
+
+export interface RankedTrend extends Trend {
+  relevance: string
+}
+
+export interface DraftResult {
+  topic: string
+  status: 'created' | 'failed'
+  postId?: string
+  slug?: string
+  error?: string
+}
+
 export class ApiError extends Error {
   status: number
 
@@ -87,4 +107,9 @@ export const api = {
     formData.append('file', file)
     return request<{ url: string }>('/uploads', { method: 'POST', body: formData }, token)
   },
+
+  discoverTrends: (token: string) => request<RankedTrend[]>('/trends/discover', { method: 'POST' }, token),
+
+  createDrafts: (token: string, trends: Trend[]) =>
+    request<DraftResult[]>('/trends/drafts', { method: 'POST', body: JSON.stringify({ trends }) }, token),
 }

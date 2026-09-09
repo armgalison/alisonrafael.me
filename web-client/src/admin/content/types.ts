@@ -20,6 +20,7 @@ export interface AdminContent {
   postList: {
     heading: string
     newPost: string
+    getTopTrends: string
     loadError: string
     loading: string
     empty: string
@@ -29,6 +30,24 @@ export interface AdminContent {
     edit: string
     delete: string
     deleteConfirm: (title: string) => string
+  }
+  trends: {
+    heading: string
+    subtitle: string
+    backToPosts: string
+    discovering: string
+    discoverError: string
+    empty: string
+    readMore: string
+    readLess: string
+    relevancePrefix: string
+    selectedCount: (count: number) => string
+    createPosts: string
+    creating: string
+    resultsHeading: string
+    created: string
+    failed: string
+    viewPost: string
   }
   editor: {
     newPostHeading: string

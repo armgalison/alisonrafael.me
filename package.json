@@ -1,19 +1,21 @@
 {
   "name": "alisonrafael.me",
   "version": "1.0.0",
-  "description": "Monorepo for alisonrafael.me: resume site (web-client) + API (server)",
+  "description": "Monorepo for alisonrafael.me: resume site (web-client) + API (server) + shared cross-app data (shared)",
   "license": "ISC",
   "author": "Alison Rafael Marinho Gonçalves",
   "private": true,
   "workspaces": [
+    "shared",
     "web-client",
     "server"
   ],
   "scripts": {
     "dev:web": "npm run dev --workspace=web-client",
     "dev:api": "npm run start:dev --workspace=server",
+    "build:shared": "npm run build --workspace=shared",
     "build:web": "npm run build --workspace=web-client",
     "build:api": "npm run build --workspace=server",
-    "build": "npm run build:web && npm run build:api"
+    "build": "npm run build:shared && npm run build:web && npm run build:api"
   }
 }

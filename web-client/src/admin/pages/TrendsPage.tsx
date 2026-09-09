@@ -1,0 +1,157 @@
+import { motion } from 'framer-motion'
+import { ArrowLeft, CheckCircle2, ChevronDown, ChevronUp, Sparkles, XCircle } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { easeOut } from '../../lib/motion'
+import { api, ApiError, type DraftResult, type RankedTrend } from '../api'
+import { useAuth } from '../AuthContext'
+import { useAdminContent } from '../i18n'
+
+export function TrendsPage() {
+  const { token } = useAuth()
+  const content = useAdminContent()
+
+  const [trends, setTrends] = useState<RankedTrend[] | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [selected, setSelected] = useState<Set<number>>(new Set())
+  const [expanded, setExpanded] = useState<Set<number>>(new Set())
+  const [creating, setCreating] = useState(false)
+  const [results, setResults] = useState<DraftResult[] | null>(null)
+
+  useEffect(() => {
+    if (!token) return
+    setError(null)
+    api
+      .discoverTrends(token)
+      .then(setTrends)
+      .catch(() => setError(content.trends.discoverError))
+  }, [token, content.trends.discoverError])
+
+  function toggleSelected(index: number) {
+    setSelected((prev) => {
+      const next = new Set(prev)
+      if (next.has(index)) next.delete(index)
+      else next.add(index)
+      return next
+    })
+  }
+
+  function toggleExpanded(index: number) {
+    setExpanded((prev) => {
+      const next = new Set(prev)
+      if (next.has(index)) next.delete(index)
+      else next.add(index)
+      return next
+    })
+  }
+
+  async function handleCreatePosts() {
+    if (!token || !trends) return
+    setCreating(true)
+    setResults(null)
+    const chosen = trends.filter((_, index) => selected.has(index))
+    try {
+      const outcome = await api.createDrafts(token, chosen)
+      setResults(outcome)
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : content.trends.discoverError)
+    } finally {
+      setCreating(false)
+    }
+  }
+
+  return (
+    <div>
+      <Link to="/admin/posts" className="mb-6 inline-flex items-center gap-1.5 text-sm text-ink-dim hover:text-ink">
+        <ArrowLeft size={14} />
+        {content.trends.backToPosts}
+      </Link>
+
+      <div className="mb-6 flex items-center gap-3">
+        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10 text-accent">
+          <Sparkles size={18} />
+        </span>
+        <div>
+          <h1 className="text-xl font-semibold">{content.trends.heading}</h1>
+          <p className="text-sm text-ink-dim">{content.trends.subtitle}</p>
+        </div>
+      </div>
+
+      {error && <p className="text-sm text-red-400">{error}</p>}
+      {!trends && !error && <p className="text-sm text-ink-dim">{content.trends.discovering}</p>}
+      {trends?.length === 0 && <p className="text-sm text-ink-dim">{content.trends.empty}</p>}
+
+      {trends && trends.length > 0 && (
+        <>
+          <ul className="flex flex-col gap-2">
+            {trends.map((trend, index) => {
+              const isExpanded = expanded.has(index)
+              const result = results?.find((r) => r.topic === trend.topic)
+              return (
+                <motion.li
+                  key={trend.topic}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: index * 0.03, ease: easeOut }}
+                  className="rounded-lg border border-line bg-surface-raised px-4 py-3"
+                >
+                  <div className="flex items-start gap-3">
+                    <input
+                      type="checkbox"
+                      checked={selected.has(index)}
+                      onChange={() => toggleSelected(index)}
+                      className="mt-1 size-4 shrink-0 accent-[var(--color-accent)]"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium">{trend.topic}</p>
+                      <p className="mt-0.5 text-sm text-ink-dim">{trend.summary}</p>
+                      <p className="mt-1 text-xs text-accent">
+                        {content.trends.relevancePrefix} {trend.relevance}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => toggleExpanded(index)}
+                        className="mt-2 inline-flex items-center gap-1 text-xs text-ink-dim hover:text-ink"
+                      >
+                        {isExpanded ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+                        {isExpanded ? content.trends.readLess : content.trends.readMore}
+                      </button>
+                      {isExpanded && <p className="mt-2 text-sm text-ink-dim">{trend.fullText}</p>}
+                      {result && (
+                        <p
+                          className={`mt-2 flex items-center gap-1.5 text-xs ${
+                            result.status === 'created' ? 'text-accent' : 'text-red-400'
+                          }`}
+                        >
+                          {result.status === 'created' ? <CheckCircle2 size={13} /> : <XCircle size={13} />}
+                          {result.status === 'created' ? content.trends.created : `${content.trends.failed}: ${result.error}`}
+                          {result.status === 'created' && result.postId && (
+                            <Link to={`/admin/posts/${result.postId}`} className="underline hover:text-ink">
+                              {content.trends.viewPost}
+                            </Link>
+                          )}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </motion.li>
+              )
+            })}
+          </ul>
+
+          <div className="mt-6 flex items-center gap-4">
+            <button
+              type="button"
+              disabled={selected.size === 0 || creating}
+              onClick={handleCreatePosts}
+              className="inline-flex items-center gap-1.5 rounded-full bg-accent px-4 py-2 text-sm font-semibold text-surface transition-opacity hover:opacity-90 disabled:opacity-50"
+            >
+              {creating ? content.trends.creating : content.trends.createPosts}
+            </button>
+            <span className="text-sm text-ink-dim">{content.trends.selectedCount(selected.size)}</span>
+          </div>
+        </>
+      )}
+    </div>
+  )
+}

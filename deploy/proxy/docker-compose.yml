@@ -11,6 +11,10 @@ services:
       - certs:/etc/nginx/certs
       - vhost:/etc/nginx/vhost.d
       - html:/usr/share/nginx/html
+      # Per-vhost timeout override for api.alisonrafael.me — see ADR 0007.
+      # A file bind-mounted here takes precedence over the named volume's
+      # copy at the same path.
+      - ./vhost.d/api.alisonrafael.me:/etc/nginx/vhost.d/api.alisonrafael.me:ro
     networks:
       - nginx-proxy
 

@@ -1,0 +1,10 @@
+# Use the Anthropic API for trend discovery and draft generation
+
+The "Get top trends" feature (Admin Panel) chains three Claude calls — search the web for what's currently drawing attention in software development, filter that list against the Tech Stack, then draft a Post for each Trend the Admin selects — using the Anthropic TypeScript SDK (`@anthropic-ai/sdk`) directly from the `server`, with Claude's built-in `web_search` server tool for the discovery step rather than integrating a separate search API. This is a deliberate, real trade-off: it adds a paid third-party dependency (an `ANTHROPIC_API_KEY`, plus `web_search`'s own per-search cost) to what was previously an API with zero external service dependencies, accepted because building and maintaining a bespoke search+summarization pipeline would cost far more engineering time than it's worth for a personal blog's occasional "find me something to write about" button.
+
+Both the discovery step (Agents 1+2, chained server-side into one `POST /trends/discover` call) and the draft-creation step (`POST /trends/drafts`, one Agent-3 call per selected Trend) are synchronous, potentially slow (tens of seconds to a couple of minutes) HTTP requests — no job queue was introduced. Accepted for the same reason `synchronize: true` was accepted in [ADR 0003](./0003-mariadb-typeorm-backend-datastore.md): this is a single admin clicking a button occasionally, not a workload that justifies job-queue infrastructure. Revisit if this ever needs to run unattended or at higher frequency.
+
+## Considered Options
+
+- A separate search API (Brave, Google Custom Search, etc.) feeding results to Claude: rejected — an extra API key and integration surface for a capability `web_search` already provides built into the Messages API.
+- Async job + polling for the long-running steps: rejected — meaningful new infrastructure (job state storage, a polling endpoint) for a wait that a loading spinner already handles fine at this usage frequency.
