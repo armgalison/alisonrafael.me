@@ -54,8 +54,22 @@ jobs:
           host: ${{ secrets.DROPLET_HOST }}
           username: ${{ secrets.DROPLET_USER }}
           key: ${{ secrets.DROPLET_SSH_KEY }}
+          # Writes .env from repo secrets on every deploy, so the real
+          # values live only in GitHub's encrypted secret store — never
+          # typed by hand on the droplet, never in git.
           script: |
             cd ${{ secrets.DROPLET_APP_DIR }}
+            cat > .env <<'ENVEOF'
+            DB_ROOT_PASSWORD=${{ secrets.DB_ROOT_PASSWORD }}
+            DB_USER=alisonrafael
+            DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+            DB_NAME=alisonrafael
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
+            JWT_EXPIRES_IN_SECONDS=86400
+            ADMIN_EMAIL=${{ secrets.ADMIN_EMAIL }}
+            ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}
+            ENVEOF
+            chmod 600 .env
             docker compose pull
             docker compose up -d
             docker image prune -f
