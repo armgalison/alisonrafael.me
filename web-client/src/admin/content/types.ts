@@ -38,8 +38,6 @@ export interface AdminContent {
     discovering: string
     discoverError: string
     empty: string
-    readMore: string
-    readLess: string
     relevancePrefix: string
     selectedCount: (count: number) => string
     createPosts: string

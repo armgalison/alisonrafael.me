@@ -36,7 +36,7 @@ An image file the Admin embeds in a Post's markdown `content`, added by dragging
 _Avoid_: Asset, media, attachment — this codebase's term is Upload.
 
 **Trend**:
-A candidate blog topic the Admin Panel surfaces by asking Claude to search the web for what's currently drawing attention in software development, then filtering that list against the Tech Stack. Has a topic, a summary, and a full agent-written text (a synthesized write-up, not a scraped source article). Entirely ephemeral: discovered fresh every time the Admin clicks "Get top trends," never written to the database — a Trend only becomes real once the Admin turns it into a Post (see [ADR 0007](./docs/adr/0007-anthropic-api-for-trend-discovery.md)).
+A candidate blog topic the Admin Panel surfaces by asking Claude to search the web for what's currently drawing attention in software development, then filtering that list against the Tech Stack. Deliberately light at this stage — just a topic and a one-line summary, plus (once filtered) a relevance rationale; no deep write-up. Entirely ephemeral: discovered fresh every time the Admin clicks "Get top trends," never written to the database — a Trend only becomes real (and only then gets a full agent-written text, synthesized, not a scraped source article) once the Admin selects it to turn into a Post (see [ADR 0007](./docs/adr/0007-anthropic-api-for-trend-discovery.md)).
 _Avoid_: Article, topic (bare), suggestion — Trend is this project's term for a not-yet-a-Post candidate.
 
 **Tech Stack**:

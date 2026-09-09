@@ -27,9 +27,10 @@ export class TrendsService {
     this.client = new Anthropic({ apiKey: config.getOrThrow<string>('ANTHROPIC_API_KEY') });
   }
 
-  // Agent 1 + Agent 2, chained: ~20 candidates down to the 10 most
+  // Agent 1 + Agent 2, chained: ~15 candidates down to the 10 most
   // relevant to the Tech Stack. Nothing here is persisted — see the Trend
-  // definition in CONTEXT.md.
+  // definition in CONTEXT.md. Deliberately cheap: no deep-dive writing
+  // happens until a topic is actually selected (see createOneDraft).
   async discover(): Promise<RankedTrend[]> {
     const candidates = await this.findTrendingTopics();
     return this.filterByStack(candidates);
@@ -48,19 +49,18 @@ export class TrendsService {
   private async findTrendingTopics(): Promise<Trend[]> {
     const message = await this.client.messages.create({
       model: DISCOVERY_MODEL,
-      max_tokens: 16000,
-      tools: [{ type: 'web_search_20260318', name: 'web_search', max_uses: 8 }],
+      max_tokens: 4000,
+      tools: [{ type: 'web_search_20260318', name: 'web_search', max_uses: 5 }],
       system:
         'You are a research assistant for a software engineer looking for their next blog post idea. ' +
         'Use web search to find what is genuinely drawing attention in software development right now — ' +
         'new tool, language, or framework releases, architecture and industry debates, notable incidents, ' +
-        'and similar. Respond with ONLY a JSON array (no prose, no markdown code fences) of about 20 ' +
-        'objects shaped as: {"topic": string, "summary": string (one or two sentences), "fullText": ' +
-        'string (a thorough, original 300-500 word explanation of the topic that YOU write, synthesizing ' +
-        'what you found — not copied verbatim from any single source)}.',
+        'and similar. Respond with ONLY a JSON array (no prose, no markdown code fences) of about 15 ' +
+        'objects shaped as: {"topic": string, "summary": string (one or two sentences)}. Keep this brief — ' +
+        'a short list of leads, not deep write-ups.',
       messages: [{ role: 'user', content: 'Find the current top trending topics in software development.' }],
     });
-    return extractJson<Trend[]>(message);
+    return extractJson<Trend[]>(message, 'trend discovery');
   }
 
   private async filterByStack(candidates: Trend[]): Promise<RankedTrend[]> {
@@ -82,26 +82,27 @@ export class TrendsService {
         },
       ],
     });
-    return extractJson<RankedTrend[]>(message);
+    return extractJson<RankedTrend[]>(message, 'stack relevance filter');
   }
 
+  // Only runs for topics the Admin actually selected — this is where the
+  // token spend that used to happen for all ~20 discovery candidates now
+  // happens instead, bounded by however many the Admin picked.
   private async draftPost(trend: Trend): Promise<{ title: string; excerpt: string; content: string }> {
     const message = await this.client.messages.create({
       model: DRAFT_MODEL,
-      max_tokens: 4000,
+      max_tokens: 8000,
+      tools: [{ type: 'web_search_20260318', name: 'web_search', max_uses: 4 }],
       system:
         "You write blog posts for a software engineer's personal technical blog, in clear, direct " +
-        'English, first-person where natural. Respond with ONLY a JSON object (no prose, no markdown ' +
-        'code fences) shaped as: {"title": string, "excerpt": string (one or two sentences), "content": ' +
-        'string (the full post body in Markdown, roughly 500-900 words, with headings)}.',
-      messages: [
-        {
-          role: 'user',
-          content: `Write a blog post about "${trend.topic}".\n\nSummary: ${trend.summary}\n\nBackground:\n${trend.fullText}`,
-        },
-      ],
+        'English, first-person where natural. Use web search to gather enough current detail on the ' +
+        'topic to write something substantive and accurate, then respond with ONLY a JSON object (no ' +
+        'prose, no markdown code fences) shaped as: {"title": string, "excerpt": string (one or two ' +
+        'sentences), "content": string (the full post body in Markdown, roughly 500-800 words, with ' +
+        'headings)}.',
+      messages: [{ role: 'user', content: `Write a blog post about "${trend.topic}".\n\nSummary: ${trend.summary}` }],
     });
-    return extractJson<{ title: string; excerpt: string; content: string }>(message);
+    return extractJson<{ title: string; excerpt: string; content: string }>(message, 'draft generation');
   }
 
   private async createOneDraft(trend: Trend): Promise<DraftResult> {
@@ -135,17 +136,37 @@ export class TrendsService {
   }
 }
 
-function extractJson<T>(message: Anthropic.Message): T {
+function extractJson<T>(message: Anthropic.Message, step: string): T {
   const text = message.content
     .filter((block): block is Anthropic.TextBlock => block.type === 'text')
     .map((block) => block.text)
     .join('\n');
+
+  if (!text) {
+    throw new Error(
+      `Claude's response for ${step} had no text content (stop_reason: ${message.stop_reason}) — it may have ` +
+        'used its whole turn on tool calls without producing a final answer. Try again, or reduce max_uses/scope.',
+    );
+  }
+
   try {
     return JSON.parse(text) as T;
   } catch {
     const start = text.search(/[[{]/);
     const end = Math.max(text.lastIndexOf(']'), text.lastIndexOf('}'));
-    if (start === -1 || end === -1) throw new Error('No JSON found in Claude response');
-    return JSON.parse(text.slice(start, end + 1)) as T;
+    if (start === -1 || end === -1) {
+      throw new Error(
+        `No JSON found in Claude's response for ${step} (stop_reason: ${message.stop_reason}). Raw text: ${text.slice(0, 300)}`,
+      );
+    }
+    try {
+      return JSON.parse(text.slice(start, end + 1)) as T;
+    } catch (err) {
+      const reason =
+        message.stop_reason === 'max_tokens'
+          ? 'the response was cut off before finishing (hit max_tokens) — try again or reduce scope'
+          : 'the extracted text was not valid JSON';
+      throw new Error(`Failed to parse Claude's response for ${step}: ${reason}. ${err instanceof Error ? err.message : ''}`);
+    }
   }
 }

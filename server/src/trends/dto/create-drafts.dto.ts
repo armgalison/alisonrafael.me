@@ -9,10 +9,6 @@ class SelectedTrendDto {
   @IsString()
   @IsNotEmpty()
   summary: string;
-
-  @IsString()
-  @IsNotEmpty()
-  fullText: string;
 }
 
 export class CreateDraftsDto {

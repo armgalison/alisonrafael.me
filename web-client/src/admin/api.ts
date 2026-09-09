@@ -21,11 +21,13 @@ export interface PostInput {
 }
 
 // A Trend only ever lives in these request/response bodies — never
-// persisted (see CONTEXT.md and ADR 0007).
+// persisted (see CONTEXT.md and ADR 0007). Deliberately just a topic +
+// summary: the deep-dive write-up only happens for topics actually
+// selected, inside the draft-creation step, not for every discovered
+// candidate up front.
 export interface Trend {
   topic: string
   summary: string
-  fullText: string
 }
 
 export interface RankedTrend extends Trend {

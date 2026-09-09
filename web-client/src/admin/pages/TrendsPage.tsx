@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { ArrowLeft, CheckCircle2, ChevronDown, ChevronUp, Sparkles, XCircle } from 'lucide-react'
+import { ArrowLeft, CheckCircle2, Sparkles, XCircle } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { easeOut } from '../../lib/motion'
@@ -14,7 +14,6 @@ export function TrendsPage() {
   const [trends, setTrends] = useState<RankedTrend[] | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [selected, setSelected] = useState<Set<number>>(new Set())
-  const [expanded, setExpanded] = useState<Set<number>>(new Set())
   const [creating, setCreating] = useState(false)
   const [results, setResults] = useState<DraftResult[] | null>(null)
 
@@ -24,7 +23,7 @@ export function TrendsPage() {
     api
       .discoverTrends(token)
       .then(setTrends)
-      .catch(() => setError(content.trends.discoverError))
+      .catch((err) => setError(err instanceof ApiError ? err.message : content.trends.discoverError))
   }, [token, content.trends.discoverError])
 
   function toggleSelected(index: number) {
@@ -36,19 +35,11 @@ export function TrendsPage() {
     })
   }
 
-  function toggleExpanded(index: number) {
-    setExpanded((prev) => {
-      const next = new Set(prev)
-      if (next.has(index)) next.delete(index)
-      else next.add(index)
-      return next
-    })
-  }
-
   async function handleCreatePosts() {
     if (!token || !trends) return
     setCreating(true)
     setResults(null)
+    setError(null)
     const chosen = trends.filter((_, index) => selected.has(index))
     try {
       const outcome = await api.createDrafts(token, chosen)
@@ -85,7 +76,6 @@ export function TrendsPage() {
         <>
           <ul className="flex flex-col gap-2">
             {trends.map((trend, index) => {
-              const isExpanded = expanded.has(index)
               const result = results?.find((r) => r.topic === trend.topic)
               return (
                 <motion.li
@@ -108,15 +98,6 @@ export function TrendsPage() {
                       <p className="mt-1 text-xs text-accent">
                         {content.trends.relevancePrefix} {trend.relevance}
                       </p>
-                      <button
-                        type="button"
-                        onClick={() => toggleExpanded(index)}
-                        className="mt-2 inline-flex items-center gap-1 text-xs text-ink-dim hover:text-ink"
-                      >
-                        {isExpanded ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
-                        {isExpanded ? content.trends.readLess : content.trends.readMore}
-                      </button>
-                      {isExpanded && <p className="mt-2 text-sm text-ink-dim">{trend.fullText}</p>}
                       {result && (
                         <p
                           className={`mt-2 flex items-center gap-1.5 text-xs ${

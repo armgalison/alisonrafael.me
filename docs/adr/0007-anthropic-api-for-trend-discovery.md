@@ -8,3 +8,7 @@ Both the discovery step (Agents 1+2, chained server-side into one `POST /trends/
 
 - A separate search API (Brave, Google Custom Search, etc.) feeding results to Claude: rejected — an extra API key and integration surface for a capability `web_search` already provides built into the Messages API.
 - Async job + polling for the long-running steps: rejected — meaningful new infrastructure (job state storage, a polling endpoint) for a wait that a loading spinner already handles fine at this usage frequency.
+
+## Update: full write-ups moved from discovery to draft time
+
+The first version had Agent 1 write a 300-500 word original text for every one of the ~20 discovered candidates, up front. In real usage this reliably burned most of its `max_tokens` budget on `web_search` tool execution before ever emitting the final JSON, both wasting tokens (`web_search` results count against the same output-token budget as the model's own text) and failing outright when the response got cut off mid-turn. It was also wasteful by construction: Agent 2 discards roughly half the candidates, and the Admin typically selects only a couple of the rest — most of that generated text was never read. Agent 1 now returns only a topic and one-line summary; the deep dive (with its own `web_search` calls) happens in Agent 3, and only for the Trends the Admin actually selects — bounded by their selection, not by discovery breadth.

@@ -40,8 +40,6 @@ export const en: AdminContent = {
     discovering: 'Searching the web and ranking topics — this can take a minute…',
     discoverError: 'Failed to discover trends. Please try again.',
     empty: 'No trends found.',
-    readMore: 'Read more',
-    readLess: 'Read less',
     relevancePrefix: 'Why it fits:',
     selectedCount: (count) => `${count} selected`,
     createPosts: 'Create posts',
