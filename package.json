@@ -1,34 +1,19 @@
 {
-  "name": "portifolio",
+  "name": "alisonrafael.me",
   "version": "1.0.0",
-  "description": "My own portifolio",
+  "description": "Monorepo for alisonrafael.me: resume site (web-client) + API (server)",
   "license": "ISC",
   "author": "Alison Rafael Marinho Gonçalves",
-  "type": "module",
   "private": true,
+  "workspaces": [
+    "web-client",
+    "server"
+  ],
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "lint": "oxlint",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "framer-motion": "^12.23.24",
-    "lucide-react": "^1.41.0",
-    "react": "^19.2.8",
-    "react-dom": "^19.2.8",
-    "react-router-dom": "^7.9.6"
-  },
-  "devDependencies": {
-    "@tailwindcss/vite": "^4.1.14",
-    "@types/node": "^24.13.3",
-    "@types/react": "^19.2.18",
-    "@types/react-dom": "^19.2.4",
-    "@vitejs/plugin-react": "^6.1.0",
-    "oxlint": "^1.79.0",
-    "playwright": "^1.62.1",
-    "tailwindcss": "^4.1.14",
-    "typescript": "~6.0.2",
-    "vite": "^8.2.2"
+    "dev:web": "npm run dev --workspace=web-client",
+    "dev:api": "npm run start:dev --workspace=server",
+    "build:web": "npm run build --workspace=web-client",
+    "build:api": "npm run build --workspace=server",
+    "build": "npm run build:web && npm run build:api"
   }
 }
