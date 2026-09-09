@@ -1,6 +1,6 @@
 services:
-  resume-site:
-    image: ghcr.io/armgalison/alisonrafael.me:latest
+  web:
+    image: ghcr.io/armgalison/alisonrafael.me-web:latest
     container_name: resume-site
     restart: unless-stopped
     environment:
@@ -10,6 +10,50 @@ services:
     networks:
       - nginx-proxy
 
+  api:
+    image: ghcr.io/armgalison/alisonrafael.me-api:latest
+    container_name: api
+    restart: unless-stopped
+    environment:
+      VIRTUAL_HOST: api.alisonrafael.me
+      LETSENCRYPT_HOST: api.alisonrafael.me
+      LETSENCRYPT_EMAIL: armg.alison@gmail.com
+      CORS_ORIGIN: https://www.alisonrafael.me
+      DB_HOST: mariadb
+      DB_PORT: 3306
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN_SECONDS: ${JWT_EXPIRES_IN_SECONDS:-86400}
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+    depends_on:
+      - mariadb
+    networks:
+      - nginx-proxy
+      - internal
+
+  mariadb:
+    image: mariadb:11
+    container_name: mariadb
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MARIADB_DATABASE: ${DB_NAME}
+      MARIADB_USER: ${DB_USER}
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - mariadb-data:/var/lib/mysql
+    networks:
+      - internal
+
 networks:
   nginx-proxy:
     external: true
+  # DB traffic never needs to leave the host or reach nginx-proxy — kept off
+  # that network so mariadb is unreachable from outside this compose stack.
+  internal:
+
+volumes:
+  mariadb-data:
