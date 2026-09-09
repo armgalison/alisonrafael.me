@@ -59,6 +59,17 @@ body {
   mask-image: radial-gradient(ellipse 60% 50% at 50% 0%, black 40%, transparent 100%);
 }
 
+/* Same pattern, but faded from the vertical center instead of the top —
+   for pages like the Admin Panel login where the focal content sits
+   mid-viewport rather than scrolling down from a hero at the top. */
+.bg-grid-center {
+  background-image:
+    linear-gradient(to right, color-mix(in srgb, var(--color-line) 60%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--color-line) 60%, transparent) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black 30%, transparent 100%);
+}
+
 /* Repaint @uiw/react-md-editor's GitHub-dark palette with this site's own
    theme tokens, so the Admin Panel's markdown editor doesn't look like a
    visitor from a different app. */
@@ -95,6 +106,19 @@ body {
 .w-md-editor-toolbar li.active > button {
   color: var(--color-accent) !important;
   background-color: var(--color-accent-soft) !important;
+}
+
+/* Tailwind's preflight resets ol/ul to `list-style: none` site-wide; the
+   markdown preview never opted back in, so bulleted/numbered lists rendered
+   with no marker at all — restore it scoped to preview content only. */
+.wmde-markdown ul {
+  list-style: disc;
+}
+.wmde-markdown ol {
+  list-style: decimal;
+}
+.wmde-markdown li {
+  display: list-item;
 }
 
 @media (prefers-reduced-motion: reduce) {

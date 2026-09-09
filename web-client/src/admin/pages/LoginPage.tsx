@@ -38,7 +38,7 @@ export function LoginPage() {
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-surface px-6 text-ink">
-      <div className="bg-grid pointer-events-none absolute inset-0" />
+      <div className="bg-grid-center pointer-events-none absolute inset-0" />
       <motion.form
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
@@ -50,7 +50,7 @@ export function LoginPage() {
           <span className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-accent/10 text-accent">
             <LayoutDashboard size={22} />
           </span>
-          <h1 className="font-mono text-lg text-ink">{content.login.title}</h1>
+          <h1 className="text-lg font-semibold text-ink">{content.login.title}</h1>
           <p className="mt-1 text-sm text-ink-dim">{content.login.subtitle}</p>
         </div>
 

@@ -56,24 +56,27 @@ export function PostListPage() {
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: index * 0.03, ease: easeOut }}
-            className="flex items-center justify-between rounded-lg border border-line bg-surface-raised px-4 py-3 transition-colors hover:border-line/80"
+            className="flex flex-col gap-3 rounded-lg border border-line bg-surface-raised px-4 py-3 transition-colors hover:border-line/80 sm:flex-row sm:items-center sm:justify-between"
           >
-            <div className="flex min-w-0 items-center gap-3">
+            <div className="flex min-w-0 items-start gap-3">
               <span
-                className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${
+                className={`mt-0.5 shrink-0 rounded-full px-2 py-0.5 text-xs font-medium sm:mt-0 ${
                   post.published ? 'bg-accent-soft text-accent' : 'border border-line text-ink-dim'
                 }`}
               >
                 {post.published ? content.postList.published : content.postList.draft}
               </span>
               <div className="min-w-0">
-                <p className="truncate font-medium">{post.title}</p>
-                <p className="truncate text-xs text-ink-dim">
-                  /{post.slug} · {content.postList.updatedAtPrefix} {new Date(post.updatedAt).toLocaleDateString('en-US')}
+                <Link to={`/admin/posts/${post.id}`} className="block font-medium break-words hover:text-accent">
+                  {post.title}
+                </Link>
+                <p className="text-xs break-words text-ink-dim">
+                  /{post.slug} · {content.postList.updatedAtPrefix}{' '}
+                  {new Date(post.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                 </p>
               </div>
             </div>
-            <div className="flex shrink-0 gap-2">
+            <div className="flex shrink-0 gap-2 self-end sm:self-auto">
               <Link
                 to={`/admin/posts/${post.id}`}
                 className="inline-flex items-center gap-1.5 rounded-md border border-line px-3 py-1.5 text-sm transition-colors hover:border-accent-dim hover:text-ink"
@@ -84,7 +87,7 @@ export function PostListPage() {
               <button
                 type="button"
                 onClick={() => handleDelete(post)}
-                className="inline-flex items-center gap-1.5 rounded-md border border-line px-3 py-1.5 text-sm text-ink-dim transition-colors hover:border-red-400 hover:text-red-400"
+                className="inline-flex items-center gap-1.5 rounded-md border border-red-400/30 px-3 py-1.5 text-sm text-red-400/80 transition-colors hover:border-red-400 hover:bg-red-400/10 hover:text-red-400"
               >
                 <Trash2 size={13} />
                 {content.postList.delete}

@@ -29,7 +29,7 @@ export function AdminLayout() {
               <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent/10 text-accent">
                 <LayoutDashboard size={16} />
               </span>
-              <span className="hidden font-mono text-sm sm:inline">{content.panel.title}</span>
+              <span className="hidden text-sm sm:inline">{content.panel.title}</span>
             </span>
 
             <ul className="flex gap-1 text-sm text-ink-dim">

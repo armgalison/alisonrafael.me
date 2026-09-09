@@ -195,7 +195,7 @@ export function PostEditorPage() {
           value={content}
           onChange={(value) => setContent(value ?? '')}
           preview="live"
-          height={420}
+          height={320}
           commandsFilter={commandsFilter}
           textareaProps={{
             placeholder: copy.editor.markdownPlaceholder,
