@@ -73,6 +73,7 @@ jobs:
           # values live only in GitHub's encrypted secret store — never
           # typed by hand on the droplet, never in git.
           script: |
+            set -e
             cd ${{ secrets.DROPLET_APP_DIR }}
             cat > .env <<'ENVEOF'
             DB_ROOT_PASSWORD=${{ secrets.DB_ROOT_PASSWORD }}
@@ -86,5 +87,11 @@ jobs:
             ENVEOF
             chmod 600 .env
             docker compose pull
-            docker compose up -d
+            # --remove-orphans: the old v1 compose file's service was
+            # literally named "resume-site" (same as container_name); this
+            # file renamed the service key to "web" but kept that
+            # container_name, so without this flag compose treats the
+            # still-running old container as an orphan and refuses to
+            # reuse its name, failing the whole `up`.
+            docker compose up -d --remove-orphans
             docker image prune -f
