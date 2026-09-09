@@ -1,4 +1,10 @@
-import { Injectable, Logger, OnModuleInit, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  OnModuleInit,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -46,5 +52,20 @@ export class AuthService implements OnModuleInit {
   login(admin: Admin) {
     const payload = { sub: admin.id, email: admin.email };
     return { accessToken: this.jwt.sign(payload) };
+  }
+
+  async findById(id: string): Promise<Admin> {
+    const admin = await this.admins.findOne({ where: { id } });
+    if (!admin) throw new NotFoundException('Admin not found');
+    return admin;
+  }
+
+  async changePassword(id: string, currentPassword: string, newPassword: string): Promise<void> {
+    const admin = await this.findById(id);
+    if (!(await bcrypt.compare(currentPassword, admin.passwordHash))) {
+      throw new UnauthorizedException('Current password is incorrect');
+    }
+    admin.passwordHash = await bcrypt.hash(newPassword, 12);
+    await this.admins.save(admin);
   }
 }

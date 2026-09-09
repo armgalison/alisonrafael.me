@@ -30,6 +30,11 @@ services:
       ADMIN_PASSWORD: ${ADMIN_PASSWORD}
     depends_on:
       - mariadb
+    volumes:
+      # Uploaded post images — the container filesystem is recreated on
+      # every deploy, so without this volume every image would vanish on
+      # the next `docker compose up`.
+      - uploads-data:/app/uploads
     networks:
       - nginx-proxy
       - internal
@@ -57,3 +62,4 @@ networks:
 
 volumes:
   mariadb-data:
+  uploads-data:

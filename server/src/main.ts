@@ -7,6 +7,11 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const config = app.get(ConfigService);
 
+  // Behind nginx-proxy: without this, req.protocol always reports 'http'
+  // (the proxy talks to us over plain HTTP internally), which would make
+  // the uploads controller build image URLs as http:// even in production.
+  app.getHttpAdapter().getInstance().set('trust proxy', 1);
+
   app.enableCors({
     origin: config.get<string>('CORS_ORIGIN', 'https://www.alisonrafael.me'),
   });

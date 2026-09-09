@@ -1,9 +1,12 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ServeStaticModule } from '@nestjs/serve-static';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module.js';
 import { BlogModule } from './blog/blog.module.js';
 import { HealthController } from './health/health.controller.js';
+import { UPLOADS_DIR, UPLOADS_ROUTE } from './uploads/uploads.constants.js';
+import { UploadsModule } from './uploads/uploads.module.js';
 
 @Module({
   imports: [
@@ -23,8 +26,10 @@ import { HealthController } from './health/health.controller.js';
         synchronize: true,
       }),
     }),
+    ServeStaticModule.forRoot({ rootPath: UPLOADS_DIR, serveRoot: UPLOADS_ROUTE }),
     AuthModule,
     BlogModule,
+    UploadsModule,
   ],
   controllers: [HealthController],
 })
