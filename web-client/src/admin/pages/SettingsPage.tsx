@@ -3,6 +3,7 @@ import { useState, type FormEvent } from 'react'
 import { api, ApiError } from '../api'
 import { useAuth } from '../AuthContext'
 import { useAdminContent } from '../i18n'
+import { PasswordInput } from '../PasswordInput'
 
 export function SettingsPage() {
   const { token } = useAuth()
@@ -29,18 +30,22 @@ export function SettingsPage() {
   }
 
   return (
-    <div>
-      <h1 className="text-xl font-semibold">{content.settings.heading}</h1>
-      <p className="mt-1 mb-6 text-sm text-ink-dim">{content.settings.subtitle}</p>
+    <div className="mx-auto max-w-md">
+      <div className="mb-6 flex flex-col items-center text-center">
+        <span className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-accent/10 text-accent">
+          <KeyRound size={22} />
+        </span>
+        <h1 className="text-xl font-semibold">{content.settings.heading}</h1>
+        <p className="mt-1 text-sm text-ink-dim">{content.settings.subtitle}</p>
+      </div>
 
-      <form onSubmit={handleSubmit} className="max-w-sm rounded-xl border border-line bg-surface-raised p-6">
+      <form onSubmit={handleSubmit} className="rounded-xl border border-line bg-surface-raised p-6">
         <div className="mb-5">
           <label className="mb-1 block text-sm text-ink-dim" htmlFor="currentPassword">
             {content.settings.currentPasswordLabel}
           </label>
-          <input
+          <PasswordInput
             id="currentPassword"
-            type="password"
             required
             minLength={8}
             autoComplete="current-password"
@@ -49,7 +54,6 @@ export function SettingsPage() {
               setCurrentPassword(e.target.value)
               setStatus('idle')
             }}
-            className="w-full rounded-md border border-line bg-surface px-3 py-2 text-sm outline-none focus:border-accent-dim"
           />
         </div>
 
@@ -57,9 +61,8 @@ export function SettingsPage() {
           <label className="mb-1 block text-sm text-ink-dim" htmlFor="newPassword">
             {content.settings.newPasswordLabel}
           </label>
-          <input
+          <PasswordInput
             id="newPassword"
-            type="password"
             required
             minLength={8}
             autoComplete="new-password"
@@ -68,7 +71,6 @@ export function SettingsPage() {
               setNewPassword(e.target.value)
               setStatus('idle')
             }}
-            className="w-full rounded-md border border-line bg-surface px-3 py-2 text-sm outline-none focus:border-accent-dim"
           />
         </div>
 
@@ -78,7 +80,7 @@ export function SettingsPage() {
         <button
           type="submit"
           disabled={status === 'saving'}
-          className="inline-flex items-center gap-1.5 rounded-full bg-accent px-4 py-2 text-sm font-semibold text-surface transition-opacity hover:opacity-90 disabled:opacity-50"
+          className="inline-flex w-full items-center justify-center gap-1.5 rounded-full bg-accent px-4 py-2.5 text-sm font-semibold text-surface transition-opacity hover:opacity-90 disabled:opacity-50"
         >
           <KeyRound size={14} />
           {status === 'saving' ? content.settings.submitting : content.settings.submit}

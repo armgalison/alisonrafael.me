@@ -1,6 +1,6 @@
 import MDEditor, { type ICommand } from '@uiw/react-md-editor'
-import { ImagePlus, Save, X } from 'lucide-react'
-import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
+import { Columns2, Eye, ImagePlus, Pencil, Save, X } from 'lucide-react'
+import { useCallback, useEffect, useRef, useState, type FormEvent, type ReactElement } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { api, ApiError } from '../api'
 import { useAuth } from '../AuthContext'
@@ -90,12 +90,26 @@ export function PostEditorPage() {
     void insertUploadedImage(file, e.currentTarget.selectionStart ?? contentRef.current.length)
   }
 
+  // View-mode toggle icons (edit / split / preview-only) are in the
+  // "extra" toolbar group and ship with the library's default GitHub-style
+  // glyphs, which don't match lucide-react's icon set used everywhere else
+  // in the panel — re-skin just those three, visual-only.
+  const viewModeIcons: Record<string, ReactElement> = {
+    edit: <Pencil size={12} />,
+    live: <Columns2 size={12} />,
+    preview: <Eye size={12} />,
+  }
+
   // Swap the toolbar's default "image" button (which just inserts
   // placeholder syntax) for one that opens a file picker and uploads
   // through our own API, matching the paste/drop behavior above.
   const commandsFilter = useCallback(
     (command: ICommand, isExtra: boolean): ICommand | false => {
-      if (isExtra || command.keyCommand !== 'image' || !token) return command
+      if (isExtra) {
+        const icon = command.name ? viewModeIcons[command.name] : undefined
+        return icon ? { ...command, icon } : command
+      }
+      if (command.keyCommand !== 'image' || !token) return command
       return {
         ...command,
         icon: <ImagePlus size={12} />,

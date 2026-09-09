@@ -73,17 +73,23 @@ body {
 /* Repaint @uiw/react-md-editor's GitHub-dark palette with this site's own
    theme tokens, so the Admin Panel's markdown editor doesn't look like a
    visitor from a different app. */
+/* !important on every custom property: @uiw's own dark-mode block targets
+   this exact same selector shape, and since it only loads once the /admin
+   route's lazy chunk does (after this file), equal-specificity + later
+   source order would otherwise let it silently win and re-introduce the
+   unthemed GitHub-dark palette (seen as a mismatched-background band
+   around the preview's actual content). */
 [data-color-mode='dark'] .wmde-markdown,
 [data-color-mode='dark'] .wmde-markdown-var,
 [data-color-mode='dark'] .w-md-editor {
-  --color-canvas-default: var(--color-surface-raised);
-  --color-canvas-subtle: var(--color-surface);
-  --color-border-default: var(--color-line);
-  --color-border-muted: var(--color-line);
-  --color-fg-default: var(--color-ink);
-  --color-fg-muted: var(--color-ink-dim);
-  --color-accent-fg: var(--color-accent);
-  --color-accent-emphasis: var(--color-accent-dim);
+  --color-canvas-default: var(--color-surface-raised) !important;
+  --color-canvas-subtle: var(--color-surface) !important;
+  --color-border-default: var(--color-line) !important;
+  --color-border-muted: var(--color-line) !important;
+  --color-fg-default: var(--color-ink) !important;
+  --color-fg-muted: var(--color-ink-dim) !important;
+  --color-accent-fg: var(--color-accent) !important;
+  --color-accent-emphasis: var(--color-accent-dim) !important;
 }
 
 .w-md-editor {

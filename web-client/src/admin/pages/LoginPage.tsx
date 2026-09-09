@@ -5,6 +5,7 @@ import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { ApiError } from '../api'
 import { useAuth } from '../AuthContext'
 import { useAdminContent } from '../i18n'
+import { PasswordInput } from '../PasswordInput'
 import { easeOut } from '../../lib/motion'
 
 export function LoginPage() {
@@ -70,14 +71,13 @@ export function LoginPage() {
         <label className="mb-1 block text-sm text-ink-dim" htmlFor="password">
           {content.login.passwordLabel}
         </label>
-        <input
+        <PasswordInput
           id="password"
-          type="password"
           required
           autoComplete="current-password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="mb-6 w-full rounded-md border border-line bg-surface px-3 py-2 text-sm outline-none focus:border-accent-dim"
+          className="mb-6"
         />
 
         {error && <p className="mb-4 text-sm text-red-400">{error}</p>}
