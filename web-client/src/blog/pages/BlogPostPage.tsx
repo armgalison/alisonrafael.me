@@ -8,6 +8,7 @@ import { Reveal } from '../../components/Reveal'
 import { useResumeContent } from '../../i18n'
 import { ApiError, blogApi, type Post } from '../api'
 import { Comments } from '../components/Comments'
+import { ShareButtons } from '../components/ShareButtons'
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
@@ -107,6 +108,17 @@ export function BlogPostPage() {
     }
   }, [slug])
 
+  // Give the browser tab / bookmarks the post's own title. Humans only —
+  // crawlers never see this (that's ADR 0011). Restored on unmount.
+  useEffect(() => {
+    if (status.kind !== 'ready') return
+    const previous = document.title
+    document.title = `${status.post.title} — Alison Gonçalves`
+    return () => {
+      document.title = previous
+    }
+  }, [status])
+
   return (
     <div className="min-h-screen bg-surface text-ink">
       <Nav content={content} />
@@ -180,6 +192,8 @@ export function BlogPostPage() {
 
               <Markdown components={markdownComponents}>{sanitizedContent}</Markdown>
             </article>
+
+            <ShareButtons slug={status.post.slug} title={status.post.title} />
 
             <hr className="my-12 border-line" />
             <Comments slug={status.post.slug} />
