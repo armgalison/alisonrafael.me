@@ -29,15 +29,35 @@ The Visitor-facing counterpart to the Admin Panel: `/blog` (a list of published 
 _Avoid_: Blog frontend, public blog — this codebase's term is Blog reading UI (distinguishing it from the Admin-only authoring UI, the Admin Panel).
 
 **Post**:
-A single Blog article: title, unique `slug`, excerpt, content, and a `published` flag. Drafts (`published: false`) are visible only via the admin-only `/posts/admin*` routes; publishing sets `publishedAt` and makes the Post visible via the public `/posts` routes. Unpublishing clears `publishedAt` again rather than preserving the original publish date.
+A single Blog article: title, unique `slug`, excerpt, content, a `published` flag, an optional Cover image, a View count, and zero or more Comments. Drafts (`published: false`) are visible only via the admin-only `/posts/admin*` routes; publishing sets `publishedAt` and makes the Post visible via the public `/posts` routes. Unpublishing clears `publishedAt` again rather than preserving the original publish date.
 _Avoid_: Article, entry — this codebase's term is Post (matches the `Post` entity and `/posts` routes).
 
 **Blog**:
 The content type this Admin manages: a list of Posts, publicly readable, admin-write-only. Not a separate app — it's a resource inside the v2 API, authored through the Admin Panel.
 
 **Upload**:
-An image file the Admin embeds in a Post's markdown `content`, added by dragging/pasting it into the Admin Panel's editor. Stored as a plain file on the droplet's own disk (not object storage — see [ADR 0004](./docs/adr/0004-local-disk-image-storage.md)), referenced by URL from the Post text. Deleting a Post or removing an image from its content does **not** delete the Upload — orphaned files are an accepted, unaddressed cost at this scale, not a bug.
+An image file the Admin embeds in a Post's markdown `content`, added by dragging/pasting it into the Admin Panel's editor. Stored as a plain file on the droplet's own disk (not object storage — see [ADR 0004](./docs/adr/0004-local-disk-image-storage.md)), referenced by URL from the Post text. A Post's Cover image is uploaded through the same `POST /uploads` endpoint but is a first-class Post field rather than inline `content`. Deleting a Post, removing an image from its content, or replacing a Cover image does **not** delete the Upload — orphaned files are an accepted, unaddressed cost at this scale, not a bug.
 _Avoid_: Asset, media, attachment — this codebase's term is Upload.
+
+**Cover image**:
+An optional image URL (`coverImageUrl`) on a Post, uploaded through the same `POST /uploads` endpoint as an inline Upload, shown as the lead visual on the Blog reading UI's listing cards. A distinct singular Post field, not one of the Post's inline `content` Uploads. A Post without one falls back to a placeholder card.
+_Avoid_: Thumbnail, hero image, banner — this codebase's term is Cover image.
+
+**View count**:
+A single integer per Post (`viewCount`) incremented once on every load of that Post's reading page, via an explicit `POST /posts/:slug/views` fired from the Blog reading UI. Deliberately **not** de-duplicated by Visitor or IP, and deliberately **not** a side effect of `GET /posts/:slug` (which stays idempotent). Refresh-inflation is a known, accepted inaccuracy (see [ADR 0010](./docs/adr/0010-view-counter-intentionally-undeduplicated.md)).
+_Avoid_: Unique views, analytics, visits — it is a raw, intentionally naive counter.
+
+**Comment**:
+A reader-submitted plain-text note on a Post: a required display name (`authorName`), an optional private `authorEmail` (stored for the Admin only — never returned on a public endpoint, never shown in the Blog reading UI), a body rendered as plain text with newlines preserved (no markdown, no HTML), and a moderation status. Threading is exactly one level: a Comment may reply to a top-level Comment, but a reply cannot itself be replied to.
+_Avoid_: Comment thread, discussion — this codebase's term is Comment; "thread" overstates a one-level model.
+
+**Comment moderation**:
+The lifecycle of a Comment's status: `pending` → `approved` → (optionally) `rejected`. Every Comment is created `pending` and is invisible on the public Post until the Admin sets it `approved` from the Comments page. The Admin can also set it `rejected` or delete it outright. There is no auto-approval (see [ADR 0009](./docs/adr/0009-reader-comments-pre-moderated-pseudonymous-one-level-rate-limited.md)).
+_Avoid_: Spam queue, review, flag — the states are exactly pending / approved / rejected.
+
+**Comments page**:
+The Admin Panel route (`/admin/comments`) for moderating Comments: filter by status, see the otherwise-hidden `authorEmail`, and approve / reject / delete. A pending-count badge in the Admin Panel nav links here; there is no email notification (the server has no email capability).
+_Avoid_: Moderation dashboard — this codebase's term is Comments page.
 
 **Trend**:
 A candidate blog topic — a topic and a one-line summary, plus (once ranked) a relevance rationale — that a Trend Search surfaces. Deliberately light: no deep write-up at this stage. A Trend only gets a full agent-written text (synthesized, not a scraped source article) once the Admin selects it to turn into a Post (see [ADR 0007](./docs/adr/0007-anthropic-api-for-trend-discovery.md)).
