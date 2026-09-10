@@ -18,7 +18,7 @@ services:
       VIRTUAL_HOST: api.alisonrafael.me
       LETSENCRYPT_HOST: api.alisonrafael.me
       LETSENCRYPT_EMAIL: armg.alison@gmail.com
-      CORS_ORIGIN: https://www.alisonrafael.me
+      CORS_ORIGIN: https://alisonrafael.me,https://www.alisonrafael.me
       DB_HOST: mariadb
       DB_PORT: 3306
       DB_USER: ${DB_USER}
