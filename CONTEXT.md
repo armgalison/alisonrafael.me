@@ -21,8 +21,12 @@ The single account (Alison himself) authorized to manage Blog content via the AP
 _Avoid_: User — there is no multi-user account system, just this one operator.
 
 **Admin Panel**:
-The authoring UI for the Admin — routes under `/admin/*` inside `web-client` (not a separate app/deploy). Lets the Admin log in, manage their password, and create/edit/publish Posts with a markdown editor. Not reachable by a Visitor without the Admin's credentials, and it doesn't render public Blog reading pages — that's a separate, not-yet-built concern (see [ADR 0005](./docs/adr/0005-admin-panel-in-web-client.md)).
+The authoring UI for the Admin — routes under `/admin/*` inside `web-client` (not a separate app/deploy). Lets the Admin log in, manage their password, and create/edit/publish Posts with a markdown editor. Not reachable by a Visitor without the Admin's credentials, and it doesn't render public Blog reading pages — that's a separate concern, the Blog reading UI (see [ADR 0005](./docs/adr/0005-admin-panel-in-web-client.md)).
 _Avoid_: Dashboard, CMS — this codebase's term is Admin Panel.
+
+**Blog reading UI**:
+The Visitor-facing counterpart to the Admin Panel: `/blog` (a list of published Posts) and `/blog/:slug` (one Post's full reading view), also routes inside `web-client` (`src/blog/`), reading `server`'s public `/posts` routes. Like the Admin Panel, it's route-split and lazy-loaded from the main resume bundle — in this case so `react-markdown` (rendering a Post's markdown `content`) doesn't ship to every Visitor, only those who actually open `/blog*`.
+_Avoid_: Blog frontend, public blog — this codebase's term is Blog reading UI (distinguishing it from the Admin-only authoring UI, the Admin Panel).
 
 **Post**:
 A single Blog article: title, unique `slug`, excerpt, content, and a `published` flag. Drafts (`published: false`) are visible only via the admin-only `/posts/admin*` routes; publishing sets `publishedAt` and makes the Post visible via the public `/posts` routes. Unpublishing clears `publishedAt` again rather than preserving the original publish date.
