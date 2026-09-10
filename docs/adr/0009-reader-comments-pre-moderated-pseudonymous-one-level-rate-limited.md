@@ -24,12 +24,19 @@ Comment, and a `POST` whose `parentId` points at a Comment that itself has a par
 a Comment on a different Post) is rejected. This keeps both rendering and moderation
 trivial — no recursive trees, no depth limits to reason about.
 
-**Rate limiting is the only spam control.** `@nestjs/throttler` (a new server dependency)
-is applied with `@UseGuards(ThrottlerGuard)` on the single public comment-create route —
-not as a global `APP_GUARD` — matching the codebase's existing per-route `@UseGuards`
-convention and keeping the blast radius to one endpoint. The limit is 5 submissions per IP
-per hour, a hardcoded constant (no env var, no deploy-config change). It relies on the
-`trust proxy` already set in `main.ts` for a correct client IP behind nginx-proxy.
+**Rate limiting is the only spam control.** A small in-process fixed-window guard
+(`CommentRateLimitGuard`, ~30 lines, no new dependency) is applied with `@UseGuards(...)`
+on the single public comment-create route — not as a global `APP_GUARD` — matching the
+codebase's existing per-route `@UseGuards` convention and keeping the blast radius to one
+endpoint. `@nestjs/throttler` was the first choice but its 6.x line still caps its
+`@nestjs/common` peer at v11 while the rest of the stack is on v12, so it cannot be
+installed without forcing peer resolution; a hand-rolled guard (in the spirit of the
+codebase's other small hand-rolled helpers) avoids that and is trivially enough for one
+route. The limit is 5 submissions per IP per hour, hardcoded constants (no env var, no
+deploy-config change); the window map is pruned opportunistically so it can't grow
+unbounded. It relies on the `trust proxy` already set in `main.ts` for a correct client IP
+behind nginx-proxy. Trade-off accepted: the counter is per-process and resets on restart —
+fine for a single low-traffic container.
 
 This also introduces the **first real relations in the schema**: `Comment → Post`
 (`@ManyToOne`, `onDelete: 'CASCADE'`) and a self-referencing `Comment → parent`
@@ -51,3 +58,7 @@ warranted; revisit before comment data is at stake.
   to an external service, and clashes with the site's no-tracking, self-contained stance.
 - A global `APP_GUARD` throttler with `@SkipThrottle` elsewhere: rejected — larger blast
   radius than the one route that needs it, and no other route wants throttling today.
+- `@nestjs/throttler`: rejected for now — 6.x's peer range stops at `@nestjs/common` v11
+  and this stack is on v12, so it won't install without forcing peer resolution; not worth
+  that for one route's worth of rate limiting. Revisit if throttling is ever wanted in
+  more than one place.

@@ -4,6 +4,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module.js';
 import { BlogModule } from './blog/blog.module.js';
+import { CommentsModule } from './comments/comments.module.js';
 import { HealthController } from './health/health.controller.js';
 import { TrendsModule } from './trends/trends.module.js';
 import { UPLOADS_DIR, UPLOADS_ROUTE } from './uploads/uploads.constants.js';
@@ -30,6 +31,7 @@ import { UploadsModule } from './uploads/uploads.module.js';
     ServeStaticModule.forRoot({ rootPath: UPLOADS_DIR, serveRoot: UPLOADS_ROUTE }),
     AuthModule,
     BlogModule,
+    CommentsModule,
     UploadsModule,
     TrendsModule,
   ],

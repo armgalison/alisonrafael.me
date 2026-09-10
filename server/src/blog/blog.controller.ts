@@ -59,6 +59,15 @@ export class BlogController {
     return this.blog.findPublished();
   }
 
+  // Its own endpoint rather than a side effect of GET :slug, so GET stays
+  // idempotent (ADR 0010). Two segments, so it can't be shadowed by :slug,
+  // but declared before it for consistency with the ordering convention above.
+  @HttpPost(':slug/views')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  registerView(@Param('slug') slug: string) {
+    return this.blog.registerView(slug);
+  }
+
   @Get(':slug')
   findPublishedBySlug(@Param('slug') slug: string) {
     return this.blog.findPublishedBySlug(slug);
