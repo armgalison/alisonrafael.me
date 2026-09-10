@@ -6,6 +6,8 @@ export interface Post {
   slug: string
   excerpt: string
   content: string
+  coverImageUrl: string | null
+  viewCount: number
   published: boolean
   publishedAt: string | null
   createdAt: string
@@ -17,7 +19,24 @@ export interface PostInput {
   slug: string
   excerpt: string
   content: string
+  coverImageUrl?: string | null
   published: boolean
+}
+
+export type CommentStatus = 'pending' | 'approved' | 'rejected'
+
+export interface AdminComment {
+  id: string
+  authorName: string
+  authorEmail: string | null
+  body: string
+  status: CommentStatus
+  parentId: string | null
+  postId: string
+  postTitle: string
+  postSlug: string
+  createdAt: string
+  updatedAt: string
 }
 
 // A Trend only ever lives in these request/response bodies — never
@@ -131,4 +150,20 @@ export const api = {
 
   createDrafts: (token: string, trends: Trend[]) =>
     request<DraftResult[]>('/trends/drafts', { method: 'POST', body: JSON.stringify({ trends }) }, token),
+
+  listComments: (token: string, status?: CommentStatus) =>
+    request<AdminComment[]>(`/posts/comments/admin${status ? `?status=${status}` : ''}`, {}, token),
+
+  pendingCommentCount: (token: string) =>
+    request<{ count: number }>('/posts/comments/admin/pending-count', {}, token),
+
+  setCommentStatus: (token: string, id: string, status: CommentStatus) =>
+    request<AdminComment>(
+      `/posts/comments/admin/${id}/status`,
+      { method: 'PATCH', body: JSON.stringify({ status }) },
+      token,
+    ),
+
+  deleteComment: (token: string, id: string) =>
+    request<void>(`/posts/comments/admin/${id}`, { method: 'DELETE' }, token),
 }

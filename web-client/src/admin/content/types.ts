@@ -5,6 +5,7 @@ export interface AdminContent {
   }
   nav: {
     posts: string
+    comments: string
     settings: string
   }
   login: {
@@ -58,12 +59,39 @@ export interface AdminContent {
     excerptLabel: string
     contentLabel: string
     markdownPlaceholder: string
+    coverImageLabel: string
+    coverImageUpload: string
+    coverImageReplace: string
+    coverImageRemove: string
+    coverImageUploading: string
+    coverImageError: string
     publishedLabel: string
     save: string
     saving: string
     cancel: string
     loadError: string
     saveError: string
+  }
+  comments: {
+    heading: string
+    subtitle: string
+    filterAll: string
+    filterPending: string
+    filterApproved: string
+    filterRejected: string
+    loading: string
+    loadError: string
+    empty: string
+    emptyPending: string
+    emailNote: string
+    replyTag: string
+    onPostPrefix: string
+    approve: string
+    unapprove: string
+    reject: string
+    delete: string
+    deleteConfirm: (name: string) => string
+    actionError: string
   }
   settings: {
     heading: string

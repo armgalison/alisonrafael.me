@@ -1,18 +1,21 @@
 import { motion } from 'framer-motion'
-import { FileText, LayoutDashboard, LogOut, Settings as SettingsIcon } from 'lucide-react'
+import { FileText, LayoutDashboard, LogOut, MessageSquare, Settings as SettingsIcon } from 'lucide-react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { easeOut } from '../lib/motion'
 import { useAuth } from './AuthContext'
 import { useAdminContent } from './i18n'
+import { usePendingComments } from './PendingCommentsContext'
 
 export function AdminLayout() {
   const { email, logout } = useAuth()
   const content = useAdminContent()
   const location = useLocation()
+  const { pendingCount } = usePendingComments()
 
   const links = [
-    { to: '/admin/posts', label: content.nav.posts, icon: FileText },
-    { to: '/admin/settings', label: content.nav.settings, icon: SettingsIcon },
+    { to: '/admin/posts', label: content.nav.posts, icon: FileText, badge: 0 },
+    { to: '/admin/comments', label: content.nav.comments, icon: MessageSquare, badge: pendingCount },
+    { to: '/admin/settings', label: content.nav.settings, icon: SettingsIcon, badge: 0 },
   ]
 
   return (
@@ -52,6 +55,11 @@ export function AdminLayout() {
                       )}
                       <link.icon size={14} className="relative" />
                       <span className="relative">{link.label}</span>
+                      {link.badge > 0 && (
+                        <span className="relative ml-0.5 rounded-full bg-accent px-1.5 py-0.5 text-[10px] font-semibold text-surface">
+                          {link.badge}
+                        </span>
+                      )}
                     </NavLink>
                   </li>
                 )
