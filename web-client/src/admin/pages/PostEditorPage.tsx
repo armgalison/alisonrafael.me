@@ -27,6 +27,8 @@ export function PostEditorPage() {
   const [slugTouched, setSlugTouched] = useState(false)
   const [excerpt, setExcerpt] = useState('')
   const [content, setContent] = useState('')
+  const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null)
+  const [coverBusy, setCoverBusy] = useState(false)
   const [published, setPublished] = useState(false)
   const [loading, setLoading] = useState(isEditing)
   const [saving, setSaving] = useState(false)
@@ -50,6 +52,7 @@ export function PostEditorPage() {
         setSlugTouched(true)
         setExcerpt(post.excerpt)
         setContent(post.content)
+        setCoverImageUrl(post.coverImageUrl)
       })
       .catch(() => setError(copy.editor.loadError))
       .finally(() => setLoading(false))
@@ -58,6 +61,30 @@ export function PostEditorPage() {
   function handleTitleChange(value: string) {
     setTitle(value)
     if (!slugTouched) setSlug(slugify(value))
+  }
+
+  // Same file-picker + upload path as the editor's toolbar image button,
+  // but stores the URL as the Post's cover rather than inserting markdown.
+  function pickCover() {
+    if (!token) return
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.accept = 'image/*'
+    input.onchange = async () => {
+      const file = input.files?.[0]
+      if (!file) return
+      setCoverBusy(true)
+      setError(null)
+      try {
+        const { url } = await api.uploadImage(token, file)
+        setCoverImageUrl(url)
+      } catch {
+        setError(copy.editor.coverImageError)
+      } finally {
+        setCoverBusy(false)
+      }
+    }
+    input.click()
   }
 
   const insertUploadedImage = useCallback(
@@ -141,9 +168,9 @@ export function PostEditorPage() {
     setError(null)
     try {
       if (isEditing && id) {
-        await api.updatePost(token, id, { title, slug, excerpt, content, published })
+        await api.updatePost(token, id, { title, slug, excerpt, content, coverImageUrl, published })
       } else {
-        await api.createPost(token, { title, slug, excerpt, content, published })
+        await api.createPost(token, { title, slug, excerpt, content, coverImageUrl, published })
       }
       navigate('/admin/posts')
     } catch (err) {
@@ -201,6 +228,46 @@ export function PostEditorPage() {
           onChange={(e) => setExcerpt(e.target.value)}
           className="w-full rounded-md border border-line bg-surface-raised px-3 py-2 text-sm outline-none focus:border-accent-dim"
         />
+      </div>
+
+      <div>
+        <span className="mb-1 block text-sm text-ink-dim">{copy.editor.coverImageLabel}</span>
+        {coverImageUrl ? (
+          <div className="flex flex-col gap-2">
+            <img
+              src={coverImageUrl}
+              alt=""
+              className="aspect-[16/9] w-full max-w-md rounded-md border border-line object-cover"
+            />
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={pickCover}
+                disabled={coverBusy}
+                className="rounded-md border border-line px-3 py-1.5 text-sm transition-colors hover:border-accent-dim disabled:opacity-50"
+              >
+                {coverBusy ? copy.editor.coverImageUploading : copy.editor.coverImageReplace}
+              </button>
+              <button
+                type="button"
+                onClick={() => setCoverImageUrl(null)}
+                className="rounded-md border border-line px-3 py-1.5 text-sm text-ink-dim transition-colors hover:text-ink"
+              >
+                {copy.editor.coverImageRemove}
+              </button>
+            </div>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={pickCover}
+            disabled={coverBusy}
+            className="inline-flex items-center gap-1.5 rounded-md border border-line px-3 py-1.5 text-sm transition-colors hover:border-accent-dim disabled:opacity-50"
+          >
+            <ImagePlus size={14} />
+            {coverBusy ? copy.editor.coverImageUploading : copy.editor.coverImageUpload}
+          </button>
+        )}
       </div>
 
       <div data-color-mode="dark">

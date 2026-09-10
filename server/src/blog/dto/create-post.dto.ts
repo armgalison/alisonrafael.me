@@ -1,4 +1,4 @@
-import { IsBoolean, IsNotEmpty, IsOptional, IsString, Matches } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsOptional, IsString, Matches, MaxLength } from 'class-validator';
 
 export class CreatePostDto {
   @IsString()
@@ -18,6 +18,13 @@ export class CreatePostDto {
   @IsString()
   @IsNotEmpty()
   content: string;
+
+  // Optional cover image URL (from POST /uploads). `@IsOptional()` accepts
+  // both `undefined` (leave as-is on update) and `null` (clear it).
+  @IsOptional()
+  @IsString()
+  @MaxLength(512)
+  coverImageUrl?: string | null;
 
   @IsOptional()
   @IsBoolean()
