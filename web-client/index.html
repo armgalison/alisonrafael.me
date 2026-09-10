@@ -13,6 +13,19 @@
       content="Alison Rafael Marinho Gonçalves — Full-Stack Engineer. Resume, experience, and skills."
     />
     <title>Alison Rafael Marinho Gonçalves — Full-Stack Engineer</title>
+    <!-- Site-wide fallback link-preview tags — identical on every route
+         (this is a static SPA). Per-post og:/twitter: tags are deferred to
+         a server-rendered /blog/:slug; see docs/adr/0011. Keep og:title /
+         og:description in sync with <title> / <meta name="description">. -->
+    <link rel="canonical" href="https://alisonrafael.me/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://alisonrafael.me" />
+    <meta property="og:title" content="Alison Rafael Marinho Gonçalves — Full-Stack Engineer" />
+    <meta
+      property="og:description"
+      content="Alison Rafael Marinho Gonçalves — Full-Stack Engineer. Resume, experience, and skills."
+    />
+    <meta name="twitter:card" content="summary" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
     <link
