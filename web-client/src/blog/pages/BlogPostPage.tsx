@@ -1,5 +1,5 @@
-import { ArrowLeft, Calendar } from 'lucide-react'
-import { type ComponentProps, useEffect, useMemo, useState } from 'react'
+import { ArrowLeft, Calendar, Eye } from 'lucide-react'
+import { type ComponentProps, useEffect, useMemo, useRef, useState } from 'react'
 import Markdown, { type Components } from 'react-markdown'
 import { Link, useParams } from 'react-router-dom'
 import { Footer } from '../../components/Footer'
@@ -7,6 +7,7 @@ import { Nav } from '../../components/Nav'
 import { Reveal } from '../../components/Reveal'
 import { useResumeContent } from '../../i18n'
 import { ApiError, blogApi, type Post } from '../api'
+import { Comments } from '../components/Comments'
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
@@ -78,6 +79,10 @@ export function BlogPostPage() {
     () => (status.kind === 'ready' ? stripRawHtmlTags(status.post.content) : ''),
     [status],
   )
+  // The slug we've already counted a view for this mount — stops React
+  // StrictMode's dev double-invoke from double-counting. Every real
+  // navigation still counts (ADR 0010).
+  const viewedSlug = useRef<string | null>(null)
 
   useEffect(() => {
     if (!slug) return
@@ -86,7 +91,12 @@ export function BlogPostPage() {
     blogApi
       .getPost(slug)
       .then((post) => {
-        if (!cancelled) setStatus({ kind: 'ready', post })
+        if (cancelled) return
+        setStatus({ kind: 'ready', post })
+        if (viewedSlug.current !== slug) {
+          viewedSlug.current = slug
+          void blogApi.registerView(slug).catch(() => {})
+        }
       })
       .catch((err: unknown) => {
         if (cancelled) return
@@ -140,19 +150,39 @@ export function BlogPostPage() {
           <Reveal>
             <article>
               <header className="mb-8">
-                {status.post.publishedAt && (
-                  <p className="flex items-center gap-1.5 font-mono text-xs text-ink-dim">
-                    <Calendar size={12} className="text-accent" />
-                    {formatDate(status.post.publishedAt)}
-                  </p>
-                )}
+                <p className="flex flex-wrap items-center gap-x-4 gap-y-1.5 font-mono text-xs text-ink-dim">
+                  {status.post.publishedAt && (
+                    <span className="flex items-center gap-1.5">
+                      <Calendar size={12} className="text-accent" />
+                      {formatDate(status.post.publishedAt)}
+                    </span>
+                  )}
+                  <span className="flex items-center gap-1.5">
+                    <Eye size={12} className="text-accent" />
+                    {status.post.viewCount.toLocaleString('en-US')} views
+                  </span>
+                </p>
                 <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
                   {status.post.title}
                 </h1>
               </header>
 
+              {status.post.coverImageUrl && (
+                <div className="mb-8 overflow-hidden rounded-xl border border-line">
+                  <img
+                    src={status.post.coverImageUrl}
+                    alt=""
+                    loading="lazy"
+                    className="block max-h-[420px] w-full object-cover"
+                  />
+                </div>
+              )}
+
               <Markdown components={markdownComponents}>{sanitizedContent}</Markdown>
             </article>
+
+            <hr className="my-12 border-line" />
+            <Comments slug={status.post.slug} />
           </Reveal>
         )}
       </main>
