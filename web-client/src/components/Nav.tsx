@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { Download, Menu, X } from 'lucide-react'
 import { useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import type { ResumeContent } from '../content/types'
 import { useActiveSection } from '../hooks/useActiveSection'
 import { easeOut } from '../lib/motion'
@@ -11,15 +12,27 @@ interface NavProps {
 
 export function Nav({ content }: NavProps) {
   const [open, setOpen] = useState(false)
+  const location = useLocation()
+  const isHome = location.pathname === '/'
+  const isBlog = location.pathname.startsWith('/blog')
 
+  // These are anchors into sections that only exist on the resume page
+  // ("/"), so they always target "/#id" rather than a bare "#id" — clicked
+  // from elsewhere (e.g. a blog page) that navigates home and scrolls;
+  // clicked from "/" itself it still works via the browser's native
+  // same-page hash-scroll behavior.
   const links: Array<{ href: string; id: string; label: string }> = [
-    { href: '#experience', id: 'experience', label: content.nav.experience },
-    { href: '#skills', id: 'skills', label: content.nav.skills },
-    { href: '#credentials', id: 'credentials', label: content.nav.credentials },
-    { href: '#contact', id: 'contact', label: content.nav.contact },
+    { href: '/#experience', id: 'experience', label: content.nav.experience },
+    { href: '/#skills', id: 'skills', label: content.nav.skills },
+    { href: '/#credentials', id: 'credentials', label: content.nav.credentials },
+    { href: '/#contact', id: 'contact', label: content.nav.contact },
   ]
 
-  const active = useActiveSection(links.map((link) => link.id))
+  // IntersectionObserver-driven section highlighting only makes sense on
+  // the resume page itself — elsewhere there's nothing to observe, so
+  // don't let its ids[0] fallback misleadingly highlight "Experience".
+  const observedSection = useActiveSection(links.map((link) => link.id))
+  const active = isHome ? observedSection : null
 
   return (
     <>
@@ -30,7 +43,7 @@ export function Nav({ content }: NavProps) {
         className="sticky top-0 z-50 border-b border-line/60 bg-surface/80 backdrop-blur-md"
       >
         <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
-          <a href="#top" className="flex items-center gap-2 font-semibold tracking-tight text-ink">
+          <a href="/#top" className="flex items-center gap-2 font-semibold tracking-tight text-ink">
             <img src="/avatar.png" alt="" className="h-8 w-8 shrink-0 rounded-lg object-cover" />
             <span className="hidden sm:inline">Alison Gonçalves</span>
           </a>
@@ -55,6 +68,23 @@ export function Nav({ content }: NavProps) {
                 </a>
               </li>
             ))}
+            <li>
+              <Link
+                to="/blog"
+                className={`relative rounded-full px-3 py-1.5 transition-colors hover:text-ink ${
+                  isBlog ? 'text-ink' : ''
+                }`}
+              >
+                {isBlog && (
+                  <motion.span
+                    layoutId="nav-active-pill"
+                    className="absolute inset-0 rounded-full bg-surface-raised"
+                    transition={{ duration: 0.3, ease: easeOut }}
+                  />
+                )}
+                <span className="relative">Blog</span>
+              </Link>
+            </li>
           </ul>
 
           <a
@@ -112,6 +142,17 @@ export function Nav({ content }: NavProps) {
                     </a>
                   </li>
                 ))}
+                <li>
+                  <Link
+                    to="/blog"
+                    onClick={() => setOpen(false)}
+                    className={`block rounded-lg px-3 py-3 text-base font-medium ${
+                      isBlog ? 'text-accent' : 'text-ink'
+                    }`}
+                  >
+                    Blog
+                  </Link>
+                </li>
               </ul>
               <div className="border-t border-line/60 px-6 py-4">
                 <a

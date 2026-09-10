@@ -1,0 +1,17 @@
+{
+  "name": "@portifolio/shared",
+  "version": "1.0.0",
+  "description": "Data shared between web-client and server (see docs/adr/0008-shared-workspace-for-cross-app-data.md)",
+  "author": "Alison Rafael Marinho Gonçalves",
+  "license": "ISC",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.2"
+  }
+}

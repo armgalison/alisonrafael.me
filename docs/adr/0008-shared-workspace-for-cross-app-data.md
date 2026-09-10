@@ -1,0 +1,10 @@
+# Add a shared/ workspace for data both apps need
+
+The trend-relevance filter (Agent 2, see [ADR 0007](./0007-anthropic-api-for-trend-discovery.md)) needs the Tech Stack list to judge which Trends are worth writing about, and that list's canonical home is `web-client`'s resume content (`en.ts`'s `technologyGroups`) — but `server` can't import a `web-client` source file directly; they're separate workspaces with separate build targets and runtimes. Rather than duplicate the list into `server` by hand (drifts silently the moment one copy is edited) or have `server` fetch it from `web-client` over HTTP at request time (a real network dependency for what's static data), a third npm workspace, `shared/` (`@portifolio/shared`), now holds it: `en.ts` imports `technologyGroups` from `shared` to keep rendering the public Skills section exactly as before, and `server`'s trend-filter prompt imports the same array. One canonical value, two consumers, no network hop.
+
+This forced a real, unplanned consequence: `web-client`'s Docker build could no longer stay self-contained. [ADR 0002](./0002-npm-workspaces-monorepo.md) deliberately kept `web-client` building from its own directory with its own lockfile, specifically because it was the one workspace with no cross-workspace dependency — that's no longer true. `web-client/Dockerfile` now builds from the repo root, the same way `server/Dockerfile` always has, and `web-client`'s standalone `package-lock.json` was removed (the root lockfile is now the only one). Introducing `shared/` was the right call regardless — the alternative (silent drift between two copies of the Tech Stack list) was worse than losing web-client's build independence.
+
+## Considered Options
+
+- Duplicate the list into `server`, kept in sync by hand: rejected — exactly the kind of drift a "single source of truth" is supposed to prevent, and nothing would catch it happening.
+- `server` fetches the list from a `web-client`-served endpoint at request time: rejected — turns static content into a runtime network dependency between the two apps for no benefit.

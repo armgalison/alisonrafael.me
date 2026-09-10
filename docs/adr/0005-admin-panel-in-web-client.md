@@ -5,3 +5,7 @@ The Admin Panel (`/admin/*` — login, password change, Post authoring) is built
 ## Considered Options
 
 - Separate app/subdomain (`admin.alisonrafael.me`, its own container): rejected — adds a whole second deploy pipeline for a single-user internal tool; not justified at this scale.
+
+## Update: the Blog reading UI reuses the same lazy-load pattern
+
+The public Blog reading UI (`/blog`, `/blog/:slug` — see `CONTEXT.md`) is also routes inside `web-client` (`src/blog/`), not a separate app, for the same reasoning as above. It carries its own bundle cost — `react-markdown`, to render a Post's markdown `content` — so `App.tsx` lazy-loads `BlogRoutes` exactly like `AdminRoutes`, keeping `react-markdown` out of the main resume bundle and loading it only when a Visitor actually navigates to `/blog*`.

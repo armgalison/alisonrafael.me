@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { FilePlus, Pencil, Trash2 } from 'lucide-react'
+import { FilePlus, Pencil, Trash2, TrendingUp } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { easeOut } from '../../lib/motion'
@@ -32,13 +32,22 @@ export function PostListPage() {
     <div>
       <div className="mb-8 flex items-center justify-between">
         <h1 className="text-xl font-semibold">{content.postList.heading}</h1>
-        <Link
-          to="/admin/posts/new"
-          className="inline-flex items-center gap-1.5 rounded-full bg-accent px-4 py-2 text-sm font-semibold text-surface transition-opacity hover:opacity-90"
-        >
-          <FilePlus size={15} />
-          {content.postList.newPost}
-        </Link>
+        <div className="flex gap-2">
+          <Link
+            to="/admin/trends"
+            className="inline-flex items-center gap-1.5 rounded-full border border-line px-4 py-2 text-sm font-semibold text-ink transition-colors hover:border-accent-dim hover:text-accent"
+          >
+            <TrendingUp size={15} />
+            {content.postList.getTopTrends}
+          </Link>
+          <Link
+            to="/admin/posts/new"
+            className="inline-flex items-center gap-1.5 rounded-full bg-accent px-4 py-2 text-sm font-semibold text-surface transition-opacity hover:opacity-90"
+          >
+            <FilePlus size={15} />
+            {content.postList.newPost}
+          </Link>
+        </div>
       </div>
 
       {error && <p className="text-sm text-red-400">{error}</p>}

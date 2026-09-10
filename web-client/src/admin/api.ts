@@ -20,6 +20,38 @@ export interface PostInput {
   published: boolean
 }
 
+// A Trend only ever lives in these request/response bodies — never
+// persisted (see CONTEXT.md and ADR 0007). Deliberately just a topic +
+// summary: the deep-dive write-up only happens for topics actually
+// selected, inside the draft-creation step, not for every discovered
+// candidate up front.
+export interface Trend {
+  topic: string
+  summary: string
+}
+
+export interface RankedTrend extends Trend {
+  relevance: string
+}
+
+// One saved "Get top trends" run — see CONTEXT.md's Trend definition and
+// ADR 0007's persistence addendum. Unlike a bare Trend, this row *is*
+// persisted, specifically so revisiting /admin/trends doesn't need to pay
+// for a fresh search every time.
+export interface TrendSearch {
+  id: string
+  trends: RankedTrend[]
+  createdAt: string
+}
+
+export interface DraftResult {
+  topic: string
+  status: 'created' | 'failed'
+  postId?: string
+  slug?: string
+  error?: string
+}
+
 export class ApiError extends Error {
   status: number
 
@@ -50,7 +82,12 @@ async function request<T>(path: string, options: RequestInit = {}, token?: strin
   }
 
   if (res.status === 204) return undefined as T
-  return (await res.json()) as T
+  // NestJS sends an empty body (not literal "null") for a null/undefined
+  // return value — res.json() throws on that, so check for content first
+  // rather than assuming every 2xx response has a parseable body.
+  const text = await res.text()
+  if (!text) return null as T
+  return JSON.parse(text) as T
 }
 
 export const api = {
@@ -87,4 +124,11 @@ export const api = {
     formData.append('file', file)
     return request<{ url: string }>('/uploads', { method: 'POST', body: formData }, token)
   },
+
+  getLatestTrendSearch: (token: string) => request<TrendSearch | null>('/trends/searches/latest', {}, token),
+
+  discoverTrends: (token: string) => request<TrendSearch>('/trends/discover', { method: 'POST' }, token),
+
+  createDrafts: (token: string, trends: Trend[]) =>
+    request<DraftResult[]>('/trends/drafts', { method: 'POST', body: JSON.stringify({ trends }) }, token),
 }
