@@ -59,6 +59,14 @@ _Avoid_: Spam queue, review, flag — the states are exactly pending / approved 
 The Admin Panel route (`/admin/comments`) for moderating Comments: filter by status, see the otherwise-hidden `authorEmail`, and approve / reject / delete. A pending-count badge in the Admin Panel nav links here; there is no email notification (the server has no email capability).
 _Avoid_: Moderation dashboard — this codebase's term is Comments page.
 
+**Share buttons**:
+A row of controls at the foot of a Post's reading view that hand the Post's canonical URL (`https://alisonrafael.me/blog/<slug>`) to LinkedIn, Facebook, or X's share dialog, plus a copy-link action and — on devices that support it — the native share sheet. No Instagram button (Instagram has no link-share URL, so copy-link covers that case) and no click tracking, consistent with the project's no-visitor-analytics stance.
+_Avoid_: Social widgets, share bar — this codebase's term is Share buttons.
+
+**Link preview**:
+The title / description / image card a social network renders when a Post URL is shared. It needs per-Post `og:` / `twitter:` tags in HTML the network's crawler can read without running JavaScript — which the static SPA cannot produce, so per-Post previews are deferred to a server-rendered `/blog/:slug` (see [ADR 0011](./docs/adr/0011-per-post-link-previews-via-server-rendered-blog-html.md)). Until then every shared Post URL gets the same site-wide fallback tags baked into `index.html`.
+_Avoid_: OG card, social card, rich preview — this codebase's term is Link preview.
+
 **Trend**:
 A candidate blog topic — a topic and a one-line summary, plus (once ranked) a relevance rationale — that a Trend Search surfaces. Deliberately light: no deep write-up at this stage. A Trend only gets a full agent-written text (synthesized, not a scraped source article) once the Admin selects it to turn into a Post (see [ADR 0007](./docs/adr/0007-anthropic-api-for-trend-discovery.md)).
 _Avoid_: Article, topic (bare), suggestion — Trend is this project's term for a not-yet-a-Post candidate.
