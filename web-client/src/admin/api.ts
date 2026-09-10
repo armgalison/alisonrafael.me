@@ -1,0 +1,90 @@
+const API_URL = import.meta.env.VITE_API_URL as string
+
+export interface Post {
+  id: string
+  title: string
+  slug: string
+  excerpt: string
+  content: string
+  published: boolean
+  publishedAt: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+export interface PostInput {
+  title: string
+  slug: string
+  excerpt: string
+  content: string
+  published: boolean
+}
+
+export class ApiError extends Error {
+  status: number
+
+  constructor(status: number, message: string) {
+    super(message)
+    this.status = status
+  }
+}
+
+async function request<T>(path: string, options: RequestInit = {}, token?: string | null): Promise<T> {
+  const headers = new Headers(options.headers)
+  if (token) headers.set('Authorization', `Bearer ${token}`)
+  if (options.body && !(options.body instanceof FormData)) {
+    headers.set('Content-Type', 'application/json')
+  }
+
+  const res = await fetch(`${API_URL}${path}`, { ...options, headers })
+
+  if (!res.ok) {
+    let message = res.statusText
+    try {
+      const data = (await res.json()) as { message?: string | string[] }
+      if (data.message) message = Array.isArray(data.message) ? data.message.join(', ') : data.message
+    } catch {
+      // non-JSON error body — fall back to the status text already set
+    }
+    throw new ApiError(res.status, message)
+  }
+
+  if (res.status === 204) return undefined as T
+  return (await res.json()) as T
+}
+
+export const api = {
+  login: (email: string, password: string) =>
+    request<{ accessToken: string }>('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+    }),
+
+  me: (token: string) => request<{ id: string; email: string }>('/auth/me', {}, token),
+
+  changePassword: (token: string, currentPassword: string, newPassword: string) =>
+    request<void>(
+      '/auth/me',
+      { method: 'PATCH', body: JSON.stringify({ currentPassword, newPassword }) },
+      token,
+    ),
+
+  listPosts: (token: string) => request<Post[]>('/posts/admin', {}, token),
+
+  getPost: (token: string, id: string) => request<Post>(`/posts/admin/${id}`, {}, token),
+
+  createPost: (token: string, input: PostInput) =>
+    request<Post>('/posts/admin', { method: 'POST', body: JSON.stringify(input) }, token),
+
+  updatePost: (token: string, id: string, input: Partial<PostInput>) =>
+    request<Post>(`/posts/admin/${id}`, { method: 'PATCH', body: JSON.stringify(input) }, token),
+
+  deletePost: (token: string, id: string) =>
+    request<void>(`/posts/admin/${id}`, { method: 'DELETE' }, token),
+
+  uploadImage: async (token: string, file: File) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    return request<{ url: string }>('/uploads', { method: 'POST', body: formData }, token)
+  },
+}

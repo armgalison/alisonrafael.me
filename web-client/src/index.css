@@ -59,6 +59,74 @@ body {
   mask-image: radial-gradient(ellipse 60% 50% at 50% 0%, black 40%, transparent 100%);
 }
 
+/* Same pattern, but faded from the vertical center instead of the top —
+   for pages like the Admin Panel login where the focal content sits
+   mid-viewport rather than scrolling down from a hero at the top. */
+.bg-grid-center {
+  background-image:
+    linear-gradient(to right, color-mix(in srgb, var(--color-line) 60%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--color-line) 60%, transparent) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black 30%, transparent 100%);
+}
+
+/* Repaint @uiw/react-md-editor's GitHub-dark palette with this site's own
+   theme tokens, so the Admin Panel's markdown editor doesn't look like a
+   visitor from a different app. */
+/* !important on every custom property: @uiw's own dark-mode block targets
+   this exact same selector shape, and since it only loads once the /admin
+   route's lazy chunk does (after this file), equal-specificity + later
+   source order would otherwise let it silently win and re-introduce the
+   unthemed GitHub-dark palette (seen as a mismatched-background band
+   around the preview's actual content). */
+[data-color-mode='dark'] .wmde-markdown,
+[data-color-mode='dark'] .wmde-markdown-var,
+[data-color-mode='dark'] .w-md-editor {
+  --color-canvas-default: var(--color-surface-raised) !important;
+  --color-canvas-subtle: var(--color-surface) !important;
+  --color-border-default: var(--color-line) !important;
+  --color-border-muted: var(--color-line) !important;
+  --color-fg-default: var(--color-ink) !important;
+  --color-fg-muted: var(--color-ink-dim) !important;
+  --color-accent-fg: var(--color-accent) !important;
+  --color-accent-emphasis: var(--color-accent-dim) !important;
+}
+
+.w-md-editor {
+  background-color: var(--color-surface-raised) !important;
+  border: 1px solid var(--color-line) !important;
+  border-radius: 0.5rem !important;
+  box-shadow: none !important;
+}
+
+.w-md-editor-toolbar {
+  background-color: var(--color-surface) !important;
+  border-bottom: 1px solid var(--color-line) !important;
+}
+
+.w-md-editor-toolbar li > button {
+  color: var(--color-ink-dim) !important;
+}
+
+.w-md-editor-toolbar li > button:hover,
+.w-md-editor-toolbar li.active > button {
+  color: var(--color-accent) !important;
+  background-color: var(--color-accent-soft) !important;
+}
+
+/* Tailwind's preflight resets ol/ul to `list-style: none` site-wide; the
+   markdown preview never opted back in, so bulleted/numbered lists rendered
+   with no marker at all — restore it scoped to preview content only. */
+.wmde-markdown ul {
+  list-style: disc;
+}
+.wmde-markdown ol {
+  list-style: decimal;
+}
+.wmde-markdown li {
+  display: list-item;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
