@@ -1,3 +1,5 @@
+'use client'
+
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react'
 import { api } from './api'
 
@@ -14,7 +16,16 @@ interface AuthContextValue {
 const AuthContext = createContext<AuthContextValue | null>(null)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [token, setToken] = useState<string | null>(() => localStorage.getItem(TOKEN_STORAGE_KEY))
+  // 'use client' controls hydration, not whether this ever runs on the
+  // server — Next.js still renders Client Components once server-side for
+  // their initial HTML (ADR 0013), and localStorage doesn't exist there.
+  // `loading` starts true regardless of this value, so the server pass and
+  // the client's first (hydration) pass render identically either way — no
+  // mismatch — and the real token is picked up when this re-runs in the
+  // browser.
+  const [token, setToken] = useState<string | null>(() =>
+    typeof window === 'undefined' ? null : localStorage.getItem(TOKEN_STORAGE_KEY),
+  )
   const [email, setEmail] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 

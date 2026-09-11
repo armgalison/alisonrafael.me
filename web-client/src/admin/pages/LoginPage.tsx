@@ -1,27 +1,33 @@
+'use client'
+
 import { motion } from 'framer-motion'
 import { LayoutDashboard, LogIn } from 'lucide-react'
-import { useState, type FormEvent } from 'react'
-import { Navigate, useLocation, useNavigate } from 'react-router-dom'
+import { useRouter } from 'next/navigation'
+import { useEffect, useState, type FormEvent } from 'react'
+import { easeOut } from '../../lib/motion'
 import { ApiError } from '../api'
 import { useAuth } from '../AuthContext'
 import { useAdminContent } from '../i18n'
 import { PasswordInput } from '../PasswordInput'
-import { easeOut } from '../../lib/motion'
 
 export function LoginPage() {
   const { token, login } = useAuth()
   const content = useAdminContent()
-  const navigate = useNavigate()
-  const location = useLocation()
+  const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
-  if (token) {
-    const from = (location.state as { from?: string } | null)?.from ?? '/admin/posts'
-    return <Navigate to={from} replace />
-  }
+  // Already authenticated (e.g. navigated here directly) — bounce to the
+  // panel. next/navigation has no <Navigate>-during-render equivalent for
+  // Client Components, so this is an effect instead (same pattern as the
+  // (protected) layout's own gate).
+  useEffect(() => {
+    if (token) router.replace('/admin/posts')
+  }, [token, router])
+
+  if (token) return null
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -29,9 +35,11 @@ export function LoginPage() {
     setSubmitting(true)
     try {
       await login(email, password)
-      navigate('/admin/posts', { replace: true })
+      router.replace('/admin/posts')
     } catch (err) {
-      setError(err instanceof ApiError && err.status === 401 ? content.login.invalidCredentials : content.login.genericError)
+      setError(
+        err instanceof ApiError && err.status === 401 ? content.login.invalidCredentials : content.login.genericError,
+      )
     } finally {
       setSubmitting(false)
     }

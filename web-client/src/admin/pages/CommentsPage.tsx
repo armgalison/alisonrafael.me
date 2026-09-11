@@ -1,7 +1,9 @@
+'use client'
+
 import { motion } from 'framer-motion'
 import { MessagesSquare } from 'lucide-react'
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
 import { easeOut } from '../../lib/motion'
 import { api, ApiError, type AdminComment, type CommentStatus } from '../api'
 import { useAuth } from '../AuthContext'
@@ -164,7 +166,7 @@ export function CommentsPage() {
                 <span className="font-mono text-xs text-ink-dim">{formatRelativeTime(comment.createdAt)}</span>
                 <span className="text-xs text-ink-dim">
                   {content.comments.onPostPrefix}{' '}
-                  <Link to={`/admin/posts/${comment.postId}`} className="underline hover:text-ink">
+                  <Link href={`/admin/posts/${comment.postId}`} className="underline hover:text-ink">
                     {comment.postTitle}
                   </Link>
                 </span>

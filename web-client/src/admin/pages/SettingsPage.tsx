@@ -1,3 +1,5 @@
+'use client'
+
 import { KeyRound } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { api, ApiError } from '../api'

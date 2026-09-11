@@ -1,15 +1,21 @@
+'use client'
+
 import { motion } from 'framer-motion'
 import { FileText, LayoutDashboard, LogOut, MessageSquare, Settings as SettingsIcon } from 'lucide-react'
-import { NavLink, Outlet, useLocation } from 'react-router-dom'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import type { ReactNode } from 'react'
 import { easeOut } from '../lib/motion'
 import { useAuth } from './AuthContext'
 import { useAdminContent } from './i18n'
 import { usePendingComments } from './PendingCommentsContext'
 
-export function AdminLayout() {
+// Renders `children` instead of an <Outlet/> — App Router passes the
+// matched page as `children` to the layout that wraps it.
+export function AdminLayout({ children }: { children: ReactNode }) {
   const { email, logout } = useAuth()
   const content = useAdminContent()
-  const location = useLocation()
+  const pathname = usePathname()
   const { pendingCount } = usePendingComments()
 
   const links = [
@@ -37,11 +43,11 @@ export function AdminLayout() {
 
             <ul className="flex gap-1 text-sm text-ink-dim">
               {links.map((link) => {
-                const active = location.pathname.startsWith(link.to)
+                const active = pathname.startsWith(link.to)
                 return (
                   <li key={link.to}>
-                    <NavLink
-                      to={link.to}
+                    <Link
+                      href={link.to}
                       className={`relative flex items-center gap-1.5 rounded-full px-3 py-1.5 transition-colors hover:text-ink ${
                         active ? 'text-ink' : ''
                       }`}
@@ -60,7 +66,7 @@ export function AdminLayout() {
                           {link.badge}
                         </span>
                       )}
-                    </NavLink>
+                    </Link>
                   </li>
                 )
               })}
@@ -80,9 +86,7 @@ export function AdminLayout() {
           </div>
         </div>
       </motion.header>
-      <main className="mx-auto max-w-4xl px-6 py-10">
-        <Outlet />
-      </main>
+      <main className="mx-auto max-w-4xl px-6 py-10">{children}</main>
     </div>
   )
 }

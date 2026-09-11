@@ -25,7 +25,7 @@ The authoring UI for the Admin — routes under `/admin/*` inside `web-client` (
 _Avoid_: Dashboard, CMS — this codebase's term is Admin Panel.
 
 **Blog reading UI**:
-The Visitor-facing counterpart to the Admin Panel: `/blog` (a list of published Posts) and `/blog/:slug` (one Post's full reading view), also routes inside `web-client` (`src/blog/`), reading `server`'s public `/posts` routes. Like the Admin Panel, it's route-split and lazy-loaded from the main resume bundle — in this case so `react-markdown` (rendering a Post's markdown `content`) doesn't ship to every Visitor, only those who actually open `/blog*`.
+The Visitor-facing counterpart to the Admin Panel: `/blog` (a list of published Posts) and `/blog/:slug` (one Post's full reading view), routes inside `web-client`'s Next.js app (`src/app/blog/`), reading `server`'s public `/posts` routes. Server-rendered — the post list and a post's content are fetched and rendered on the server per request, not loaded client-side after an empty shell — with the comment form, share buttons, and view-count registration as client-side islands within that server-rendered page (see [ADR 0013](./docs/adr/0013-migrate-web-client-to-nextjs-app-router.md)).
 _Avoid_: Blog frontend, public blog — this codebase's term is Blog reading UI (distinguishing it from the Admin-only authoring UI, the Admin Panel).
 
 **Post**:
@@ -64,7 +64,7 @@ A row of controls at the foot of a Post's reading view that hand the Post's cano
 _Avoid_: Social widgets, share bar — this codebase's term is Share buttons.
 
 **Link preview**:
-The title / description / image card a social network renders when a Post URL is shared. It needs per-Post `og:` / `twitter:` tags in HTML the network's crawler can read without running JavaScript — which the static SPA cannot produce, so per-Post previews are deferred to a server-rendered `/blog/:slug` (see [ADR 0011](./docs/adr/0011-per-post-link-previews-via-server-rendered-blog-html.md)). Until then every shared Post URL gets the same site-wide fallback tags baked into `index.html`.
+The title / description / image card a social network renders when a Post URL is shared. Produced server-side, per Post, by `/blog/:slug`'s `generateMetadata` (title, excerpt as the description, Cover image, canonical URL) — a real network crawler reads this straight out of the server-rendered response, no client JavaScript involved (see [ADR 0013](./docs/adr/0013-migrate-web-client-to-nextjs-app-router.md), which replaced an earlier attempt at this — [ADR 0011](./docs/adr/0011-per-post-link-previews-via-server-rendered-blog-html.md) — that only injected `<head>` tags into an otherwise still-client-rendered SPA shell). Every route without its own per-post metadata (the resume, the `/blog` list) still falls back to the site-wide tags on the root layout.
 _Avoid_: OG card, social card, rich preview — this codebase's term is Link preview.
 
 **Trend**:

@@ -1,10 +1,20 @@
-import MDEditor, { type ICommand } from '@uiw/react-md-editor'
+'use client'
+
+import type { ICommand } from '@uiw/react-md-editor'
 import { Columns2, Eye, ImagePlus, Pencil, Save, X } from 'lucide-react'
+import dynamic from 'next/dynamic'
+import { useParams, useRouter } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState, type FormEvent, type ReactElement } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
 import { api, ApiError } from '../api'
 import { useAuth } from '../AuthContext'
 import { useAdminContent } from '../i18n'
+
+// @uiw/react-md-editor touches browser APIs (CodeMirror) outside of just
+// render time, which breaks under SSR even inside an already-'use client'
+// page — next/dynamic's ssr:false is the documented escape hatch. Costs
+// nothing behaviorally here since this whole page is already client-only
+// (behind the admin auth gate).
+const MDEditor = dynamic(() => import('@uiw/react-md-editor'), { ssr: false })
 
 function slugify(title: string): string {
   return title
@@ -16,11 +26,14 @@ function slugify(title: string): string {
 }
 
 export function PostEditorPage() {
-  const { id } = useParams()
+  // { id: undefined } on /admin/posts/new (no dynamic segment matched
+  // there), a real string on /admin/posts/[id] — same shape react-router's
+  // useParams() had for these two sibling routes.
+  const { id } = useParams<{ id?: string }>()
   const isEditing = Boolean(id)
   const { token } = useAuth()
   const copy = useAdminContent()
-  const navigate = useNavigate()
+  const router = useRouter()
 
   const [title, setTitle] = useState('')
   const [slug, setSlug] = useState('')
@@ -172,7 +185,7 @@ export function PostEditorPage() {
       } else {
         await api.createPost(token, { title, slug, excerpt, content, coverImageUrl, published })
       }
-      navigate('/admin/posts')
+      router.push('/admin/posts')
     } catch (err) {
       setError(err instanceof ApiError ? err.message : copy.editor.saveError)
     } finally {
@@ -309,7 +322,7 @@ export function PostEditorPage() {
         </button>
         <button
           type="button"
-          onClick={() => navigate('/admin/posts')}
+          onClick={() => router.push('/admin/posts')}
           className="inline-flex items-center gap-1.5 rounded-full border border-line px-4 py-2 text-sm text-ink-dim transition-colors hover:text-ink"
         >
           <X size={14} />

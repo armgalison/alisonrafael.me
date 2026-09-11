@@ -1,67 +1,48 @@
 import { Calendar, Eye, MessageSquare, Newspaper } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { Footer } from '../../components/Footer'
-import { Nav } from '../../components/Nav'
+import Link from 'next/link'
+import { blogApi } from '../../blog/api'
 import { Reveal } from '../../components/Reveal'
 import { SectionHeading } from '../../components/Section'
-import { useResumeContent } from '../../i18n'
-import { blogApi, type Post } from '../api'
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 }
 
-export function BlogListPage() {
-  const content = useResumeContent()
-  const [posts, setPosts] = useState<Post[] | null>(null)
-  const [error, setError] = useState<string | null>(null)
+// Server Component — fetches directly, no loading state needed (the page
+// doesn't render until the data is ready). See docs/adr/0013.
+export default async function BlogListPage() {
+  const posts = await blogApi.listPosts({ cache: 'no-store' }).catch(() => null)
 
-  useEffect(() => {
-    let cancelled = false
-    blogApi
-      .listPosts()
-      .then((data) => {
-        if (!cancelled) setPosts(data)
-      })
-      .catch(() => {
-        if (!cancelled) setError('Could not load posts right now. Please try again later.')
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [])
-
-  return (
-    <div className="min-h-screen bg-surface text-ink">
-      <Nav content={content} />
+  if (!posts) {
+    return (
       <main className="mx-auto max-w-5xl px-6 py-16">
         <SectionHeading title="Blog" icon={Newspaper} />
+        <Reveal>
+          <p className="text-sm text-red-400">Could not load posts right now. Please try again later.</p>
+        </Reveal>
+      </main>
+    )
+  }
 
-        {error && (
-          <Reveal>
-            <p className="text-sm text-red-400">{error}</p>
-          </Reveal>
-        )}
-        {!posts && !error && (
-          <Reveal>
-            <p className="text-sm text-ink-dim">Loading posts…</p>
-          </Reveal>
-        )}
-        {posts?.length === 0 && (
-          <Reveal>
-            <p className="rounded-lg border border-dashed border-line px-4 py-10 text-center text-sm text-ink-dim">
-              No posts published yet — check back soon.
-            </p>
-          </Reveal>
-        )}
+  return (
+    <main className="mx-auto max-w-5xl px-6 py-16">
+      <SectionHeading title="Blog" icon={Newspaper} />
 
+      {posts.length === 0 && (
+        <Reveal>
+          <p className="rounded-lg border border-dashed border-line px-4 py-10 text-center text-sm text-ink-dim">
+            No posts published yet — check back soon.
+          </p>
+        </Reveal>
+      )}
+
+      {posts.length > 0 && (
         <ul className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-          {posts?.map((post, index) => (
+          {posts.map((post, index) => (
             <li key={post.id} className="h-full">
               <Reveal delay={index * 0.05} className="h-full">
                 <Link
-                  to={`/blog/${post.slug}`}
+                  href={`/blog/${post.slug}`}
                   className="group flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-surface-raised transition-colors hover:border-accent-dim/60"
                 >
                   {post.coverImageUrl ? (
@@ -105,8 +86,7 @@ export function BlogListPage() {
             </li>
           ))}
         </ul>
-      </main>
-      <Footer content={content} />
-    </div>
+      )}
+    </main>
   )
 }

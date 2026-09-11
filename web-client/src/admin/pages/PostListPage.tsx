@@ -1,7 +1,9 @@
+'use client'
+
 import { motion } from 'framer-motion'
 import { FilePlus, Pencil, Trash2, TrendingUp } from 'lucide-react'
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
 import { easeOut } from '../../lib/motion'
 import { api, type Post } from '../api'
 import { useAuth } from '../AuthContext'
@@ -34,14 +36,14 @@ export function PostListPage() {
         <h1 className="text-xl font-semibold">{content.postList.heading}</h1>
         <div className="flex gap-2">
           <Link
-            to="/admin/trends"
+            href="/admin/trends"
             className="inline-flex items-center gap-1.5 rounded-full border border-line px-4 py-2 text-sm font-semibold text-ink transition-colors hover:border-accent-dim hover:text-accent"
           >
             <TrendingUp size={15} />
             {content.postList.getTopTrends}
           </Link>
           <Link
-            to="/admin/posts/new"
+            href="/admin/posts/new"
             className="inline-flex items-center gap-1.5 rounded-full bg-accent px-4 py-2 text-sm font-semibold text-surface transition-opacity hover:opacity-90"
           >
             <FilePlus size={15} />
@@ -76,7 +78,7 @@ export function PostListPage() {
                 {post.published ? content.postList.published : content.postList.draft}
               </span>
               <div className="min-w-0">
-                <Link to={`/admin/posts/${post.id}`} className="block font-medium break-words hover:text-accent">
+                <Link href={`/admin/posts/${post.id}`} className="block font-medium break-words hover:text-accent">
                   {post.title}
                 </Link>
                 <p className="text-xs break-words text-ink-dim">
@@ -87,7 +89,7 @@ export function PostListPage() {
             </div>
             <div className="flex shrink-0 gap-2 self-end sm:self-auto">
               <Link
-                to={`/admin/posts/${post.id}`}
+                href={`/admin/posts/${post.id}`}
                 className="inline-flex items-center gap-1.5 rounded-md border border-line px-3 py-1.5 text-sm transition-colors hover:border-accent-dim hover:text-ink"
               >
                 <Pencil size={13} />

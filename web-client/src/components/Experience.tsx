@@ -1,3 +1,5 @@
+'use client'
+
 import { AnimatePresence, motion } from 'framer-motion'
 import { Briefcase, ChevronRight, MapPin } from 'lucide-react'
 import { useState } from 'react'
