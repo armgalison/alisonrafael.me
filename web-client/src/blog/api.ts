@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_URL as string
+const API_URL = process.env.NEXT_PUBLIC_API_URL as string
 
 // Mirrors the Post shape returned by the server's public /posts routes
 // (see server/src/blog/). Deliberately separate from ../admin/api.ts's
