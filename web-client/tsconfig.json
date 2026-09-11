@@ -19,11 +19,5 @@
     "plugins": [{ "name": "next" }]
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", ".next/dev/types/**/*.ts"],
-  "exclude": [
-    "node_modules",
-    "src/admin",
-    "src/blog",
-    "src/legacy-pages",
-    "src/components/Nav.tsx"
-  ]
+  "exclude": ["node_modules", "src/admin", "src/blog"]
 }

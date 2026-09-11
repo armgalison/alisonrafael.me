@@ -1,7 +1,10 @@
+'use client'
+
 import { AnimatePresence, motion } from 'framer-motion'
 import { Download, Menu, X } from 'lucide-react'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
 import type { ResumeContent } from '../content/types'
 import { useActiveSection } from '../hooks/useActiveSection'
 import { easeOut } from '../lib/motion'
@@ -12,9 +15,9 @@ interface NavProps {
 
 export function Nav({ content }: NavProps) {
   const [open, setOpen] = useState(false)
-  const location = useLocation()
-  const isHome = location.pathname === '/'
-  const isBlog = location.pathname.startsWith('/blog')
+  const pathname = usePathname()
+  const isHome = pathname === '/'
+  const isBlog = pathname.startsWith('/blog')
 
   // These are anchors into sections that only exist on the resume page
   // ("/"), so they always target "/#id" rather than a bare "#id" — clicked
@@ -70,7 +73,7 @@ export function Nav({ content }: NavProps) {
             ))}
             <li>
               <Link
-                to="/blog"
+                href="/blog"
                 className={`relative rounded-full px-3 py-1.5 transition-colors hover:text-ink ${
                   isBlog ? 'text-ink' : ''
                 }`}
@@ -144,7 +147,7 @@ export function Nav({ content }: NavProps) {
                 ))}
                 <li>
                   <Link
-                    to="/blog"
+                    href="/blog"
                     onClick={() => setOpen(false)}
                     className={`block rounded-lg px-3 py-3 text-base font-medium ${
                       isBlog ? 'text-accent' : 'text-ink'
