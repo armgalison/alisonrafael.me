@@ -1,7 +1,9 @@
+'use client'
+
 import { motion } from 'framer-motion'
 import { ArrowLeft, CheckCircle2, RefreshCw, Sparkles, XCircle } from 'lucide-react'
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
 import { easeOut } from '../../lib/motion'
 import { api, ApiError, type DraftResult, type RankedTrend } from '../api'
 import { useAuth } from '../AuthContext'
@@ -90,7 +92,7 @@ export function TrendsPage() {
 
   return (
     <div>
-      <Link to="/admin/posts" className="mb-6 inline-flex items-center gap-1.5 text-sm text-ink-dim hover:text-ink">
+      <Link href="/admin/posts" className="mb-6 inline-flex items-center gap-1.5 text-sm text-ink-dim hover:text-ink">
         <ArrowLeft size={14} />
         {content.trends.backToPosts}
       </Link>
@@ -161,7 +163,7 @@ export function TrendsPage() {
                           {result.status === 'created' ? <CheckCircle2 size={13} /> : <XCircle size={13} />}
                           {result.status === 'created' ? content.trends.created : `${content.trends.failed}: ${result.error}`}
                           {result.status === 'created' && result.postId && (
-                            <Link to={`/admin/posts/${result.postId}`} className="underline hover:text-ink">
+                            <Link href={`/admin/posts/${result.postId}`} className="underline hover:text-ink">
                               {content.trends.viewPost}
                             </Link>
                           )}

@@ -1,3 +1,5 @@
+'use client'
+
 import { Eye, EyeOff } from 'lucide-react'
 import { useState, type InputHTMLAttributes } from 'react'
 
