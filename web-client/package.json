@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "next dev -p 5173",
     "build": "next build",
-    "start": "next start -p 5173",
+    "start": "mkdir -p .next/standalone/web-client/.next/static .next/standalone/web-client/public && cp -r .next/static/. .next/standalone/web-client/.next/static/ && cp -r public/. .next/standalone/web-client/public/ && PORT=5173 node .next/standalone/web-client/server.js",
     "lint": "oxlint",
     "typecheck": "tsc --noEmit"
   },

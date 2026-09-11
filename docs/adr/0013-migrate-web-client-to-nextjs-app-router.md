@@ -1,6 +1,6 @@
 # Migrate web-client to Next.js (App Router) for real SSR
 
-**Status:** accepted (direction); implementation in progress.
+**Status:** accepted, implemented.
 
 `web-client` is a Vite + React 19 + React Router single-page app: every route, including
 the Blog reading UI, is rendered entirely client-side from a static `index.html` shell. A
