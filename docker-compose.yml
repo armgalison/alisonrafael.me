@@ -7,6 +7,11 @@ services:
       VIRTUAL_HOST: alisonrafael.me,www.alisonrafael.me
       LETSENCRYPT_HOST: alisonrafael.me,www.alisonrafael.me
       LETSENCRYPT_EMAIL: armg.alison@gmail.com
+      # The Next.js standalone server listens on 3000, not nginx's old 80 —
+      # nginx-proxy auto-detects a single EXPOSEd port, which the old nginx
+      # image had; this one has other ports EXPOSEd by its base image too,
+      # so it must be told explicitly (ADR 0013).
+      VIRTUAL_PORT: 3000
     networks:
       - nginx-proxy
 
