@@ -1,5 +1,7 @@
+'use client'
+
 import { CornerDownRight } from 'lucide-react'
-import { type FormEvent, useEffect, useState } from 'react'
+import { type FormEvent, useState } from 'react'
 import { ApiError, blogApi, type BlogComment } from '../api'
 
 // Local copy rather than a shared import — keeps the Blog chunk decoupled
@@ -161,50 +163,33 @@ function TopLevelComment({ slug, comment }: { slug: string; comment: BlogComment
   )
 }
 
-export function Comments({ slug }: { slug: string }) {
-  const [comments, setComments] = useState<BlogComment[] | null>(null)
-  const [error, setError] = useState(false)
-
-  useEffect(() => {
-    let cancelled = false
-    blogApi
-      .listComments(slug)
-      .then((data) => {
-        if (!cancelled) setComments(data)
-      })
-      .catch(() => {
-        if (!cancelled) setError(true)
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [slug])
-
+// `initialComments` arrives already fetched by the Server Component parent
+// (ADR 0013) — comment content is present in the initial HTML instead of
+// loading in after a client-side fetch. There's no local list state to
+// manage: a newly posted comment is pending moderation and never appears
+// in this list until the Admin approves it and the page is loaded again,
+// so nothing here ever needs to mutate `initialComments` after mount.
+export function Comments({ slug, initialComments }: { slug: string; initialComments: BlogComment[] }) {
   return (
     <section>
       <h2 className="mb-6 text-2xl font-semibold text-ink">Comments</h2>
 
-      {error && <p className="text-sm text-red-400">Could not load comments right now.</p>}
-      {!comments && !error && <p className="text-sm text-ink-dim">Loading comments…</p>}
-
-      {comments && comments.length === 0 && (
+      {initialComments.length === 0 && (
         <p className="mb-8 text-sm text-ink-dim">No comments yet — be the first.</p>
       )}
 
-      {comments && comments.length > 0 && (
+      {initialComments.length > 0 && (
         <ul className="mb-10 flex flex-col gap-6">
-          {comments.map((comment) => (
+          {initialComments.map((comment) => (
             <TopLevelComment key={comment.id} slug={slug} comment={comment} />
           ))}
         </ul>
       )}
 
-      {comments && (
-        <div>
-          <h3 className="mb-3 text-sm font-semibold text-ink">Leave a comment</h3>
-          <CommentForm slug={slug} />
-        </div>
-      )}
+      <div>
+        <h3 className="mb-3 text-sm font-semibold text-ink">Leave a comment</h3>
+        <CommentForm slug={slug} />
+      </div>
     </section>
   )
 }

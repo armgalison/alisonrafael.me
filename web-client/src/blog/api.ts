@@ -56,8 +56,10 @@ async function readError(res: Response): Promise<string> {
   return res.statusText
 }
 
-async function request<T>(path: string): Promise<T> {
-  const res = await fetch(`${API_URL}${path}`)
+// `init` lets Server Component call sites pass fetch options (e.g.
+// `{ cache: 'no-store' }`) — client call sites just omit it.
+async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  const res = await fetch(`${API_URL}${path}`, init)
   if (!res.ok) throw new ApiError(res.status, await readError(res))
   return (await res.json()) as T
 }
@@ -76,17 +78,22 @@ async function send<T>(path: string, body?: unknown): Promise<T> {
 
 export const blogApi = {
   // Newest-published-first, published posts only — see server/src/blog/.
-  listPosts: () => request<Post[]>('/posts'),
+  // Called from a Server Component with { cache: 'no-store' } (ADR 0013) —
+  // this is a low-traffic personal blog where staleness (a just-approved
+  // comment, a fresh view count) is actively confusing, and it matches the
+  // SPA-era behavior of always fetching fresh.
+  listPosts: (init?: RequestInit) => request<Post[]>('/posts', init),
 
   // 404s (as an ApiError with status 404) for an unknown or unpublished slug.
-  getPost: (slug: string) => request<Post>(`/posts/${encodeURIComponent(slug)}`),
+  getPost: (slug: string, init?: RequestInit) => request<Post>(`/posts/${encodeURIComponent(slug)}`, init),
 
   // Fire-and-forget from the reading page's load effect. Un-deduplicated by
   // design (ADR 0010).
   registerView: (slug: string) => send<void>(`/posts/${encodeURIComponent(slug)}/views`),
 
   // Approved comments only, nested one level.
-  listComments: (slug: string) => request<BlogComment[]>(`/posts/${encodeURIComponent(slug)}/comments`),
+  listComments: (slug: string, init?: RequestInit) =>
+    request<BlogComment[]>(`/posts/${encodeURIComponent(slug)}/comments`, init),
 
   // Creates a pending comment. Throws ApiError(429) when rate-limited.
   createComment: (slug: string, input: NewComment) =>
