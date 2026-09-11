@@ -1,6 +1,6 @@
 # Per-Post link previews come from server-rendered `/blog/:slug` HTML
 
-**Status:** accepted (direction); implementation deferred to a later phase.
+**Status:** superseded by [ADR 0013](./0013-migrate-web-client-to-nextjs-app-router.md).
 
 When a Post URL is shared to LinkedIn / Facebook / X, those crawlers fetch the URL and
 read `<head>` **without running JavaScript**. Today `web-client` is a static SPA served by
@@ -40,3 +40,15 @@ crawler gets what it needs. No User-Agent sniffing.
   the database after the frontend is built; a build-time pass can't see them.
 - **Move the whole Blog reading UI to server-side rendering:** rejected as far more than
   the problem needs — the SPA is fine for humans; only `<head>` needs to be server-truth.
+
+## Update: superseded by a full Next.js migration
+
+The rejected "move the whole Blog reading UI to server-side rendering" option above is, in
+hindsight, exactly what got chosen — just framed differently: not a bespoke NestJS
+`<head>`-injection layer bolted onto the existing SPA, but a full migration of `web-client`
+to Next.js (App Router), which does real per-route SSR and `generateMetadata` natively. A
+follow-up implementation attempt at *this* ADR's direction (an nginx `location /blog/`
+proxied to a NestJS `PreviewModule` that fetched the built `index.html` at runtime and
+string-injected tags into it) was built, tested end-to-end, and then abandoned once it
+became clear the real want was actual server-rendered content, not just injected `<head>`
+tags into an otherwise-empty shell. See [ADR 0013](./0013-migrate-web-client-to-nextjs-app-router.md).
