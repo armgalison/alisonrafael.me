@@ -71,6 +71,16 @@ export interface DraftResult {
   error?: string
 }
 
+// One SSE frame from /trends/discover or /trends/drafts — mirrors the
+// server's TrendsStreamEvent (server/src/trends/trend.interface.ts),
+// duplicated here the same way Trend/RankedTrend/DraftResult already are.
+export type TrendsStreamEvent =
+  | { type: 'thinking'; phase: 'discovery' | 'draft'; delta: string; topic?: string }
+  | { type: 'status'; phase: 'discovery' | 'filtering' | 'draft'; message: string; topic?: string }
+  | { type: 'result'; result: TrendSearch }
+  | { type: 'draft_result'; result: DraftResult }
+  | { type: 'error'; message: string }
+
 export class ApiError extends Error {
   status: number
 
@@ -80,25 +90,30 @@ export class ApiError extends Error {
   }
 }
 
-async function request<T>(path: string, options: RequestInit = {}, token?: string | null): Promise<T> {
+function buildHeaders(options: RequestInit, token?: string | null): Headers {
   const headers = new Headers(options.headers)
   if (token) headers.set('Authorization', `Bearer ${token}`)
   if (options.body && !(options.body instanceof FormData)) {
     headers.set('Content-Type', 'application/json')
   }
+  return headers
+}
 
-  const res = await fetch(`${API_URL}${path}`, { ...options, headers })
-
-  if (!res.ok) {
-    let message = res.statusText
-    try {
-      const data = (await res.json()) as { message?: string | string[] }
-      if (data.message) message = Array.isArray(data.message) ? data.message.join(', ') : data.message
-    } catch {
-      // non-JSON error body — fall back to the status text already set
-    }
-    throw new ApiError(res.status, message)
+async function throwOnError(res: Response): Promise<void> {
+  if (res.ok) return
+  let message = res.statusText
+  try {
+    const data = (await res.json()) as { message?: string | string[] }
+    if (data.message) message = Array.isArray(data.message) ? data.message.join(', ') : data.message
+  } catch {
+    // non-JSON error body — fall back to the status text already set
   }
+  throw new ApiError(res.status, message)
+}
+
+async function request<T>(path: string, options: RequestInit = {}, token?: string | null): Promise<T> {
+  const res = await fetch(`${API_URL}${path}`, { ...options, headers: buildHeaders(options, token) })
+  await throwOnError(res)
 
   if (res.status === 204) return undefined as T
   // NestJS sends an empty body (not literal "null") for a null/undefined
@@ -107,6 +122,37 @@ async function request<T>(path: string, options: RequestInit = {}, token?: strin
   const text = await res.text()
   if (!text) return null as T
   return JSON.parse(text) as T
+}
+
+// Reads a Server-Sent Events response (fetch, not EventSource: the Admin
+// API is Bearer-token auth, which EventSource can't send, and /trends/drafts
+// needs a POST body, which EventSource can't send either). Buffers on the
+// SSE `\n\n` frame boundary and parses each frame's `data: ` line as JSON.
+async function streamSse<TEvent>(
+  path: string,
+  onEvent: (event: TEvent) => void,
+  options: RequestInit = {},
+  token?: string | null,
+): Promise<void> {
+  const res = await fetch(`${API_URL}${path}`, { ...options, headers: buildHeaders(options, token) })
+  await throwOnError(res)
+  if (!res.body) return
+
+  const reader = res.body.getReader()
+  const decoder = new TextDecoder()
+  let buffer = ''
+  for (;;) {
+    const { done, value } = await reader.read()
+    if (done) break
+    buffer += decoder.decode(value, { stream: true })
+    const frames = buffer.split('\n\n')
+    buffer = frames.pop() ?? ''
+    for (const frame of frames) {
+      const line = frame.split('\n').find((l) => l.startsWith('data: '))
+      if (!line) continue
+      onEvent(JSON.parse(line.slice('data: '.length)) as TEvent)
+    }
+  }
 }
 
 export const api = {
@@ -146,10 +192,11 @@ export const api = {
 
   getLatestTrendSearch: (token: string) => request<TrendSearch | null>('/trends/searches/latest', {}, token),
 
-  discoverTrends: (token: string) => request<TrendSearch>('/trends/discover', { method: 'POST' }, token),
+  streamDiscoverTrends: (token: string, onEvent: (event: TrendsStreamEvent) => void) =>
+    streamSse<TrendsStreamEvent>('/trends/discover', onEvent, { method: 'POST' }, token),
 
-  createDrafts: (token: string, trends: Trend[]) =>
-    request<DraftResult[]>('/trends/drafts', { method: 'POST', body: JSON.stringify({ trends }) }, token),
+  streamCreateDrafts: (token: string, trends: Trend[], onEvent: (event: TrendsStreamEvent) => void) =>
+    streamSse<TrendsStreamEvent>('/trends/drafts', onEvent, { method: 'POST', body: JSON.stringify({ trends }) }, token),
 
   listComments: (token: string, status?: CommentStatus) =>
     request<AdminComment[]>(`/posts/comments/admin${status ? `?status=${status}` : ''}`, {}, token),

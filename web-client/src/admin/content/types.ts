@@ -41,6 +41,7 @@ export interface AdminContent {
     searchNow: string
     newSearch: string
     discovering: string
+    liveOutputHeading: string
     discoverError: string
     empty: string
     relevancePrefix: string

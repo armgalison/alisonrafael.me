@@ -43,6 +43,7 @@ export const en: AdminContent = {
     searchNow: 'Search now',
     newSearch: 'New search',
     discovering: 'Searching the web and ranking topics — this can take a minute…',
+    liveOutputHeading: 'Live output',
     discoverError: 'Failed to discover trends. Please try again.',
     empty: 'No trends found.',
     relevancePrefix: 'Why it fits:',
