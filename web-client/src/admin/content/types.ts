@@ -7,6 +7,7 @@ export interface AdminContent {
     posts: string
     comments: string
     settings: string
+    tools: string
   }
   login: {
     title: string
@@ -21,7 +22,6 @@ export interface AdminContent {
   postList: {
     heading: string
     newPost: string
-    getTopTrends: string
     loadError: string
     loading: string
     empty: string
@@ -35,7 +35,7 @@ export interface AdminContent {
   trends: {
     heading: string
     subtitle: string
-    backToPosts: string
+    backToTools: string
     lastSearchedPrefix: string
     noSearchYet: string
     searchNow: string
@@ -104,6 +104,29 @@ export interface AdminContent {
     success: string
     submit: string
     submitting: string
+  }
+  tools: {
+    heading: string
+    subtitle: string
+    coverLetterName: string
+    coverLetterDescription: string
+    trendsName: string
+    trendsDescription: string
+  }
+  toolsCoverLetter: {
+    heading: string
+    subtitle: string
+    backToTools: string
+    jobDescriptionLabel: string
+    jobDescriptionPlaceholder: string
+    generate: string
+    generating: string
+    generateError: string
+    resultHeading: string
+    copy: string
+    copied: string
+    downloadPdf: string
+    empty: string
   }
   common: {
     loading: string

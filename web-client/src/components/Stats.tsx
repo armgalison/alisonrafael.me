@@ -13,6 +13,13 @@ function earliestYear(content: ResumeContent): number | null {
   return years.length ? Math.min(...years) : null
 }
 
+const SM_GRID_COLS_BY_COUNT: Record<number, string> = {
+  1: 'sm:grid-cols-1',
+  2: 'sm:grid-cols-2',
+  3: 'sm:grid-cols-3',
+  4: 'sm:grid-cols-4',
+}
+
 export function Stats({ content }: StatsProps) {
   const since = earliestYear(content)
   const years = since ? new Date().getFullYear() - since : null
@@ -23,12 +30,16 @@ export function Stats({ content }: StatsProps) {
     { value: String(content.experience.length), label: 'Companies' },
     { value: String(roleCount), label: 'Roles held' },
     { value: String(content.certifications.length), label: 'Certifications' },
-  ].filter((stat): stat is { value: string; label: string } => stat !== null)
+  ].filter((stat): stat is { value: string; label: string } => stat !== null && stat.value !== '0')
+
+  const smGridColsClass = SM_GRID_COLS_BY_COUNT[stats.length] ?? SM_GRID_COLS_BY_COUNT[4]
 
   return (
     <div className="mx-auto max-w-6xl px-6 pb-4">
       <Reveal>
-        <div className="grid grid-cols-2 divide-x divide-y divide-line rounded-2xl border border-line sm:grid-cols-4 sm:divide-y-0">
+        <div
+          className={`grid grid-cols-1 divide-x divide-y divide-line rounded-2xl border border-line sm:divide-y-0 ${smGridColsClass}`}
+        >
           {stats.map((stat) => (
             <div key={stat.label} className="px-4 py-5 text-center">
               <p className="font-mono text-2xl font-bold text-accent sm:text-3xl">{stat.value}</p>
