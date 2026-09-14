@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { FilePlus, Pencil, Trash2, TrendingUp } from 'lucide-react'
+import { FilePlus, Pencil, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { easeOut } from '../../lib/motion'
@@ -35,13 +35,6 @@ export function PostListPage() {
       <div className="mb-8 flex items-center justify-between">
         <h1 className="text-xl font-semibold">{content.postList.heading}</h1>
         <div className="flex gap-2">
-          <Link
-            href="/admin/trends"
-            className="inline-flex items-center gap-1.5 rounded-full border border-line px-4 py-2 text-sm font-semibold text-ink transition-colors hover:border-accent-dim hover:text-accent"
-          >
-            <TrendingUp size={15} />
-            {content.postList.getTopTrends}
-          </Link>
           <Link
             href="/admin/posts/new"
             className="inline-flex items-center gap-1.5 rounded-full bg-accent px-4 py-2 text-sm font-semibold text-surface transition-opacity hover:opacity-90"

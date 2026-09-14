@@ -164,9 +164,9 @@ export function TrendsPage() {
 
   return (
     <div>
-      <Link href="/admin/posts" className="mb-6 inline-flex items-center gap-1.5 text-sm text-ink-dim hover:text-ink">
+      <Link href="/admin/tools" className="mb-6 inline-flex items-center gap-1.5 text-sm text-ink-dim hover:text-ink">
         <ArrowLeft size={14} />
-        {content.trends.backToPosts}
+        {content.trends.backToTools}
       </Link>
 
       <div className="mb-6 flex items-center justify-between gap-3">

@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { FileText, LayoutDashboard, LogOut, MessageSquare, Settings as SettingsIcon } from 'lucide-react'
+import { FileText, LayoutDashboard, LogOut, MessageSquare, Settings as SettingsIcon, Wrench } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import type { ReactNode } from 'react'
@@ -21,6 +21,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
   const links = [
     { to: '/admin/posts', label: content.nav.posts, icon: FileText, badge: 0 },
     { to: '/admin/comments', label: content.nav.comments, icon: MessageSquare, badge: pendingCount },
+    { to: '/admin/tools', label: content.nav.tools, icon: Wrench, badge: 0 },
     { to: '/admin/settings', label: content.nav.settings, icon: SettingsIcon, badge: 0 },
   ]
 

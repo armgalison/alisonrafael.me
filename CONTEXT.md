@@ -72,9 +72,21 @@ A candidate blog topic — a topic and a one-line summary, plus (once ranked) a 
 _Avoid_: Article, topic (bare), suggestion — Trend is this project's term for a not-yet-a-Post candidate.
 
 **Trend Search**:
-One run of "Get top trends": Claude searches the web for what's currently drawing attention in software development, then ranks that list against the Tech Stack, producing up to 10 Trends. Unlike a bare Trend, a Trend Search *is* persisted (one row per run, see ADR 0007's persistence addendum) — specifically so opening `/admin/trends` shows the last run's results for free, and a fresh (paid) search only happens when the Admin presses "New search." The Admin Panel only ever shows the single most recent Trend Search; older ones stay in the table but aren't browsable from the UI today.
+One run of "Get top trends": Claude searches the web for what's currently drawing attention in software development, then ranks that list against the Tech Stack, producing up to 10 Trends. Unlike a bare Trend, a Trend Search *is* persisted (one row per run, see ADR 0007's persistence addendum) — specifically so opening `/admin/tools/trends` shows the last run's results for free, and a fresh (paid) search only happens when the Admin presses "New search." The Admin Panel only ever shows the single most recent Trend Search; older ones stay in the table but aren't browsable from the UI today.
 _Avoid_: Discovery, search results (bare) — Trend Search is this project's term for one saved run.
 
 **Tech Stack**:
 Alison's own professional skill list — the `technologyGroups` shown in the public Skills section (`en.ts`, sourced from the `shared/` workspace) — used to judge which Trends are worth writing about. This is his career-wide toolbox (includes things like Angular, AWS, Kubernetes from past roles), **not** this repository's own implementation stack, which is a different, narrower list documented in `CLAUDE.md`'s Stack section.
 _Avoid_: "my stack" / "the stack" unqualified — always say Tech Stack (career-wide) vs. this repo's own stack when the distinction matters.
+
+**Tools**:
+The Admin Panel section (`/admin/tools`) holding personal utilities the Admin builds for themselves — distinct from the Blog's authoring pages. Two tools live here: the Cover Letter Generator and Get Top Trends (formerly linked directly from the Posts page, moved here since it's also a personal utility rather than Blog-authoring itself). The section is deliberately a small directory so more can be added without restructuring the nav.
+_Avoid_: Utilities, dashboard widgets — this codebase's term is Tools, matching the nav label and route.
+
+**Cover Letter Generator**:
+The first Tool: the Admin pastes a job description and Claude writes a cover letter grounded in the Resume Profile (see below), returned synchronously (one Claude call, no `web_search`, no streaming — unlike Trends). Ephemeral by design — nothing is persisted, matching this codebase's bias toward only storing a Claude response when there's a concrete reason to avoid re-paying for it (there isn't one here; see ADR 0008's resume-facts addendum).
+_Avoid_: Cover letter writer, application assistant — this codebase's term is Cover Letter Generator.
+
+**Resume Profile**:
+The subset of resume content (`resumeProfile` in the `shared/` workspace) both apps need: name, headline, location, top skills, the Tech Stack, experience, education, certifications, languages. `web-client`'s `en.ts` sources these fields from it rather than duplicating them; `server`'s Cover Letter Generator reads the same values to build its Claude prompt. Purely UI copy (nav labels, hero text, section titles, contact details, footer) stays local to `web-client` — only the resume *facts* live here.
+_Avoid_: Resume data, resume content (bare) — Resume Profile is this project's term for the specific shared subset, not the whole `ResumeContent` type (which also holds `web-client`-only UI copy).

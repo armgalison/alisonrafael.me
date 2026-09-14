@@ -213,4 +213,11 @@ export const api = {
 
   deleteComment: (token: string, id: string) =>
     request<void>(`/posts/comments/admin/${id}`, { method: 'DELETE' }, token),
+
+  generateCoverLetter: (token: string, jobDescription: string) =>
+    request<{ coverLetter: string }>(
+      '/tools/cover-letter',
+      { method: 'POST', body: JSON.stringify({ jobDescription }) },
+      token,
+    ),
 }

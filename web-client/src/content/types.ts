@@ -1,28 +1,7 @@
-export interface ExperienceRole {
-  title: string
-  period: string
-  location: string
-  description: string
-  emphasized: boolean
-}
-
-export interface ExperienceEntry {
-  company: string
-  totalDuration?: string
-  roles: ExperienceRole[]
-  emphasized: boolean
-}
-
-export interface LanguageSkill {
-  name: string
-  level: string
-}
-
-export interface EducationEntry {
-  school: string
-  degree: string
-  period: string
-}
+// Canonically owned in shared/ (see ADR 0008) since server's cover-letter
+// generator needs the same shapes.
+export type { ExperienceRole, ExperienceEntry, LanguageSkill, EducationEntry } from '@portifolio/shared'
+import type { EducationEntry, ExperienceEntry, LanguageSkill } from '@portifolio/shared'
 
 export interface ResumeContent {
   meta: {

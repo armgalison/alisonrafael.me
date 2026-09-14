@@ -34,20 +34,22 @@ export function Credentials({
           </ul>
         </div>
 
-        <div className="p-5">
-          <h3 className="mb-3 flex items-center gap-2 text-xs font-medium tracking-wide text-ink-dim uppercase">
-            <Award size={14} />
-            {certificationsTitle}
-          </h3>
-          <ul className="space-y-2.5">
-            {certifications.map((certification) => (
-              <li key={certification} className="flex items-start gap-2.5 text-sm text-ink">
-                <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-accent" />
-                {certification}
-              </li>
-            ))}
-          </ul>
-        </div>
+        { certifications.length > 0 && (
+          <div className="p-5">
+            <h3 className="mb-3 flex items-center gap-2 text-xs font-medium tracking-wide text-ink-dim uppercase">
+              <Award size={14} />
+              {certificationsTitle}
+            </h3>
+            <ul className="space-y-2.5">
+              {certifications.map((certification) => (
+                <li key={certification} className="flex items-start gap-2.5 text-sm text-ink">
+                  <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-accent" />
+                  {certification}
+                </li>
+              ))}
+            </ul>
+          </div>
+      )}
       </div>
     </Reveal>
   )

@@ -8,3 +8,7 @@ This forced a real, unplanned consequence: `web-client`'s Docker build could no 
 
 - Duplicate the list into `server`, kept in sync by hand: rejected — exactly the kind of drift a "single source of truth" is supposed to prevent, and nothing would catch it happening.
 - `server` fetches the list from a `web-client`-served endpoint at request time: rejected — turns static content into a runtime network dependency between the two apps for no benefit.
+
+## Update: resume facts promoted alongside the Tech Stack
+
+The Cover Letter Generator (Admin Panel → Tools) needs the same kind of resume content the public site renders — experience, education, certifications, languages, top skills, name/headline/location — to give Claude the candidate's real background when writing a letter. The same reasoning applies as above: `server` can't import `web-client`'s `en.ts` directly, and hand-duplicating this content server-side would drift the moment the resume is updated in one place and not the other. `shared/src/index.ts`'s single file was split into `tech-stack.ts` (unchanged `techStackGroups`) and a new `resume.ts` exporting `resumeProfile` — the same subset listed above, moved verbatim out of `en.ts`. `en.ts` now sources those fields from `resumeProfile` instead of inlining them, keeping only pure UI copy (`nav`, `hero`, `sectionTitles`, `contact`, `footer`) local to `web-client`.
