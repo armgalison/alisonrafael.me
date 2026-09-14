@@ -3,9 +3,9 @@
 import { motion } from 'framer-motion'
 import { ArrowLeft, CheckCircle2, RefreshCw, Sparkles, XCircle } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { easeOut } from '../../lib/motion'
-import { api, ApiError, type DraftResult, type RankedTrend } from '../api'
+import { api, ApiError, type DraftResult, type RankedTrend, type TrendsStreamEvent } from '../api'
 import { useAuth } from '../AuthContext'
 import { useAdminContent } from '../i18n'
 
@@ -16,6 +16,63 @@ function formatRelativeTime(iso: string): string {
   const hours = Math.round(minutes / 60)
   if (hours < 24) return `${hours}h ago`
   return `${Math.round(hours / 24)}d ago`
+}
+
+interface LiveEntry {
+  id: number
+  kind: 'thinking' | 'status'
+  text: string
+}
+
+// Consecutive thinking deltas merge into one flowing block instead of a
+// list of tiny fragments; a status event (phase change, web search
+// starting/finishing, a new draft starting) always starts a fresh block —
+// that's a natural, meaningful break, not noise.
+function appendLiveEvent(prev: LiveEntry[], event: TrendsStreamEvent): LiveEntry[] {
+  if (event.type === 'thinking') {
+    const last = prev[prev.length - 1]
+    if (last?.kind === 'thinking') {
+      return [...prev.slice(0, -1), { ...last, text: last.text + event.delta }]
+    }
+    return [...prev, { id: prev.length, kind: 'thinking', text: event.delta }]
+  }
+  if (event.type === 'status') {
+    return [...prev, { id: prev.length, kind: 'status', text: event.message }]
+  }
+  return prev
+}
+
+function LivePanel({ heading, entries }: { heading: string; entries: LiveEntry[] }) {
+  const scrollRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight })
+  }, [entries])
+
+  return (
+    <div className="mt-4 overflow-hidden rounded-2xl border border-line bg-surface-raised/60">
+      <div className="flex items-center gap-1.5 border-b border-line px-4 py-3">
+        <span className="h-2.5 w-2.5 rounded-full bg-ink-dim/30" />
+        <span className="h-2.5 w-2.5 rounded-full bg-ink-dim/30" />
+        <span className="h-2.5 w-2.5 rounded-full bg-accent/60" />
+        <span className="ml-2 font-mono text-xs text-ink-dim">{heading}</span>
+      </div>
+      <div ref={scrollRef} className="max-h-64 space-y-2 overflow-y-auto p-5 font-mono text-xs leading-relaxed">
+        {entries.map((entry) =>
+          entry.kind === 'status' ? (
+            <p key={entry.id} className="text-ink-dim">
+              <span className="text-accent">❯</span> {entry.text}
+            </p>
+          ) : (
+            <p key={entry.id} className="whitespace-pre-wrap text-ink-dim/80">
+              {entry.text}
+            </p>
+          ),
+        )}
+        <span className="inline-block h-3 w-1.5 animate-pulse bg-accent" />
+      </div>
+    </div>
+  )
 }
 
 export function TrendsPage() {
@@ -30,6 +87,7 @@ export function TrendsPage() {
   const [searching, setSearching] = useState(false)
   const [creating, setCreating] = useState(false)
   const [results, setResults] = useState<DraftResult[] | null>(null)
+  const [live, setLive] = useState<LiveEntry[]>([])
 
   // Only ever reads the last saved search — never triggers a new (paid)
   // discovery run on its own. "New search" below is the only thing that
@@ -54,10 +112,17 @@ export function TrendsPage() {
     setError(null)
     setResults(null)
     setSelected(new Set())
+    setLive([])
     try {
-      const search = await api.discoverTrends(token)
-      setTrends(search.trends)
-      setSearchedAt(search.createdAt)
+      await api.streamDiscoverTrends(token, (event) => {
+        setLive((prev) => appendLiveEvent(prev, event))
+        if (event.type === 'result') {
+          setTrends(event.result.trends)
+          setSearchedAt(event.result.createdAt)
+        } else if (event.type === 'error') {
+          setError(event.message)
+        }
+      })
     } catch (err) {
       setError(err instanceof ApiError ? err.message : content.trends.discoverError)
     } finally {
@@ -79,10 +144,17 @@ export function TrendsPage() {
     setCreating(true)
     setResults(null)
     setError(null)
+    setLive([])
     const chosen = trends.filter((_, index) => selected.has(index))
     try {
-      const outcome = await api.createDrafts(token, chosen)
-      setResults(outcome)
+      await api.streamCreateDrafts(token, chosen, (event) => {
+        setLive((prev) => appendLiveEvent(prev, event))
+        if (event.type === 'draft_result') {
+          setResults((prev) => [...(prev ?? []), event.result])
+        } else if (event.type === 'error') {
+          setError(event.message)
+        }
+      })
     } catch (err) {
       setError(err instanceof ApiError ? err.message : content.trends.discoverError)
     } finally {
@@ -124,6 +196,7 @@ export function TrendsPage() {
 
       {loadingLatest && <p className="text-sm text-ink-dim">{content.common.loading}</p>}
       {searching && <p className="text-sm text-ink-dim">{content.trends.discovering}</p>}
+      {(searching || creating) && <LivePanel heading={content.trends.liveOutputHeading} entries={live} />}
       {error && <p className="text-sm text-red-400">{error}</p>}
       {!loadingLatest && !searching && !trends && !error && <p className="text-sm text-ink-dim">{content.trends.noSearchYet}</p>}
       {!searching && trends?.length === 0 && <p className="text-sm text-ink-dim">{content.trends.empty}</p>}
