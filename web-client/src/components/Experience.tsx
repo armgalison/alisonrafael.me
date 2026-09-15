@@ -1,10 +1,7 @@
 'use client'
 
-import { AnimatePresence, motion } from 'framer-motion'
-import { Briefcase, ChevronRight, MapPin } from 'lucide-react'
-import { useState } from 'react'
+import { Briefcase, MapPin } from 'lucide-react'
 import type { ExperienceEntry } from '../content/types'
-import { easeOut } from '../lib/motion'
 import { Reveal } from './Reveal'
 
 interface ExperienceProps {
@@ -68,66 +65,13 @@ function RoleCard({
   )
 }
 
-function EarlierRoleRow({ role, company }: { role: ExperienceEntry['roles'][number]; company: string }) {
-  return (
-    <div className="relative pl-10">
-      <span className="absolute top-2 left-[7px] h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-line" />
-      <div className="border-l border-line/60 py-1 pl-4 text-sm">
-        <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <h4 className="font-medium text-ink-dim">{role.title}</h4>
-          <span className="font-mono text-xs text-ink-dim/70">{role.period}</span>
-        </div>
-        <p className="mt-0.5 text-xs text-ink-dim/70">
-          {company} · {role.location}
-        </p>
-        <p className="mt-1.5 leading-relaxed text-ink-dim/80">{role.description}</p>
-      </div>
-    </div>
-  )
-}
-
-function GroupedRoleRow({ role }: { role: ExperienceEntry['roles'][number] }) {
-  return (
-    <div className="border-l-2 border-line/50 py-1 pl-4 text-sm">
-      <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h4 className="font-medium text-ink-dim">{role.title}</h4>
-        <span className="font-mono text-xs text-ink-dim/70">{role.period}</span>
-      </div>
-      <p className="mt-0.5 text-xs text-ink-dim/70">{role.location}</p>
-      <p className="mt-1.5 leading-relaxed text-ink-dim/80">{role.description}</p>
-    </div>
-  )
-}
-
-function CompanyGroup({ company, duration, roles }: { company: string; duration: string; roles: ExperienceEntry['roles'] }) {
-  return (
-    <div className="relative pl-10">
-      <span className="absolute top-3.5 left-[7px] h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-line" />
-      <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 rounded-lg border border-line/60 bg-surface-raised/50 px-4 py-2.5">
-        <span className="text-xs font-semibold tracking-wide text-ink-dim uppercase">{company}</span>
-        <span className="font-mono text-xs text-ink-dim">{duration}</span>
-      </div>
-      <div className="mt-3 ml-6 space-y-3">
-        {roles.map((role) => (
-          <GroupedRoleRow key={`${company}-${role.title}-${role.period}`} role={role} />
-        ))}
-      </div>
-    </div>
-  )
-}
-
 export function Experience({ entries }: ExperienceProps) {
-  const [showEarlier, setShowEarlier] = useState(false)
-
-  const emphasized = entries.filter((entry) => entry.emphasized)
-  const earlier = entries.filter((entry) => !entry.emphasized)
-
   return (
     <div className="relative">
       <div className="absolute top-2 bottom-2 left-[7px] w-px bg-gradient-to-b from-line via-line to-transparent" />
 
       <div className="space-y-5">
-        {emphasized.map((entry, entryIndex) => (
+        {entries.map((entry, entryIndex) => (
           <Reveal key={entry.company}>
             <div className="space-y-5">
               {entry.roles.map((role, roleIndex) => (
@@ -143,62 +87,6 @@ export function Experience({ entries }: ExperienceProps) {
           </Reveal>
         ))}
       </div>
-
-      {earlier.length > 0 && (
-        <div className="mt-5">
-          <button
-            type="button"
-            onClick={() => setShowEarlier((value) => !value)}
-            className="flex items-center gap-2 pl-10 text-sm font-medium text-ink-dim transition-colors hover:text-accent"
-            aria-expanded={showEarlier}
-          >
-            <motion.span
-              animate={{ rotate: showEarlier ? 90 : 0 }}
-              className="inline-flex"
-              transition={{ duration: 0.2 }}
-            >
-              <ChevronRight size={16} />
-            </motion.span>
-            {showEarlier ? 'Hide earlier roles' : `Show earlier roles (${earlier.length})`}
-          </button>
-
-          <AnimatePresence initial={false}>
-            {showEarlier && (
-              <motion.div
-                key="earlier-roles"
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.35, ease: easeOut }}
-                className="overflow-hidden"
-              >
-                <div className="mt-4 space-y-4">
-                  {earlier.map((entry) =>
-                    entry.totalDuration ? (
-                      <CompanyGroup
-                        key={entry.company}
-                        company={entry.company}
-                        duration={entry.totalDuration}
-                        roles={entry.roles}
-                      />
-                    ) : (
-                      <div key={entry.company} className="space-y-3">
-                        {entry.roles.map((role) => (
-                          <EarlierRoleRow
-                            key={`${entry.company}-${role.title}-${role.period}`}
-                            role={role}
-                            company={entry.company}
-                          />
-                        ))}
-                      </div>
-                    ),
-                  )}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      )}
     </div>
   )
 }
