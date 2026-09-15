@@ -12,6 +12,8 @@ export const en: ResumeContent = {
     email: 'armg.alison@gmail.com',
     linkedin: 'https://www.linkedin.com/in/armgalison',
     linkedinLabel: 'linkedin.com/in/armgalison',
+    github: 'https://github.com/armgalison',
+    githubLabel: 'github.com/armgalison',
   },
   nav: {
     experience: 'Experience',

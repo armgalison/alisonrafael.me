@@ -14,6 +14,8 @@ export interface ResumeContent {
     email: string
     linkedin: string
     linkedinLabel: string
+    github: string
+    githubLabel: string
   }
   nav: {
     experience: string

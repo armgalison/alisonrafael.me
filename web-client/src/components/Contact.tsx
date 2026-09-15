@@ -1,4 +1,4 @@
-import { Mail, Phone, Send } from 'lucide-react'
+import { GitBranch, Mail, Phone, Send } from 'lucide-react'
 import type { ResumeContent } from '../content/types'
 import { Reveal } from './Reveal'
 
@@ -10,6 +10,7 @@ export function Contact({ content }: ContactProps) {
   const links = [
     { icon: Mail, label: content.contact.email, href: `mailto:${content.contact.email}` },
     { icon: Send, label: content.contact.linkedinLabel, href: content.contact.linkedin },
+    { icon: GitBranch, label: content.contact.githubLabel, href: content.contact.github },
     {
       icon: Phone,
       label: content.contact.phone,
@@ -29,7 +30,7 @@ export function Contact({ content }: ContactProps) {
           Let's build something great together.
         </p>
         <p className="mt-2 text-ink-dim">Reach out any time — I usually reply within a day.</p>
-        <ul className="mt-9 grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <ul className="mt-9 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {links.map((link) => (
             <li key={link.href}>
               <a
