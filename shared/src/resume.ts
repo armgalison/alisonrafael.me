@@ -89,7 +89,10 @@ export const resumeProfile: ResumeProfile = {
     { name: 'English', level: 'Full Professional' },
     { name: 'Portuguese', level: 'Native or Bilingual' },
   ],
-  certifications: [],
+  certifications: [
+    'Testing Angular 4 (previously Angular 2) Apps with Jasmine',
+    'Introduction to JavaScript Security LFS184',
+  ],
   experience: [
     {
       company: 'BairesDev',
@@ -97,7 +100,7 @@ export const resumeProfile: ResumeProfile = {
       roles: [
         {
           title: 'Principal Software Engineer',
-          period: 'September 2021 - Present (5 years)',
+          period: 'September 2021 - Present (5 years 1 month)',
           location: 'San Francisco, California, United States',
           emphasized: true,
           description:
@@ -115,7 +118,7 @@ export const resumeProfile: ResumeProfile = {
           location: 'São Paulo, Brazil',
           emphasized: true,
           description:
-            'At LABSIT, I focused on web application development as a frontend engineer, where I played a pivotal role in creating an Angular library that significantly improved development efficiency. Leading a squad, I was responsible for task delegation, architectural decisions, and code reviews, ensuring high-quality deliverables. My experience here has honed my leadership and technical skills in a dynamic environment of an established company.',
+            "I worked as a frontend engineer focused on web application development, leading a squad of 4-6 engineers responsible for architectural decisions, task delegation, and code reviews across the team's deliverables. I built an internal Angular component library, based on the company's design system, that grew to over 50 reusable components and was adopted across 6 projects. Since most of the team consisted of backend developers working on frontend tasks, the library cut their development time by at least 50%, letting them ship UI work without deep Angular expertise. I owned architectural decisions for frontend projects, setting technical direction and code standards that the squad followed, and led code reviews to maintain consistency and quality across deliverables. Leading the squad's day-to-day execution, I managed task delegation and sprint planning, balancing team capacity against delivery deadlines while mentoring engineers on frontend best practices.",
         },
       ],
     },
@@ -129,7 +132,7 @@ export const resumeProfile: ResumeProfile = {
           location: 'Seattle, WA',
           emphasized: false,
           description:
-            'At TECLA, I contributed to the development of a web-based mental health system, focusing on migrating a legacy system to modern web technologies. My experience included participating in agile Scrum practices and completing HIPAA training to ensure compliance. Although my tenure was brief, it was an enriching opportunity that enhanced my skills in web application development and teamwork.',
+            'I contributed to the development of a web-based mental health records system for ICANotes, a U.S. healthcare software company, focusing on migrating a legacy system to modern web technologies while maintaining HIPAA compliance throughout. I worked within an agile Scrum team, participating in sprint planning and delivery cycles, and completed formal HIPAA training to ensure the migration met healthcare data privacy and security standards. This experience gave me early exposure to U.S.-based engineering practices, healthcare compliance requirements, and remote collaboration with an international team.',
         },
       ],
     },
@@ -140,27 +143,10 @@ export const resumeProfile: ResumeProfile = {
       roles: [
         {
           title: 'Software Engineer',
-          period: 'February 2018 - August 2020 (2 years 7 months)',
+          period: 'June 2016 - August 2020 (4 years 3 months)',
           location: 'Santa Rita do Sapucaí, MG',
           emphasized: false,
-          description:
-            'At Inatel Competence Center, I have played a pivotal role in developing web applications tailored for Telecom product management. My focus has been on enhancing user experience and ensuring efficient functionality. Working closely with cross-functional teams, I have contributed to the seamless integration of features while continuously improving my skills in frontend development.',
-        },
-        {
-          title: 'Software Development Intern',
-          period: 'March 2017 - February 2018 (1 year)',
-          location: 'Santa Rita do Sapucaí, Minas Gerais',
-          emphasized: false,
-          description:
-            'I designed and implemented an IoT platform from scratch, capable of handling thousands of requests per hour and supporting multiple communication protocols such as HTTP, CoAP, and MQTT. To validate the solution, we integrated devices across the INATEL campus. This allowed me to develop a comprehensive application that enabled real-time visualization.',
-        },
-        {
-          title: 'Software Development Intern',
-          period: 'June 2016 - February 2017 (9 months)',
-          location: 'Santa Rita do Sapucaí, MG',
-          emphasized: false,
-          description:
-            'Validated potential projects, contributing to accurate project estimations and proof of concepts to ensure feasibility. Researched and summarized new frameworks and technologies, providing valuable insights to senior engineers. Enhanced project validation efficiency, reducing validation time through thorough analysis and innovative approaches.',
+          description: 'I spent over four years at Inatel Competence Center, progressing from intern to Software Engineer while working on web applications for Telecom product management and an IoT platform built from the ground up. As an intern, I designed and implemented an IoT platform from scratch, supporting multiple communication protocols (HTTP, CoAP, and MQTT) and handling continuous data from over 200 devices, including campus lighting, sensors, and the main electrical panel, each sending requests at 1 request per second. I integrated the platform across the full INATEL campus and built a comprehensive application for real-time visualization of device data. In an earlier intern role, I supported project validation by researching new frameworks and technologies, producing proof-of-concepts and estimations that improved the accuracy and speed of project scoping for senior engineers. Moving into the Software Engineer role, I worked on a Telecom Plans Design System application for Ericsson, focusing on frontend development to support telecom product management, working closely with cross-functional teams to improve user experience and platform functionality',
         },
       ],
     },
