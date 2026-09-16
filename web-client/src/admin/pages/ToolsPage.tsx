@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { FileEdit, TrendingUp } from 'lucide-react'
+import { FileEdit, FileText, TrendingUp } from 'lucide-react'
 import Link from 'next/link'
 import { easeOut } from '../../lib/motion'
 import { useAdminContent } from '../i18n'
@@ -23,6 +23,12 @@ export function ToolsPage() {
       icon: TrendingUp,
       name: content.tools.trendsName,
       description: content.tools.trendsDescription,
+    },
+    {
+      href: '/admin/tools/ats-resume',
+      icon: FileText,
+      name: content.tools.atsResumeName,
+      description: content.tools.atsResumeDescription,
     },
   ]
 

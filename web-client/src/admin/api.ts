@@ -1,4 +1,8 @@
+import type { ResumeProfile } from '@portifolio/shared'
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL as string
+
+export type { ResumeProfile }
 
 export interface Post {
   id: string
@@ -80,6 +84,17 @@ export type TrendsStreamEvent =
   | { type: 'result'; result: TrendSearch }
   | { type: 'draft_result'; result: DraftResult }
   | { type: 'error'; message: string }
+
+// One ATS Resume draft/approval — mirrors server/src/ats-resume's AtsResume
+// entity. approvedAt is null until the Admin approves that draft's markdown,
+// which is also when it becomes the file GET /resume serves publicly.
+export interface AtsResume {
+  id: string
+  markdown: string
+  jobDescription: string
+  createdAt: string
+  approvedAt: string | null
+}
 
 export class ApiError extends Error {
   status: number
@@ -220,4 +235,27 @@ export const api = {
       { method: 'POST', body: JSON.stringify({ jobDescription }) },
       token,
     ),
+
+  getLatestAtsResume: (token: string) => request<AtsResume | null>('/ats-resume/latest', {}, token),
+
+  generateAtsResume: (token: string, jobDescription: string) =>
+    request<AtsResume>(
+      '/ats-resume/generate',
+      { method: 'POST', body: JSON.stringify({ jobDescription }) },
+      token,
+    ),
+
+  approveAtsResume: (token: string, id: string, markdown: string) =>
+    request<AtsResume>(
+      `/ats-resume/${id}/approve`,
+      { method: 'POST', body: JSON.stringify({ markdown }) },
+      token,
+    ),
+
+  // Public route (no guard server-side) — the Admin Panel still passes a
+  // token where it has one, but it's never required.
+  getResumeProfile: () => request<ResumeProfile>('/resume-profile'),
+
+  updateResumeProfile: (token: string, data: ResumeProfile) =>
+    request<ResumeProfile>('/resume-profile', { method: 'PATCH', body: JSON.stringify(data) }, token),
 }

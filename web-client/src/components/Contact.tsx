@@ -1,4 +1,4 @@
-import { Mail, Phone, Send } from 'lucide-react'
+import { Globe, Mail, Phone, Send, Terminal } from 'lucide-react'
 import type { ResumeContent } from '../content/types'
 import { Reveal } from './Reveal'
 
@@ -7,14 +7,17 @@ interface ContactProps {
 }
 
 export function Contact({ content }: ContactProps) {
+  const { links: contact } = content
   const links = [
-    { icon: Mail, label: content.contact.email, href: `mailto:${content.contact.email}` },
-    { icon: Send, label: content.contact.linkedinLabel, href: content.contact.linkedin },
+    { icon: Mail, label: contact.email, href: `mailto:${contact.email}` },
+    { icon: Send, label: contact.linkedinLabel, href: contact.linkedin },
     {
       icon: Phone,
-      label: content.contact.phone,
-      href: `tel:${content.contact.phone.replace(/[^+\d]/g, '')}`,
+      label: contact.phone,
+      href: `tel:${contact.phone.replace(/[^+\d]/g, '')}`,
     },
+    ...(contact.github ? [{ icon: Terminal, label: contact.githubLabel, href: contact.github }] : []),
+    ...(contact.website ? [{ icon: Globe, label: contact.websiteLabel, href: contact.website }] : []),
   ]
 
   return (

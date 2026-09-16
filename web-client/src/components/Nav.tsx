@@ -8,6 +8,7 @@ import { useState } from 'react'
 import type { ResumeContent } from '../content/types'
 import { useActiveSection } from '../hooks/useActiveSection'
 import { easeOut } from '../lib/motion'
+import { resumeDownloadUrl } from '../lib/resumeUrl'
 
 interface NavProps {
   content: ResumeContent
@@ -91,7 +92,7 @@ export function Nav({ content }: NavProps) {
           </ul>
 
           <a
-            href="/resume.pdf"
+            href={resumeDownloadUrl}
             download
             className="hidden items-center gap-1.5 rounded-full border border-ink-dim/40 px-3.5 py-1.5 text-xs font-semibold text-ink transition-colors hover:border-accent hover:text-accent sm:inline-flex"
           >
@@ -159,7 +160,7 @@ export function Nav({ content }: NavProps) {
               </ul>
               <div className="border-t border-line/60 px-6 py-4">
                 <a
-                  href="/resume.pdf"
+                  href={resumeDownloadUrl}
                   download
                   onClick={() => setOpen(false)}
                   className="flex items-center justify-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-surface"

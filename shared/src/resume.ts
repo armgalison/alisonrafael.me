@@ -33,10 +33,28 @@ export interface EducationEntry {
   period: string
 }
 
+// The contact/profile links a resume needs (phone, email, LinkedIn, GitHub,
+// personal site) — Resume Profile data like everything else here, so the
+// ATS Resume Generator and Cover Letter Generator (server/) can read the
+// same values web-client renders in the public Contact section. `*Label`
+// fields hold the short display text (e.g. "github.com/armgalison") for the
+// full URL in the sibling field.
+export interface ResumeLinks {
+  phone: string
+  email: string
+  linkedin: string
+  linkedinLabel: string
+  github: string
+  githubLabel: string
+  website: string
+  websiteLabel: string
+}
+
 export interface ResumeProfile {
   name: string
   headline: string
   location: string
+  links: ResumeLinks
   topSkills: string[]
   technologyGroups: { label: string; items: string[] }[]
   languages: LanguageSkill[]
@@ -50,6 +68,16 @@ export const resumeProfile: ResumeProfile = {
   headline:
     'Full-Stack Engineer · Delivering high-impact products\nTurning complex problems into scalable solutions',
   location: 'Pouso Alegre, Minas Gerais, Brazil',
+  links: {
+    phone: '+55 35 99198-3363',
+    email: 'armg.alison@gmail.com',
+    linkedin: 'https://www.linkedin.com/in/armgalison',
+    linkedinLabel: 'linkedin.com/in/armgalison',
+    github: 'https://github.com/armgalison',
+    githubLabel: 'github.com/armgalison',
+    website: 'https://alisonrafael.me',
+    websiteLabel: 'alisonrafael.me',
+  },
   topSkills: [
     'AI-Native Development',
     'Functional Programming',

@@ -9,14 +9,16 @@ import { Nav } from '../components/Nav'
 import { SectionHeading } from '../components/Section'
 import { Skills } from '../components/Skills'
 import { Stats } from '../components/Stats'
-import { useResumeContent } from '../i18n'
+import { getResumeContent } from '../i18n'
 
-// Server Component — content is static (../content/en.ts) so this renders
-// fully server-side, no data fetching. The interactive/animated pieces
+// Server Component — renders fully server-side. The Resume Profile part of
+// `content` is fetched from the API per request (cached until the Admin's
+// next Settings save, see i18n/index.ts's getResumeContent), the rest is
+// still the static ../content/en.ts copy. The interactive/animated pieces
 // (Nav, Hero, Experience, Reveal, ...) are client islands within it — see
 // docs/adr/0013-migrate-web-client-to-nextjs-app-router.md.
-export default function Home() {
-  const content = useResumeContent()
+export default async function Home() {
+  const content = await getResumeContent()
 
   return (
     <div className="min-h-screen bg-surface text-ink">
