@@ -5,6 +5,7 @@ import { Download, MapPin } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import type { ResumeContent } from '../content/types'
 import { easeOut } from '../lib/motion'
+import { resumeDownloadUrl } from '../lib/resumeUrl'
 
 interface HeroProps {
   content: ResumeContent
@@ -134,7 +135,7 @@ export function Hero({ content }: HeroProps) {
 
           <motion.div variants={item} className="mt-9 flex flex-wrap items-center gap-4">
             <a
-              href="/resume.pdf"
+              href={resumeDownloadUrl}
               download
               className="group inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-surface transition-transform hover:scale-[1.03] active:scale-[0.98]"
             >

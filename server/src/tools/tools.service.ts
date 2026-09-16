@@ -1,7 +1,8 @@
 import Anthropic from '@anthropic-ai/sdk';
-import { resumeProfile, type ResumeProfile } from '@portifolio/shared';
+import type { ResumeProfile } from '@portifolio/shared';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { ResumeProfileService } from '../resume-profile/resume-profile.service.js';
 
 // Sonnet: this is prose generation that needs real judgment about which
 // parts of the resume to foreground for a given job description, not a
@@ -12,11 +13,15 @@ const COVER_LETTER_MODEL = 'claude-sonnet-5';
 export class ToolsService {
   private readonly client: Anthropic;
 
-  constructor(config: ConfigService) {
+  constructor(
+    config: ConfigService,
+    private readonly resumeProfile: ResumeProfileService,
+  ) {
     this.client = new Anthropic({ apiKey: config.getOrThrow<string>('ANTHROPIC_API_KEY') });
   }
 
   async generateCoverLetter(jobDescription: string): Promise<string> {
+    const profile = await this.resumeProfile.get();
     const message = await this.client.messages.create({
       model: COVER_LETTER_MODEL,
       max_tokens: 2000,
@@ -31,7 +36,7 @@ export class ToolsService {
             "never use an em dash (—), and skip stock phrases like \"I am excited to apply\" or \"I believe I " +
             'would be a great fit." Respond with ONLY the cover letter body (no subject line, no markdown ' +
             'formatting, no commentary before or after), three to five paragraphs, ready to send as-is.\n\n' +
-            `Candidate background:\n${formatResumeProfile(resumeProfile)}`,
+            `Candidate background:\n${formatResumeProfile(profile)}`,
           cache_control: { type: 'ephemeral' },
         },
       ],
@@ -41,7 +46,7 @@ export class ToolsService {
   }
 }
 
-function formatResumeProfile(profile: ResumeProfile): string {
+export function formatResumeProfile(profile: ResumeProfile): string {
   const experience = profile.experience
     .flatMap((entry) =>
       entry.roles.map((role) => `- ${role.title} at ${entry.company} (${role.period}): ${role.description}`),
@@ -63,7 +68,7 @@ function formatResumeProfile(profile: ResumeProfile): string {
   ].join('\n\n');
 }
 
-function extractText(message: Anthropic.Message): string {
+export function extractText(message: Anthropic.Message): string {
   const text = message.content
     .filter((block): block is Anthropic.TextBlock => block.type === 'text')
     .map((block) => block.text)

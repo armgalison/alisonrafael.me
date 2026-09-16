@@ -104,6 +104,15 @@ export interface AdminContent {
     success: string
     submit: string
     submitting: string
+    resumeProfileHeading: string
+    resumeProfileSubtitle: string
+    resumeProfileLoading: string
+    resumeProfileLoadError: string
+    resumeProfileInvalidJson: string
+    resumeProfileSaveError: string
+    resumeProfileSuccess: string
+    resumeProfileSave: string
+    resumeProfileSaving: string
   }
   tools: {
     heading: string
@@ -112,6 +121,8 @@ export interface AdminContent {
     coverLetterDescription: string
     trendsName: string
     trendsDescription: string
+    atsResumeName: string
+    atsResumeDescription: string
   }
   toolsCoverLetter: {
     heading: string
@@ -126,6 +137,24 @@ export interface AdminContent {
     copy: string
     copied: string
     downloadPdf: string
+    empty: string
+  }
+  toolsAtsResume: {
+    heading: string
+    subtitle: string
+    backToTools: string
+    jobDescriptionLabel: string
+    jobDescriptionPlaceholder: string
+    generate: string
+    generating: string
+    regenerate: string
+    generateError: string
+    contentLabel: string
+    approve: string
+    approving: string
+    approveError: string
+    approvedPrefix: string
+    viewLive: string
     empty: string
   }
   common: {

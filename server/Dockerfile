@@ -23,5 +23,6 @@ COPY server/package.json ./server/package.json
 RUN npm ci --omit=dev
 COPY --from=build /app/shared/dist ./shared/dist
 COPY --from=build /app/server/dist ./server/dist
+COPY server/assets ./assets
 EXPOSE 3000
 CMD ["node", "server/dist/main.js"]

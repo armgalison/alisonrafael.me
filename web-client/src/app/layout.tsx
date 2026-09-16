@@ -56,7 +56,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <link href={FONT_HREF} rel="stylesheet" />
         </noscript>
       </head>
-      <body>{children}</body>
+      <body suppressHydrationWarning>{children}</body>
     </html>
   )
 }

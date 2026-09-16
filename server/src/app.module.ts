@@ -2,10 +2,12 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AtsResumeModule } from './ats-resume/ats-resume.module.js';
 import { AuthModule } from './auth/auth.module.js';
 import { BlogModule } from './blog/blog.module.js';
 import { CommentsModule } from './comments/comments.module.js';
 import { HealthController } from './health/health.controller.js';
+import { ResumeProfileModule } from './resume-profile/resume-profile.module.js';
 import { ToolsModule } from './tools/tools.module.js';
 import { TrendsModule } from './trends/trends.module.js';
 import { UPLOADS_DIR, UPLOADS_ROUTE } from './uploads/uploads.constants.js';
@@ -36,6 +38,8 @@ import { UploadsModule } from './uploads/uploads.module.js';
     UploadsModule,
     TrendsModule,
     ToolsModule,
+    AtsResumeModule,
+    ResumeProfileModule,
   ],
   controllers: [HealthController],
 })

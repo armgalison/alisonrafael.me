@@ -1,20 +1,6 @@
-import { resumeProfile } from '@portifolio/shared'
-import type { ResumeContent } from './types'
+import type { StaticResumeContent } from './types'
 
-export const en: ResumeContent = {
-  meta: {
-    name: resumeProfile.name,
-    headline: resumeProfile.headline,
-    location: resumeProfile.location,
-  },
-  contact: {
-    phone: '+55 35 99198-3363',
-    email: 'armg.alison@gmail.com',
-    linkedin: 'https://www.linkedin.com/in/armgalison',
-    linkedinLabel: 'linkedin.com/in/armgalison',
-    github: 'https://github.com/armgalison',
-    githubLabel: 'github.com/armgalison',
-  },
+export const en: StaticResumeContent = {
   nav: {
     experience: 'Experience',
     skills: 'Skills',
@@ -43,14 +29,6 @@ export const en: ResumeContent = {
     certifications: 'Certifications',
     contact: 'Get in Touch',
   },
-  // Sourced from shared/'s resumeProfile (see ADR 0008) — server's
-  // cover-letter generator reads the same data.
-  topSkills: resumeProfile.topSkills,
-  technologyGroups: resumeProfile.technologyGroups,
-  languages: resumeProfile.languages,
-  certifications: resumeProfile.certifications,
-  experience: resumeProfile.experience,
-  education: resumeProfile.education,
   footer: {
     rights: 'Built with React, Tailwind, Claude Code, and a healthy dose of caffeine.',
   },

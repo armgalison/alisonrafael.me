@@ -2,9 +2,8 @@
 
 import { ArrowLeft, Check, Copy, Download, FileEdit } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
-import { useResumeContent } from '../../i18n'
-import { api, ApiError } from '../api'
+import { useEffect, useState } from 'react'
+import { api, ApiError, type ResumeProfile } from '../api'
 import { useAuth } from '../AuthContext'
 import { useAdminContent } from '../i18n'
 import { downloadCoverLetterPdf } from '../lib/coverLetterPdf'
@@ -12,13 +11,20 @@ import { downloadCoverLetterPdf } from '../lib/coverLetterPdf'
 export function ToolsCoverLetterPage() {
   const { token } = useAuth()
   const content = useAdminContent()
-  const resume = useResumeContent()
 
+  // name/location/contact links are Resume Profile data (now DB-backed,
+  // see Settings' Resume Profile editor) — fetched live rather than from
+  // the static useResumeContent(), which only holds UI copy now.
+  const [profile, setProfile] = useState<ResumeProfile | null>(null)
   const [jobDescription, setJobDescription] = useState('')
   const [coverLetter, setCoverLetter] = useState<string | null>(null)
   const [generating, setGenerating] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
+
+  useEffect(() => {
+    api.getResumeProfile().then(setProfile)
+  }, [])
 
   async function handleGenerate() {
     if (!token || !jobDescription.trim()) return
@@ -44,13 +50,13 @@ export function ToolsCoverLetterPage() {
   }
 
   function handleDownloadPdf() {
-    if (!coverLetter) return
+    if (!coverLetter || !profile) return
     downloadCoverLetterPdf(coverLetter, {
-      name: resume.meta.name,
-      location: resume.meta.location,
-      phone: resume.contact.phone,
-      email: resume.contact.email,
-      linkedinLabel: resume.contact.linkedinLabel,
+      name: profile.name,
+      location: profile.location,
+      phone: profile.links.phone,
+      email: profile.links.email,
+      linkedinLabel: profile.links.linkedinLabel,
     })
   }
 
@@ -116,7 +122,8 @@ export function ToolsCoverLetterPage() {
               <button
                 type="button"
                 onClick={handleDownloadPdf}
-                className="inline-flex items-center gap-1.5 rounded-full border border-line px-3 py-1.5 text-xs font-semibold text-ink transition-colors hover:border-accent-dim hover:text-accent"
+                disabled={!profile}
+                className="inline-flex items-center gap-1.5 rounded-full border border-line px-3 py-1.5 text-xs font-semibold text-ink transition-colors hover:border-accent-dim hover:text-accent disabled:opacity-50"
               >
                 <Download size={13} />
                 {content.toolsCoverLetter.downloadPdf}
