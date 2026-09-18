@@ -109,13 +109,10 @@ export function Hero({ content }: HeroProps) {
             />
             <span className="inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-3 py-1 text-xs font-medium text-accent">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-accent" />
-              Open to new opportunities
+              {content.hero.greeting}
             </span>
           </motion.div>
 
-          <motion.p variants={item} className="mb-3 font-mono text-sm text-accent">
-            {content.hero.greeting}
-          </motion.p>
           <motion.h1
             variants={item}
             className="text-4xl font-extrabold tracking-tight text-ink sm:text-6xl"
