@@ -4,8 +4,8 @@ services:
     container_name: resume-site
     restart: unless-stopped
     environment:
-      VIRTUAL_HOST: alisonrafael.me,www.alisonrafael.me
-      LETSENCRYPT_HOST: alisonrafael.me,www.alisonrafael.me
+      VIRTUAL_HOST: alisonrafael.me,www.alisonrafael.me,blog.alisonrafael.me
+      LETSENCRYPT_HOST: alisonrafael.me,www.alisonrafael.me,blog.alisonrafael.me
       LETSENCRYPT_EMAIL: armg.alison@gmail.com
       # The Next.js standalone server listens on 3000, not nginx's old 80 —
       # nginx-proxy auto-detects a single EXPOSEd port, which the old nginx
@@ -23,7 +23,7 @@ services:
       VIRTUAL_HOST: api.alisonrafael.me
       LETSENCRYPT_HOST: api.alisonrafael.me
       LETSENCRYPT_EMAIL: armg.alison@gmail.com
-      CORS_ORIGIN: https://alisonrafael.me,https://www.alisonrafael.me
+      CORS_ORIGIN: https://alisonrafael.me,https://www.alisonrafael.me,https://blog.alisonrafael.me
       DB_HOST: mariadb
       DB_PORT: 3306
       DB_USER: ${DB_USER}

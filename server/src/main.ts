@@ -12,12 +12,16 @@ async function bootstrap() {
   // the uploads controller build image URLs as http:// even in production.
   app.getHttpAdapter().getInstance().set('trust proxy', 1);
 
-  // VIRTUAL_HOST in docker-compose.yml serves the site on both the apex
-  // and www domains with no redirect between them, so both must be
+  // VIRTUAL_HOST in docker-compose.yml serves the site on the apex, www,
+  // and blog subdomains with no redirect between them, so all three must be
   // allowed here too — a single origin string here would silently CORS-block
-  // every API call (including login) from whichever domain isn't listed.
+  // every API call (including login, or a comment submitted from the blog
+  // subdomain) from whichever domain isn't listed.
   const corsOrigins = config
-    .get<string>('CORS_ORIGIN', 'https://alisonrafael.me,https://www.alisonrafael.me')
+    .get<string>(
+      'CORS_ORIGIN',
+      'https://alisonrafael.me,https://www.alisonrafael.me,https://blog.alisonrafael.me',
+    )
     .split(',')
     .map((origin) => origin.trim());
   app.enableCors({

@@ -1,15 +1,17 @@
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
+import { blogListPath } from '../../../blog/routes'
 
 // The nearest not-found.tsx up the segment tree handles notFound() calls
 // from this route — colocating it here (rather than relying on the root
 // one) keeps the Blog-specific "Post not found" copy and Back-to-Blog
 // link, still wrapped in blog/layout.tsx's Nav/Footer chrome.
-export default function PostNotFound() {
+export default async function PostNotFound() {
+  const backToBlog = await blogListPath()
   return (
     <main className="mx-auto max-w-3xl px-6 py-16">
       <Link
-        href="/blog"
+        href={backToBlog}
         className="mb-8 inline-flex items-center gap-1.5 text-sm text-ink-dim transition-colors hover:text-accent"
       >
         <ArrowLeft size={14} />
@@ -20,7 +22,7 @@ export default function PostNotFound() {
         <h1 className="mt-2 text-xl font-semibold text-ink">Post not found</h1>
         <p className="mt-2 text-sm text-ink-dim">
           This post doesn't exist or hasn't been published.{' '}
-          <Link href="/blog" className="text-accent underline underline-offset-2">
+          <Link href={backToBlog} className="text-accent underline underline-offset-2">
             Back to Blog
           </Link>
         </p>

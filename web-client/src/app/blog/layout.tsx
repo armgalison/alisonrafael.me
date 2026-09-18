@@ -12,7 +12,7 @@ export default async function BlogLayout({ children }: { children: ReactNode }) 
   const content = await getResumeContent()
   return (
     <div className="min-h-screen bg-surface text-ink">
-      <Nav content={content} />
+      <Nav content={content} section="blog" />
       {children}
       <Footer content={content} />
     </div>
