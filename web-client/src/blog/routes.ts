@@ -4,6 +4,11 @@ import { headers } from 'next/headers'
 // builders (BLOG_ORIGIN, blogListUrl, blogPostUrl).
 const BLOG_HOST = 'blog.alisonrafael.me'
 
+export async function isOnBlogHost() {
+  const host = (await headers()).get('host')
+  return host === BLOG_HOST
+}
+
 // Same-origin in-page navigation within the Blog route tree. In production
 // blog.alisonrafael.me/foo is rewritten internally to /blog/foo by
 // src/proxy.ts, so the browser's address bar never shows "/blog" — links
@@ -15,8 +20,7 @@ const BLOG_HOST = 'blog.alisonrafael.me'
 // Exported for callers that build several hrefs off one request (e.g. a
 // post list) and don't want to re-read headers() per item.
 export async function blogPathPrefix() {
-  const host = (await headers()).get('host')
-  return host === BLOG_HOST ? '' : '/blog'
+  return (await isOnBlogHost()) ? '' : '/blog'
 }
 
 export async function blogListPath() {

@@ -17,9 +17,17 @@ interface NavProps {
   // "/:slug" (src/proxy.ts rewrites the "/blog" prefix away internally), so
   // pathname alone can't distinguish "on the blog" from "on the resume".
   section?: 'blog'
+  // Absolute origin ("https://alisonrafael.me") to prefix the home-page
+  // anchors below with. Passed by blog/layout.tsx only when actually
+  // rendered under blog.alisonrafael.me, where a bare "/#experience" would
+  // resolve on the blog's own origin instead of navigating to the resume
+  // site. Empty/omitted anywhere same-origin with the resume page (the
+  // resume page itself, or /blog reached directly in local dev), where a
+  // relative link is correct and simpler.
+  homeOrigin?: string
 }
 
-export function Nav({ content, section }: NavProps) {
+export function Nav({ content, section, homeOrigin = '' }: NavProps) {
   const [open, setOpen] = useState(false)
   const pathname = usePathname()
   const isBlog = section === 'blog' || pathname.startsWith('/blog')
@@ -31,10 +39,10 @@ export function Nav({ content, section }: NavProps) {
   // clicked from "/" itself it still works via the browser's native
   // same-page hash-scroll behavior.
   const links: Array<{ href: string; id: string; label: string }> = [
-    { href: '/#experience', id: 'experience', label: content.nav.experience },
-    { href: '/#skills', id: 'skills', label: content.nav.skills },
-    { href: '/#credentials', id: 'credentials', label: content.nav.credentials },
-    { href: '/#contact', id: 'contact', label: content.nav.contact },
+    { href: `${homeOrigin}/#experience`, id: 'experience', label: content.nav.experience },
+    { href: `${homeOrigin}/#skills`, id: 'skills', label: content.nav.skills },
+    { href: `${homeOrigin}/#credentials`, id: 'credentials', label: content.nav.credentials },
+    { href: `${homeOrigin}/#contact`, id: 'contact', label: content.nav.contact },
   ]
 
   // IntersectionObserver-driven section highlighting only makes sense on
@@ -52,7 +60,7 @@ export function Nav({ content, section }: NavProps) {
         className="sticky top-0 z-50 border-b border-line/60 bg-surface/80 backdrop-blur-md"
       >
         <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
-          <a href="/#top" className="flex items-center gap-2 font-semibold tracking-tight text-ink">
+          <a href={`${homeOrigin}/#top`} className="flex items-center gap-2 font-semibold tracking-tight text-ink">
             <img src="/avatar.png" alt="" className="h-8 w-8 shrink-0 rounded-lg object-cover" />
             <span className="hidden sm:inline">Alison Gonçalves</span>
           </a>
