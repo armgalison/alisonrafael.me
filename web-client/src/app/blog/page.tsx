@@ -1,9 +1,6 @@
 import { Calendar, Eye, MessageSquare, Newspaper } from 'lucide-react'
-import type { Metadata } from 'next'
 import Link from 'next/link'
 import { blogApi } from '../../blog/api'
-import { blogPathPrefix } from '../../blog/routes'
-import { blogListUrl } from '../../blog/url'
 import { Reveal } from '../../components/Reveal'
 import { SectionHeading } from '../../components/Section'
 
@@ -11,22 +8,10 @@ function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 }
 
-const SITE_NAME = 'Alison Rafael Marinho Gonçalves — Full-Stack Engineer'
-
-// Without this, the list page silently inherited the root layout's
-// alternates.canonical: '/' — wrong even before the Blog moved to its own
-// subdomain, and actively wrong now that "/" means something different
-// depending on host.
-export const metadata: Metadata = {
-  title: `Blog — ${SITE_NAME}`,
-  alternates: { canonical: blogListUrl() },
-}
-
 // Server Component — fetches directly, no loading state needed (the page
 // doesn't render until the data is ready). See docs/adr/0013.
 export default async function BlogListPage() {
   const posts = await blogApi.listPosts({ cache: 'no-store' }).catch(() => null)
-  const pathPrefix = await blogPathPrefix()
 
   if (!posts) {
     return (
@@ -57,7 +42,7 @@ export default async function BlogListPage() {
             <li key={post.id} className="h-full">
               <Reveal delay={index * 0.05} className="h-full">
                 <Link
-                  href={`${pathPrefix}/${post.slug}`}
+                  href={`/blog/${post.slug}`}
                   className="group flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-surface-raised transition-colors hover:border-accent-dim/60"
                 >
                   {post.coverImageUrl ? (

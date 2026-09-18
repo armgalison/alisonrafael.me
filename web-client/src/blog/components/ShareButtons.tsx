@@ -2,7 +2,11 @@
 
 import { Check, Link2, Share2 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
-import { blogPostUrl } from '../url'
+
+// The Post's canonical origin — the site answers on both the apex and
+// www with no redirect, so share links pin to one host regardless of
+// which the reader is on (and it lines up with index.html's canonical).
+const SITE_ORIGIN = 'https://alisonrafael.me'
 
 // Brand marks from Simple Icons (CC0), inlined rather than pulling an
 // icon package — lucide-react ships no brand glyphs.
@@ -31,7 +35,7 @@ interface ShareButtonsProps {
 }
 
 export function ShareButtons({ slug, title }: ShareButtonsProps) {
-  const url = blogPostUrl(slug)
+  const url = `${SITE_ORIGIN}/blog/${slug}`
   const [copied, setCopied] = useState(false)
   const copyTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
   // Resolve once, on mount, so it doesn't flash in or out.

@@ -8,8 +8,6 @@ import { Comments } from '../../../blog/components/Comments'
 import { MarkdownImage } from '../../../blog/components/MarkdownImage'
 import { ShareButtons } from '../../../blog/components/ShareButtons'
 import { ViewRegistrar } from '../../../blog/components/ViewRegistrar'
-import { blogListPath } from '../../../blog/routes'
-import { blogPostUrl } from '../../../blog/url'
 import { Reveal } from '../../../components/Reveal'
 
 const SITE_NAME = 'Alison Rafael Marinho Gonçalves — Full-Stack Engineer'
@@ -75,7 +73,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const post = await blogApi.getPost(slug, { cache: 'no-store' }).catch(() => null)
   if (!post) return {}
 
-  const canonical = blogPostUrl(post.slug)
+  const canonical = `/blog/${post.slug}`
   const images = post.coverImageUrl ? [{ url: post.coverImageUrl, alt: post.title }] : undefined
 
   return {
@@ -106,8 +104,6 @@ export default async function BlogPostPage({ params }: Props) {
   // Next memoizes identical fetch() calls within one render pass, so this
   // doesn't double-hit the API even though generateMetadata above already
   // fetched the same URL — verified in Phase 3's manual testing.
-  const backToBlog = await blogListPath()
-
   let post
   try {
     post = await blogApi.getPost(slug, { cache: 'no-store' })
@@ -116,7 +112,7 @@ export default async function BlogPostPage({ params }: Props) {
     return (
       <main className="mx-auto max-w-3xl px-6 py-16">
         <Link
-          href={backToBlog}
+          href="/blog"
           className="mb-8 inline-flex items-center gap-1.5 text-sm text-ink-dim transition-colors hover:text-accent"
         >
           <ArrowLeft size={14} />
@@ -136,7 +132,7 @@ export default async function BlogPostPage({ params }: Props) {
     <main className="mx-auto max-w-3xl px-6 py-16">
       <ViewRegistrar slug={post.slug} />
       <Link
-        href={backToBlog}
+        href="/blog"
         className="mb-8 inline-flex items-center gap-1.5 text-sm text-ink-dim transition-colors hover:text-accent"
       >
         <ArrowLeft size={14} />

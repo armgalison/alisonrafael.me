@@ -2,9 +2,9 @@
 
 import { AnimatePresence, motion } from 'framer-motion'
 import { Download, Menu, X } from 'lucide-react'
+import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
-import { BLOG_ORIGIN } from '../blog/url'
 import type { ResumeContent } from '../content/types'
 import { useActiveSection } from '../hooks/useActiveSection'
 import { easeOut } from '../lib/motion'
@@ -12,18 +12,13 @@ import { resumeDownloadUrl } from '../lib/resumeUrl'
 
 interface NavProps {
   content: ResumeContent
-  // Set by blog/layout.tsx, which always wraps the Blog route tree — needed
-  // because on blog.alisonrafael.me the browser-visible pathname is "/" or
-  // "/:slug" (src/proxy.ts rewrites the "/blog" prefix away internally), so
-  // pathname alone can't distinguish "on the blog" from "on the resume".
-  section?: 'blog'
 }
 
-export function Nav({ content, section }: NavProps) {
+export function Nav({ content }: NavProps) {
   const [open, setOpen] = useState(false)
   const pathname = usePathname()
-  const isBlog = section === 'blog' || pathname.startsWith('/blog')
-  const isHome = !isBlog && pathname === '/'
+  const isHome = pathname === '/'
+  const isBlog = pathname.startsWith('/blog')
 
   // These are anchors into sections that only exist on the resume page
   // ("/"), so they always target "/#id" rather than a bare "#id" — clicked
@@ -78,8 +73,8 @@ export function Nav({ content, section }: NavProps) {
               </li>
             ))}
             <li>
-              <a
-                href={BLOG_ORIGIN}
+              <Link
+                href="/blog"
                 className={`relative rounded-full px-3 py-1.5 transition-colors hover:text-ink ${
                   isBlog ? 'text-ink' : ''
                 }`}
@@ -92,7 +87,7 @@ export function Nav({ content, section }: NavProps) {
                   />
                 )}
                 <span className="relative">Blog</span>
-              </a>
+              </Link>
             </li>
           </ul>
 
@@ -152,15 +147,15 @@ export function Nav({ content, section }: NavProps) {
                   </li>
                 ))}
                 <li>
-                  <a
-                    href={BLOG_ORIGIN}
+                  <Link
+                    href="/blog"
                     onClick={() => setOpen(false)}
                     className={`block rounded-lg px-3 py-3 text-base font-medium ${
                       isBlog ? 'text-accent' : 'text-ink'
                     }`}
                   >
                     Blog
-                  </a>
+                  </Link>
                 </li>
               </ul>
               <div className="border-t border-line/60 px-6 py-4">
