@@ -21,6 +21,7 @@ interface RemoteCursor extends CursorState {
 // "Live Cursor" entry and docs/adr/0017.
 export function LiveCursorOverlay({ room }: { room: string }) {
   const [cursors, setCursors] = useState<Map<string, RemoteCursor>>(new Map())
+  const [docHeight, setDocHeight] = useState(0)
 
   useEffect(() => {
     // Touch/coarse-pointer devices get zero value from "see someone else's
@@ -28,6 +29,20 @@ export function LiveCursorOverlay({ room }: { room: string }) {
     // connection, and saves a connection/battery/data on a device class
     // that can never send its own position anyway.
     if (typeof window === 'undefined' || window.matchMedia('(pointer: coarse)').matches) return
+
+    // Positions are normalized against the full scrollable document, not
+    // just the viewport, and the overlay below is `position: absolute`
+    // (scrolls with the page) rather than `fixed` (pinned to the
+    // viewport) — an arrow near the bottom of a long page only comes into
+    // view once you actually scroll there, instead of being clamped into
+    // whatever's currently on screen.
+    function updateDocHeight() {
+      setDocHeight(document.documentElement.scrollHeight)
+    }
+    updateDocHeight()
+    const resizeObserver = new ResizeObserver(updateDocHeight)
+    resizeObserver.observe(document.documentElement)
+    window.addEventListener('resize', updateDocHeight)
 
     const socket = connectLiveCursorSocket(room)
 
@@ -52,21 +67,27 @@ export function LiveCursorOverlay({ room }: { room: string }) {
       if (now - lastSentAt < MOVE_INTERVAL_MS) return
       lastSentAt = now
       socket.emit('cursor:move', {
-        xPct: (event.clientX / window.innerWidth) * 100,
-        yPct: (event.clientY / window.innerHeight) * 100,
+        xPct: (event.pageX / document.documentElement.scrollWidth) * 100,
+        yPct: (event.pageY / document.documentElement.scrollHeight) * 100,
       })
     }
     window.addEventListener('mousemove', handleMouseMove)
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove)
+      window.removeEventListener('resize', updateDocHeight)
+      resizeObserver.disconnect()
       socket.disconnect()
       setCursors(new Map())
     }
   }, [room])
 
   return (
-    <div className="pointer-events-none fixed inset-0 z-50 overflow-hidden" aria-hidden>
+    <div
+      className="pointer-events-none absolute inset-x-0 top-0 z-50"
+      style={{ height: docHeight || '100%' }}
+      aria-hidden
+    >
       {Array.from(cursors.values()).map((cursor) => (
         <CursorArrow key={cursor.id} color={cursor.color} xPct={cursor.xPct} yPct={cursor.yPct} />
       ))}
