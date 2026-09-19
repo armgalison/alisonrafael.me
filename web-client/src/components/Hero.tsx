@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Download, MapPin } from 'lucide-react'
+import { Download } from 'lucide-react'
 import type { ResumeContent } from '../content/types'
 import { easeOut } from '../lib/motion'
 import { resumeDownloadUrl } from '../lib/resumeUrl'
@@ -20,7 +20,7 @@ const item = {
   show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: easeOut } },
 }
 
-export function   Hero({ content }: HeroProps) {
+export function Hero({ content }: HeroProps) {
   return (
     <section id="top" className="relative overflow-hidden px-6 pt-24 pb-10">
       <motion.div

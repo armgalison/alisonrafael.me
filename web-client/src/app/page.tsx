@@ -58,7 +58,7 @@ export default async function Home() {
           </aside>
         </div>
 
-        <section id="contact" className="mx-auto max-w-4xl scroll-mt-24 px-6 py-16">
+        <section id="contact" className="mx-auto max-w-6xl scroll-mt-24 px-6 pt-8 pb-8">
           <SectionHeading title={content.sectionTitles.contact} icon={Send} />
           <Contact content={content} />
         </section>

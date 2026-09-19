@@ -27,17 +27,17 @@ export function Contact({ content }: ContactProps) {
           Let's build something great together.
         </p>
         <p className="mt-2 text-ink-dim">Reach out any time — I usually reply within a day.</p>
-        <ul className="mt-9 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <ul className="mt-9 flex flex-wrap justify-center gap-3 px-6">
           {links.map((link) => (
             <li key={link.href}>
               <a
                 href={link.href}
                 target={link.href.startsWith('http') ? '_blank' : undefined}
                 rel={link.href.startsWith('http') ? 'noreferrer' : undefined}
-                className="flex items-center justify-center gap-2 rounded-none border border-line bg-surface px-4 py-2.5 text-sm font-medium text-nowrap text-ink transition-colors hover:border-accent-dim hover:text-accent-dim"
+                className="flex items-center gap-2 rounded-none border border-line bg-surface px-4 py-2.5 text-sm font-medium text-nowrap text-ink transition-colors hover:border-accent-dim hover:text-accent-dim"
               >
                 <link.icon size={15} className="shrink-0 text-accent-dim" />
-                <span className="truncate">{link.label}</span>
+                {link.label}
               </a>
             </li>
           ))}
