@@ -36,7 +36,7 @@ export function Skills({ topSkills, technologyGroups, languages }: SkillsProps) 
             return (
               <li
                 key={skill}
-                className="flex items-center gap-2 rounded-full border border-accent/25 bg-accent/5 px-3 py-1.5 text-xs font-medium text-ink transition-colors hover:border-accent/50"
+                className="flex items-center gap-2 rounded-none border border-accent/25 bg-accent/5 px-3 py-1.5 text-xs font-medium text-ink transition-colors hover:border-accent/50"
               >
                 <Icon size={13} className="shrink-0 text-accent" />
                 {skill}
@@ -60,7 +60,7 @@ export function Skills({ topSkills, technologyGroups, languages }: SkillsProps) 
               {group.items.map((tech) => (
                 <span
                   key={tech}
-                  className="rounded-full border border-line bg-surface px-3 py-1 font-mono text-xs text-ink-dim"
+                  className="rounded-none border border-line bg-surface px-3 py-1 text-xs text-ink-dim"
                 >
                   {tech}
                 </span>
@@ -79,10 +79,10 @@ export function Skills({ topSkills, technologyGroups, languages }: SkillsProps) 
           {languages.map((language) => (
             <li
               key={language.name}
-              className="flex items-center justify-between rounded-lg border border-line bg-surface px-3 py-2 text-sm"
+              className="flex items-center justify-between rounded-none border border-line bg-surface px-3 py-2 text-sm"
             >
               <span className="text-ink">{language.name}</span>
-              <span className="rounded-full bg-surface-raised px-2.5 py-0.5 text-xs text-ink-dim">
+              <span className="rounded-none bg-surface-raised px-2.5 py-0.5 text-xs text-ink-dim">
                 {language.level}
               </span>
             </li>

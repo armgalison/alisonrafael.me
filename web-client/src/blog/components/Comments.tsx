@@ -19,14 +19,14 @@ function formatRelativeTime(iso: string): string {
 }
 
 const inputClass =
-  'w-full rounded-md border border-line bg-surface-raised px-3 py-2 text-sm outline-none focus:border-accent-dim'
+  'w-full rounded-none border border-line bg-surface-raised px-3 py-2 text-sm outline-none focus:border-accent-dim'
 
 function CommentRow({ comment }: { comment: BlogComment }) {
   return (
     <div>
       <div className="flex items-baseline gap-2">
         <span className="font-medium text-ink">{comment.authorName}</span>
-        <span className="font-mono text-xs text-ink-dim">{formatRelativeTime(comment.createdAt)}</span>
+        <span className="text-xs text-ink-dim">{formatRelativeTime(comment.createdAt)}</span>
       </div>
       <p className="mt-1 whitespace-pre-wrap text-sm leading-relaxed text-ink-dim">{comment.body}</p>
     </div>
@@ -51,7 +51,7 @@ function CommentForm({
 
   if (done) {
     return (
-      <p className="rounded-lg border border-dashed border-line px-4 py-3 text-sm text-ink-dim">
+      <p className="rounded-none border border-dashed border-line px-4 py-3 text-sm text-ink-dim">
         Thanks — your comment is awaiting moderation and will appear once approved.
       </p>
     )
@@ -115,12 +115,12 @@ function CommentForm({
         onChange={(e) => setBody(e.target.value)}
         maxLength={5000}
       />
-      {error && <p className="text-sm text-red-400">{error}</p>}
+      {error && <p className="text-sm text-red-600">{error}</p>}
       <div>
         <button
           type="submit"
           disabled={submitting}
-          className="rounded-full bg-accent px-4 py-2 text-sm font-semibold text-surface transition-opacity hover:opacity-90 disabled:opacity-50"
+          className="rounded-none bg-ink px-4 py-2 text-sm font-semibold text-surface transition-opacity hover:opacity-90 disabled:opacity-50"
         >
           {submitting ? 'Posting…' : parentId ? 'Post reply' : 'Post comment'}
         </button>
@@ -138,7 +138,7 @@ function TopLevelComment({ slug, comment }: { slug: string; comment: BlogComment
       <button
         type="button"
         onClick={() => setReplying((v) => !v)}
-        className="mt-2 inline-flex items-center gap-1 text-xs text-ink-dim transition-colors hover:text-accent"
+        className="mt-2 inline-flex items-center gap-1 text-xs text-ink-dim transition-colors hover:text-accent-dim"
       >
         <CornerDownRight size={12} />
         {replying ? 'Cancel' : 'Reply'}

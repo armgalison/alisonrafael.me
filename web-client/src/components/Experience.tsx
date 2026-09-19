@@ -12,19 +12,15 @@ function RoleCard({
   role,
   company,
   current = false,
-  recent = false,
 }: {
   role: ExperienceEntry['roles'][number]
   company: string
   current?: boolean
-  recent?: boolean
 }) {
-  const dotColor = current || !recent ? 'bg-accent' : 'bg-violet'
+  const dotColor = current ? 'bg-accent' : 'bg-line'
   const dotRing = current
-    ? 'shadow-[0_0_0_4px_var(--color-accent-soft),0_0_0_7px_rgba(110,231,194,0.15)]'
-    : recent
-      ? 'shadow-[0_0_0_4px_rgba(167,139,250,0.18)]'
-      : 'shadow-[0_0_0_4px_var(--color-accent-soft)]'
+    ? 'shadow-[0_0_0_4px_var(--color-accent-soft)]'
+    : 'shadow-[0_0_0_4px_var(--color-surface)]'
 
   return (
     <div className="relative pl-10">
@@ -35,28 +31,28 @@ function RoleCard({
         className={`absolute top-6 left-[7px] h-3 w-3 -translate-x-1/2 rounded-full border-2 border-surface ${dotColor} ${dotRing}`}
       />
       <div
-        className={`rounded-2xl border p-6 transition-colors ${
+        className={`rounded-none border p-6 transition-colors ${
           current
-            ? 'border-accent/40 bg-gradient-to-br from-accent/[0.06] to-surface-raised shadow-lg shadow-accent/5'
-            : 'border-line bg-surface-raised shadow-lg shadow-black/20 hover:border-accent/40 hover:bg-surface-raised-hover'
+            ? 'border-accent/40 bg-surface-raised'
+            : 'border-line bg-surface-raised hover:border-accent/40 hover:bg-surface-raised-hover'
         }`}
       >
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <h3 className="flex items-center gap-2 font-semibold text-ink">
             {role.title}
             {current && (
-              <span className="rounded-full bg-accent/15 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-accent uppercase">
+              <span className="rounded-none bg-accent/15 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-accent-dim uppercase">
                 Current
               </span>
             )}
           </h3>
-          <span className="font-mono text-xs text-ink-dim">{role.period}</span>
+          <span className="text-xs text-ink-dim">{role.period}</span>
         </div>
         <p className="mt-1.5 flex items-center gap-1.5 text-sm text-ink-dim">
-          <Briefcase size={13} className="text-accent" />
+          <Briefcase size={13} className="text-accent-dim" />
           {company}
           <span className="text-line">·</span>
-          <MapPin size={13} className="text-accent" />
+          <MapPin size={13} className="text-accent-dim" />
           {role.location}
         </p>
         <p className="mt-3 text-sm leading-relaxed text-ink-dim">{role.description}</p>
@@ -80,7 +76,6 @@ export function Experience({ entries }: ExperienceProps) {
                   role={role}
                   company={entry.company}
                   current={entryIndex === 0 && roleIndex === 0}
-                  recent={entryIndex === 1}
                 />
               ))}
             </div>

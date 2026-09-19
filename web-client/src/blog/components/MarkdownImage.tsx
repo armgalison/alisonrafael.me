@@ -9,9 +9,9 @@ export function MarkdownImage(props: ComponentProps<'img'>) {
   const [loaded, setLoaded] = useState(false)
   return (
     <span
-      className={`mb-5 block overflow-hidden rounded-xl border border-line bg-surface-raised ${loaded ? '' : 'min-h-60'}`}
+      className={`mb-5 block overflow-hidden rounded-none border border-line bg-surface-raised ${loaded ? '' : 'min-h-60'}`}
     >
-      <img {...props} loading="lazy" className="block w-full rounded-xl" onLoad={() => setLoaded(true)} />
+      <img {...props} loading="lazy" className="block w-full" onLoad={() => setLoaded(true)} />
     </span>
   )
 }

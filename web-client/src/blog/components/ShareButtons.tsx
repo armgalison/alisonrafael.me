@@ -23,7 +23,7 @@ function BrandIcon({ path }: { path: string }) {
 }
 
 const controlClass =
-  'flex h-9 w-9 items-center justify-center rounded-md border border-line text-ink-dim transition-colors hover:border-accent-dim hover:text-ink'
+  'flex h-9 w-9 items-center justify-center rounded-none border border-line text-ink-dim transition-colors hover:border-accent-dim hover:text-ink'
 
 interface ShareButtonsProps {
   slug: string
@@ -101,7 +101,7 @@ export function ShareButtons({ slug, title }: ShareButtonsProps) {
           title={copied ? 'Copied!' : 'Copy link'}
           className={controlClass}
         >
-          {copied ? <Check size={15} className="text-accent" /> : <Link2 size={15} />}
+          {copied ? <Check size={15} className="text-accent-dim" /> : <Link2 size={15} />}
         </button>
 
         {canNativeShare && (
