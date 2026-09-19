@@ -10,6 +10,7 @@ import { SectionHeading } from '../components/Section'
 import { Skills } from '../components/Skills'
 import { Stats } from '../components/Stats'
 import { getResumeContent } from '../i18n'
+import { LiveCursorOverlay } from '../live-cursors/components/LiveCursorOverlay'
 
 // Server Component — renders fully server-side. The Resume Profile part of
 // `content` is fetched from the API per request (cached until the Admin's
@@ -23,6 +24,7 @@ export default async function Home() {
   return (
     <div className="min-h-screen bg-surface text-ink">
       <HashScrollOnLoad />
+      <LiveCursorOverlay room="home" />
       <Nav content={content} />
       <main>
         <Hero content={content} />
