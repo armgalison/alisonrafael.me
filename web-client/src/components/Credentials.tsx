@@ -17,7 +17,7 @@ export function Credentials({
 }: CredentialsProps) {
   return (
     <Reveal>
-      <div className="divide-y divide-line rounded-2xl border border-line bg-surface-raised">
+      <div className="divide-y divide-line rounded-none border border-line bg-surface-raised">
         <div className="p-5">
           <h3 className="mb-3 flex items-center gap-2 text-xs font-medium tracking-wide text-ink-dim uppercase">
             <GraduationCap size={14} />

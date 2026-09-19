@@ -59,7 +59,7 @@ const markdownComponents: Components = {
   ),
   img: (props) => <MarkdownImage {...props} />,
   code: (props) => (
-    <code className="rounded bg-surface-raised px-1.5 py-0.5 font-mono text-[0.85em] text-ink" {...props} />
+    <code className="bg-surface-raised px-1.5 py-0.5 font-mono text-[0.85em] text-ink" {...props} />
   ),
   hr: (props) => <hr className="my-8 border-line" {...props} />,
 }
@@ -164,7 +164,7 @@ export default async function BlogPostPage({ params }: Props) {
           </header>
 
           {post.coverImageUrl && (
-            <div className="mb-8 overflow-hidden rounded-xl border border-line">
+            <div className="mb-8 overflow-hidden border border-line">
               <img
                 src={post.coverImageUrl}
                 alt=""

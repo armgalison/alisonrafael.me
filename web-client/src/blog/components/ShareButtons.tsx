@@ -23,7 +23,7 @@ function BrandIcon({ path }: { path: string }) {
 }
 
 const controlClass =
-  'flex h-9 w-9 items-center justify-center rounded-md border border-line text-ink-dim transition-colors hover:border-accent-dim hover:text-ink'
+  'flex h-9 w-9 items-center justify-center rounded-none border border-line text-ink-dim transition-colors hover:border-accent-dim hover:text-ink'
 
 interface ShareButtonsProps {
   slug: string

@@ -38,7 +38,7 @@ export function Stats({ content }: StatsProps) {
     <div className="mx-auto max-w-6xl px-6 pb-4">
       <Reveal>
         <div
-          className={`grid grid-cols-1 divide-x divide-y divide-line rounded-2xl border border-line sm:divide-y-0 ${smGridColsClass}`}
+          className={`grid grid-cols-1 divide-x divide-y divide-line rounded-none border border-line sm:divide-y-0 ${smGridColsClass}`}
         >
           {stats.map((stat) => (
             <div key={stat.label} className="px-4 py-5 text-center">

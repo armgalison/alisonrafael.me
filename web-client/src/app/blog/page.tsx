@@ -48,7 +48,7 @@ export default async function BlogListPage() {
 
       {posts.length === 0 && (
         <Reveal>
-          <p className="rounded-lg border border-dashed border-line px-4 py-10 text-center text-sm text-ink-dim">
+          <p className="rounded-none border border-dashed border-line px-4 py-10 text-center text-sm text-ink-dim">
             No posts published yet — check back soon.
           </p>
         </Reveal>
@@ -61,7 +61,7 @@ export default async function BlogListPage() {
               <Reveal delay={index * 0.05} className="h-full">
                 <Link
                   href={`${pathPrefix}/${post.slug}`}
-                  className="group flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-surface-raised transition-colors hover:border-accent-dim/60"
+                  className="group flex h-full flex-col overflow-hidden rounded-none border border-line bg-surface-raised transition-colors hover:border-accent-dim/60"
                 >
                   {post.coverImageUrl ? (
                     <div className="aspect-[16/9] overflow-hidden border-b border-line">

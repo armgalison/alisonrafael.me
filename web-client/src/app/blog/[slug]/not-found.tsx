@@ -17,7 +17,7 @@ export default async function PostNotFound() {
         <ArrowLeft size={14} />
         Back to Blog
       </Link>
-      <div className="rounded-lg border border-dashed border-line px-6 py-12 text-center">
+      <div className="rounded-none border border-dashed border-line px-6 py-12 text-center">
         <p className="text-sm text-accent-dim">404</p>
         <h1 className="mt-2 text-xl font-semibold text-ink">Post not found</h1>
         <p className="mt-2 text-sm text-ink-dim">

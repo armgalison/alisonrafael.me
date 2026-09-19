@@ -61,7 +61,7 @@ export function Nav({ content, section, homeOrigin = '' }: NavProps) {
       >
         <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
           <a href={`${homeOrigin}/#top`} className="flex items-center gap-2 font-semibold tracking-tight text-ink">
-            <img src="/avatar.png" alt="" className="h-8 w-8 shrink-0 rounded-lg object-cover" />
+            <img src="/avatar.png" alt="" className="h-8 w-8 shrink-0 rounded-none object-cover" />
             <span className="hidden sm:inline">Alison Gonçalves</span>
           </a>
 
@@ -70,14 +70,14 @@ export function Nav({ content, section, homeOrigin = '' }: NavProps) {
               <li key={link.href}>
                 <a
                   href={link.href}
-                  className={`relative rounded-full px-3 py-1.5 transition-colors hover:text-ink ${
+                  className={`relative rounded-none px-3 py-1.5 transition-colors hover:text-ink ${
                     active === link.id ? 'text-ink' : ''
                   }`}
                 >
                   {active === link.id && (
                     <motion.span
                       layoutId="nav-active-pill"
-                      className="absolute inset-0 rounded-full bg-surface-raised"
+                      className="absolute inset-0 rounded-none bg-surface-raised"
                       transition={{ duration: 0.3, ease: easeOut }}
                     />
                   )}
@@ -88,14 +88,14 @@ export function Nav({ content, section, homeOrigin = '' }: NavProps) {
             <li>
               <a
                 href={BLOG_ORIGIN}
-                className={`relative rounded-full px-3 py-1.5 transition-colors hover:text-ink ${
+                className={`relative rounded-none px-3 py-1.5 transition-colors hover:text-ink ${
                   isBlog ? 'text-ink' : ''
                 }`}
               >
                 {isBlog && (
                   <motion.span
                     layoutId="nav-active-pill"
-                    className="absolute inset-0 rounded-full bg-surface-raised"
+                    className="absolute inset-0 rounded-none bg-surface-raised"
                     transition={{ duration: 0.3, ease: easeOut }}
                   />
                 )}
@@ -107,7 +107,7 @@ export function Nav({ content, section, homeOrigin = '' }: NavProps) {
           <a
             href={resumeDownloadUrl}
             download
-            className="hidden items-center gap-1.5 rounded-full border border-ink-dim/40 px-3.5 py-1.5 text-xs font-semibold text-ink transition-colors hover:border-accent-dim hover:text-accent-dim sm:inline-flex"
+            className="hidden items-center gap-1.5 rounded-none border border-ink-dim/40 px-3.5 py-1.5 text-xs font-semibold text-ink transition-colors hover:border-accent-dim hover:text-accent-dim sm:inline-flex"
           >
             <Download size={13} />
             Download Resume
@@ -116,7 +116,7 @@ export function Nav({ content, section, homeOrigin = '' }: NavProps) {
           <button
             type="button"
             onClick={() => setOpen((value) => !value)}
-            className="relative z-10 flex h-9 w-9 items-center justify-center rounded-lg border border-line text-ink sm:hidden"
+            className="relative z-10 flex h-9 w-9 items-center justify-center rounded-none border border-line text-ink sm:hidden"
             aria-label={open ? 'Close menu' : 'Open menu'}
             aria-expanded={open}
           >
@@ -143,7 +143,7 @@ export function Nav({ content, section, homeOrigin = '' }: NavProps) {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.2, ease: easeOut }}
-              className="fixed inset-x-0 top-16 z-40 border-b border-line/60 bg-surface shadow-xl shadow-black/40 sm:hidden"
+              className="fixed inset-x-0 top-16 z-40 border-b border-line/60 bg-surface sm:hidden"
             >
               <ul className="flex flex-col gap-1 px-6 py-4">
                 {links.map((link) => (
@@ -151,7 +151,7 @@ export function Nav({ content, section, homeOrigin = '' }: NavProps) {
                     <a
                       href={link.href}
                       onClick={() => setOpen(false)}
-                      className={`block rounded-lg px-3 py-3 text-base font-medium ${
+                      className={`block rounded-none px-3 py-3 text-base font-medium ${
                         active === link.id ? 'text-accent-dim' : 'text-ink'
                       }`}
                     >
@@ -163,7 +163,7 @@ export function Nav({ content, section, homeOrigin = '' }: NavProps) {
                   <a
                     href={BLOG_ORIGIN}
                     onClick={() => setOpen(false)}
-                    className={`block rounded-lg px-3 py-3 text-base font-medium ${
+                    className={`block rounded-none px-3 py-3 text-base font-medium ${
                       isBlog ? 'text-accent-dim' : 'text-ink'
                     }`}
                   >
@@ -176,7 +176,7 @@ export function Nav({ content, section, homeOrigin = '' }: NavProps) {
                   href={resumeDownloadUrl}
                   download
                   onClick={() => setOpen(false)}
-                  className="flex items-center justify-center gap-2 rounded-full bg-ink px-5 py-2.5 text-sm font-semibold text-surface"
+                  className="flex items-center justify-center gap-2 rounded-none bg-ink px-5 py-2.5 text-sm font-semibold text-surface"
                 >
                   <Download size={15} />
                   Download Resume

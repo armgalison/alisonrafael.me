@@ -19,7 +19,7 @@ function formatRelativeTime(iso: string): string {
 }
 
 const inputClass =
-  'w-full rounded-md border border-line bg-surface-raised px-3 py-2 text-sm outline-none focus:border-accent-dim'
+  'w-full rounded-none border border-line bg-surface-raised px-3 py-2 text-sm outline-none focus:border-accent-dim'
 
 function CommentRow({ comment }: { comment: BlogComment }) {
   return (
@@ -51,7 +51,7 @@ function CommentForm({
 
   if (done) {
     return (
-      <p className="rounded-lg border border-dashed border-line px-4 py-3 text-sm text-ink-dim">
+      <p className="rounded-none border border-dashed border-line px-4 py-3 text-sm text-ink-dim">
         Thanks — your comment is awaiting moderation and will appear once approved.
       </p>
     )
@@ -120,7 +120,7 @@ function CommentForm({
         <button
           type="submit"
           disabled={submitting}
-          className="rounded-full bg-ink px-4 py-2 text-sm font-semibold text-surface transition-opacity hover:opacity-90 disabled:opacity-50"
+          className="rounded-none bg-ink px-4 py-2 text-sm font-semibold text-surface transition-opacity hover:opacity-90 disabled:opacity-50"
         >
           {submitting ? 'Posting…' : parentId ? 'Post reply' : 'Post comment'}
         </button>

@@ -55,21 +55,21 @@ export function Hero({ content }: HeroProps) {
             <a
               href={resumeDownloadUrl}
               download
-              className="group inline-flex items-center gap-2 rounded-full bg-ink px-6 py-3 text-sm font-semibold text-surface transition-transform hover:scale-[1.03] active:scale-[0.98]"
+              className="group inline-flex items-center gap-2 rounded-none bg-ink px-6 py-3 text-sm font-semibold text-surface transition-transform hover:scale-[1.03] active:scale-[0.98]"
             >
               <Download size={16} className="transition-transform group-hover:-translate-y-0.5" />
               {content.hero.downloadResume}
             </a>
             <a
               href="#contact"
-              className="inline-flex items-center gap-2 rounded-full border border-ink/25 px-6 py-3 text-sm font-semibold text-ink transition-colors hover:border-accent-dim hover:bg-accent/8 hover:text-accent-dim"
+              className="inline-flex items-center gap-2 rounded-none border border-ink/25 px-6 py-3 text-sm font-semibold text-ink transition-colors hover:border-accent-dim hover:bg-accent/8 hover:text-accent-dim"
             >
               {content.hero.contactMe}
             </a>
           </motion.div>
         </div>
 
-        <motion.div variants={item} className="hidden overflow-hidden rounded-2xl lg:block">
+        <motion.div variants={item} className="hidden overflow-hidden lg:block">
           <img
             src="/avatar.png"
             alt={content.meta.name}

@@ -31,17 +31,17 @@ function RoleCard({
         className={`absolute top-6 left-[7px] h-3 w-3 -translate-x-1/2 rounded-full border-2 border-surface ${dotColor} ${dotRing}`}
       />
       <div
-        className={`rounded-2xl border p-6 transition-colors ${
+        className={`rounded-none border p-6 transition-colors ${
           current
-            ? 'border-accent/40 bg-gradient-to-br from-accent/[0.06] to-surface-raised shadow-lg shadow-accent/5'
-            : 'border-line bg-surface-raised shadow-lg shadow-black/20 hover:border-accent/40 hover:bg-surface-raised-hover'
+            ? 'border-accent/40 bg-surface-raised'
+            : 'border-line bg-surface-raised hover:border-accent/40 hover:bg-surface-raised-hover'
         }`}
       >
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <h3 className="flex items-center gap-2 font-semibold text-ink">
             {role.title}
             {current && (
-              <span className="rounded-full bg-accent/15 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-accent-dim uppercase">
+              <span className="rounded-none bg-accent/15 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-accent-dim uppercase">
                 Current
               </span>
             )}

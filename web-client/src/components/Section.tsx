@@ -10,7 +10,7 @@ export function SectionHeading({ title, icon: Icon }: SectionHeadingProps) {
   return (
     <Reveal>
       <h2 className="mb-8 flex items-center gap-3 text-sm font-semibold tracking-widest text-accent-dim uppercase">
-        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent/10 text-accent-dim">
+        <span className="flex h-8 w-8 items-center justify-center rounded-none bg-accent/10 text-accent-dim">
           <Icon size={16} />
         </span>
         {title}
