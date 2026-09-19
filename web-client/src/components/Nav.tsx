@@ -61,7 +61,7 @@ export function Nav({ content, section, homeOrigin = '' }: NavProps) {
       >
         <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
           <a href={`${homeOrigin}/#top`} className="flex items-center gap-2 font-semibold tracking-tight text-ink">
-            <img src="/avatar.png" alt="" className="h-8 w-8 shrink-0 rounded-none object-cover" />
+            <img src="/android-chrome-192x192.png" alt="" className="h-8 w-8 shrink-0 rounded-none object-cover" />
             <span className="hidden sm:inline">Alison Gonçalves</span>
           </a>
 

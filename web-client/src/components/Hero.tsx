@@ -20,7 +20,7 @@ const item = {
   show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: easeOut } },
 }
 
-export function Hero({ content }: HeroProps) {
+export function   Hero({ content }: HeroProps) {
   return (
     <section id="top" className="relative overflow-hidden px-6 pt-24 pb-10">
       <motion.div
@@ -45,10 +45,6 @@ export function Hero({ content }: HeroProps) {
             className="mt-5 max-w-xl text-lg leading-relaxed whitespace-pre-line text-ink-dim"
           >
             {content.meta.headline}
-          </motion.p>
-          <motion.p variants={item} className="mt-3 flex items-center gap-1.5 text-sm text-ink-dim">
-            <MapPin size={14} className="text-accent-dim" />
-            {content.meta.location}
           </motion.p>
 
           <motion.div variants={item} className="mt-9 flex flex-wrap items-center gap-4">
