@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module.js';
 import { BlogModule } from './blog/blog.module.js';
 import { CommentsModule } from './comments/comments.module.js';
 import { HealthController } from './health/health.controller.js';
+import { LiveCursorsModule } from './live-cursors/live-cursors.module.js';
 import { ResumeProfileModule } from './resume-profile/resume-profile.module.js';
 import { ToolsModule } from './tools/tools.module.js';
 import { TrendsModule } from './trends/trends.module.js';
@@ -40,6 +41,7 @@ import { UploadsModule } from './uploads/uploads.module.js';
     ToolsModule,
     AtsResumeModule,
     ResumeProfileModule,
+    LiveCursorsModule,
   ],
   controllers: [HealthController],
 })

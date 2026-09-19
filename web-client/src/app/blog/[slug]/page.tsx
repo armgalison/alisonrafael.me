@@ -11,6 +11,7 @@ import { ViewRegistrar } from '../../../blog/components/ViewRegistrar'
 import { blogListPath } from '../../../blog/routes'
 import { blogPostUrl } from '../../../blog/url'
 import { Reveal } from '../../../components/Reveal'
+import { LiveCursorOverlay } from '../../../live-cursors/components/LiveCursorOverlay'
 
 const SITE_NAME = 'Alison Rafael Marinho Gonçalves — Full-Stack Engineer'
 
@@ -135,6 +136,7 @@ export default async function BlogPostPage({ params }: Props) {
   return (
     <main className="mx-auto max-w-3xl px-6 py-16">
       <ViewRegistrar slug={post.slug} />
+      <LiveCursorOverlay room={`post:${post.slug}`} key={post.slug} />
       <Link
         href={backToBlog}
         className="mb-8 inline-flex items-center gap-1.5 text-sm text-ink-dim transition-colors hover:text-accent"

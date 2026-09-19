@@ -6,6 +6,7 @@ import { blogPathPrefix } from '../../blog/routes'
 import { blogListUrl } from '../../blog/url'
 import { Reveal } from '../../components/Reveal'
 import { SectionHeading } from '../../components/Section'
+import { LiveCursorOverlay } from '../../live-cursors/components/LiveCursorOverlay'
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
@@ -31,6 +32,7 @@ export default async function BlogListPage() {
   if (!posts) {
     return (
       <main className="mx-auto max-w-5xl px-6 py-16">
+        <LiveCursorOverlay room="blog" />
         <SectionHeading title="Blog" icon={Newspaper} />
         <Reveal>
           <p className="text-sm text-red-400">Could not load posts right now. Please try again later.</p>
@@ -41,6 +43,7 @@ export default async function BlogListPage() {
 
   return (
     <main className="mx-auto max-w-5xl px-6 py-16">
+      <LiveCursorOverlay room="blog" />
       <SectionHeading title="Blog" icon={Newspaper} />
 
       {posts.length === 0 && (

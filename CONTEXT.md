@@ -12,6 +12,10 @@ _Avoid_: Portfolio — implies project case studies/screenshots, which this proj
 Anyone viewing the site. Primarily a recruiter or hiring manager doing a fast skim before or during a hiring process.
 _Avoid_: User, client, candidate (candidate refers to Alison himself, the subject of the resume, not the visitor).
 
+**Live Cursor**:
+An ephemeral, anonymous mouse-position indicator broadcast over WebSocket to every other Visitor currently on the same public page. Tied 1:1 to one WebSocket connection's lifetime — created the instant a client connects, removed the instant that connection disconnects — with no auth, no persistence, and no identity linkage back to a Visitor: two browser tabs from the same person are two independent Live Cursors with no way to correlate them, and that's intentional. Scoped to exactly one room (`home`, `blog`, or `post:<slug>`) for its entire lifetime, visible only to other Live Cursors in that same room, and never present on `/admin/*`. See [ADR 0017](./docs/adr/0017-live-cursors-unauthenticated-per-room-websocket-gateway.md).
+_Avoid_: Presence, live viewer, cursor share — this codebase's term is Live Cursor, and it only ever carries a position, never a viewer count or "who's online" concept.
+
 **v1 / v2**:
 Versioning shorthand for build scope, not maturity. v1 is the static resume site (no backend) — complete and deployed. v2 is the backend service now being built: a NestJS API (`server/`) behind `api.alisonrafael.me`, backed by MariaDB, adding admin auth and the Blog.
 _Avoid_: MVP — v1 was the complete first release, not a stripped-down placeholder.

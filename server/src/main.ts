@@ -2,6 +2,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { AppModule } from './app.module.js';
+import { LiveCursorsIoAdapter } from './live-cursors/live-cursors.io-adapter.js';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -27,6 +28,10 @@ async function bootstrap() {
   app.enableCors({
     origin: corsOrigins,
   });
+  // Socket.IO's CORS is separate machinery from Express's enableCors above
+  // — @WebSocketGateway's decorator config is static and runs before DI is
+  // available, so the same allow-list has to reach it via a custom adapter.
+  app.useWebSocketAdapter(new LiveCursorsIoAdapter(app, corsOrigins));
   app.useGlobalPipes(
     new ValidationPipe({ whitelist: true, transform: true, forbidNonWhitelisted: true }),
   );
