@@ -20,8 +20,6 @@ export interface StaticResumeContent {
     greeting: string
     downloadResume: string
     contactMe: string
-    terminalIntro: string
-    terminalCommits: string[]
   }
   sectionTitles: {
     experience: string

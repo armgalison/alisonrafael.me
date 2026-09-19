@@ -12,17 +12,17 @@ export default async function PostNotFound() {
     <main className="mx-auto max-w-3xl px-6 py-16">
       <Link
         href={backToBlog}
-        className="mb-8 inline-flex items-center gap-1.5 text-sm text-ink-dim transition-colors hover:text-accent"
+        className="mb-8 inline-flex items-center gap-1.5 text-sm text-ink-dim transition-colors hover:text-accent-dim"
       >
         <ArrowLeft size={14} />
         Back to Blog
       </Link>
       <div className="rounded-lg border border-dashed border-line px-6 py-12 text-center">
-        <p className="font-mono text-sm text-accent">404</p>
+        <p className="text-sm text-accent-dim">404</p>
         <h1 className="mt-2 text-xl font-semibold text-ink">Post not found</h1>
         <p className="mt-2 text-sm text-ink-dim">
           This post doesn't exist or hasn't been published.{' '}
-          <Link href={backToBlog} className="text-accent underline underline-offset-2">
+          <Link href={backToBlog} className="text-accent-dim underline underline-offset-2">
             Back to Blog
           </Link>
         </p>

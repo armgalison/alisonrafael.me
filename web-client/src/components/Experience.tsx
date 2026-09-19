@@ -12,19 +12,15 @@ function RoleCard({
   role,
   company,
   current = false,
-  recent = false,
 }: {
   role: ExperienceEntry['roles'][number]
   company: string
   current?: boolean
-  recent?: boolean
 }) {
-  const dotColor = current || !recent ? 'bg-accent' : 'bg-violet'
+  const dotColor = current ? 'bg-accent' : 'bg-line'
   const dotRing = current
-    ? 'shadow-[0_0_0_4px_var(--color-accent-soft),0_0_0_7px_rgba(110,231,194,0.15)]'
-    : recent
-      ? 'shadow-[0_0_0_4px_rgba(167,139,250,0.18)]'
-      : 'shadow-[0_0_0_4px_var(--color-accent-soft)]'
+    ? 'shadow-[0_0_0_4px_var(--color-accent-soft)]'
+    : 'shadow-[0_0_0_4px_var(--color-surface)]'
 
   return (
     <div className="relative pl-10">
@@ -45,18 +41,18 @@ function RoleCard({
           <h3 className="flex items-center gap-2 font-semibold text-ink">
             {role.title}
             {current && (
-              <span className="rounded-full bg-accent/15 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-accent uppercase">
+              <span className="rounded-full bg-accent/15 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-accent-dim uppercase">
                 Current
               </span>
             )}
           </h3>
-          <span className="font-mono text-xs text-ink-dim">{role.period}</span>
+          <span className="text-xs text-ink-dim">{role.period}</span>
         </div>
         <p className="mt-1.5 flex items-center gap-1.5 text-sm text-ink-dim">
-          <Briefcase size={13} className="text-accent" />
+          <Briefcase size={13} className="text-accent-dim" />
           {company}
           <span className="text-line">·</span>
-          <MapPin size={13} className="text-accent" />
+          <MapPin size={13} className="text-accent-dim" />
           {role.location}
         </p>
         <p className="mt-3 text-sm leading-relaxed text-ink-dim">{role.description}</p>
@@ -80,7 +76,6 @@ export function Experience({ entries }: ExperienceProps) {
                   role={role}
                   company={entry.company}
                   current={entryIndex === 0 && roleIndex === 0}
-                  recent={entryIndex === 1}
                 />
               ))}
             </div>

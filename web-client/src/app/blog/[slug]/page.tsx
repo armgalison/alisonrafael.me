@@ -43,7 +43,7 @@ const markdownComponents: Components = {
   p: (props) => <p className="mb-5 leading-relaxed text-ink-dim" {...props} />,
   a: (props) => (
     <a
-      className="text-accent underline decoration-accent/40 underline-offset-2 hover:decoration-accent"
+      className="text-accent-dim underline decoration-accent/40 underline-offset-2 hover:decoration-accent-dim"
       target="_blank"
       rel="noreferrer"
       {...props}
@@ -59,7 +59,7 @@ const markdownComponents: Components = {
   ),
   img: (props) => <MarkdownImage {...props} />,
   code: (props) => (
-    <code className="rounded bg-surface-raised px-1.5 py-0.5 font-mono text-[0.85em] text-accent" {...props} />
+    <code className="rounded bg-surface-raised px-1.5 py-0.5 font-mono text-[0.85em] text-ink" {...props} />
   ),
   hr: (props) => <hr className="my-8 border-line" {...props} />,
 }
@@ -118,13 +118,13 @@ export default async function BlogPostPage({ params }: Props) {
       <main className="mx-auto max-w-3xl px-6 py-16">
         <Link
           href={backToBlog}
-          className="mb-8 inline-flex items-center gap-1.5 text-sm text-ink-dim transition-colors hover:text-accent"
+          className="mb-8 inline-flex items-center gap-1.5 text-sm text-ink-dim transition-colors hover:text-accent-dim"
         >
           <ArrowLeft size={14} />
           Back to Blog
         </Link>
         <Reveal>
-          <p className="text-sm text-red-400">Could not load this post right now. Please try again later.</p>
+          <p className="text-sm text-red-600">Could not load this post right now. Please try again later.</p>
         </Reveal>
       </main>
     )
@@ -139,7 +139,7 @@ export default async function BlogPostPage({ params }: Props) {
       <LiveCursorOverlay room={`post:${post.slug}`} key={post.slug} />
       <Link
         href={backToBlog}
-        className="mb-8 inline-flex items-center gap-1.5 text-sm text-ink-dim transition-colors hover:text-accent"
+        className="mb-8 inline-flex items-center gap-1.5 text-sm text-ink-dim transition-colors hover:text-accent-dim"
       >
         <ArrowLeft size={14} />
         Back to Blog
@@ -148,15 +148,15 @@ export default async function BlogPostPage({ params }: Props) {
       <Reveal>
         <article>
           <header className="mb-8">
-            <p className="flex flex-wrap items-center gap-x-4 gap-y-1.5 font-mono text-xs text-ink-dim">
+            <p className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-ink-dim">
               {post.publishedAt && (
                 <span className="flex items-center gap-1.5">
-                  <Calendar size={12} className="text-accent" />
+                  <Calendar size={12} className="text-accent-dim" />
                   {formatDate(post.publishedAt)}
                 </span>
               )}
               <span className="flex items-center gap-1.5">
-                <Eye size={12} className="text-accent" />
+                <Eye size={12} className="text-accent-dim" />
                 {post.viewCount.toLocaleString('en-US')} views
               </span>
             </p>

@@ -60,7 +60,7 @@ export function Skills({ topSkills, technologyGroups, languages }: SkillsProps) 
               {group.items.map((tech) => (
                 <span
                   key={tech}
-                  className="rounded-full border border-line bg-surface px-3 py-1 font-mono text-xs text-ink-dim"
+                  className="rounded-full border border-line bg-surface px-3 py-1 text-xs text-ink-dim"
                 >
                   {tech}
                 </span>

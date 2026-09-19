@@ -101,7 +101,7 @@ export function ShareButtons({ slug, title }: ShareButtonsProps) {
           title={copied ? 'Copied!' : 'Copy link'}
           className={controlClass}
         >
-          {copied ? <Check size={15} className="text-accent" /> : <Link2 size={15} />}
+          {copied ? <Check size={15} className="text-accent-dim" /> : <Link2 size={15} />}
         </button>
 
         {canNativeShare && (

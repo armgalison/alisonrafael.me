@@ -107,7 +107,7 @@ export function Nav({ content, section, homeOrigin = '' }: NavProps) {
           <a
             href={resumeDownloadUrl}
             download
-            className="hidden items-center gap-1.5 rounded-full border border-ink-dim/40 px-3.5 py-1.5 text-xs font-semibold text-ink transition-colors hover:border-accent hover:text-accent sm:inline-flex"
+            className="hidden items-center gap-1.5 rounded-full border border-ink-dim/40 px-3.5 py-1.5 text-xs font-semibold text-ink transition-colors hover:border-accent-dim hover:text-accent-dim sm:inline-flex"
           >
             <Download size={13} />
             Download Resume
@@ -152,7 +152,7 @@ export function Nav({ content, section, homeOrigin = '' }: NavProps) {
                       href={link.href}
                       onClick={() => setOpen(false)}
                       className={`block rounded-lg px-3 py-3 text-base font-medium ${
-                        active === link.id ? 'text-accent' : 'text-ink'
+                        active === link.id ? 'text-accent-dim' : 'text-ink'
                       }`}
                     >
                       {link.label}
@@ -164,7 +164,7 @@ export function Nav({ content, section, homeOrigin = '' }: NavProps) {
                     href={BLOG_ORIGIN}
                     onClick={() => setOpen(false)}
                     className={`block rounded-lg px-3 py-3 text-base font-medium ${
-                      isBlog ? 'text-accent' : 'text-ink'
+                      isBlog ? 'text-accent-dim' : 'text-ink'
                     }`}
                   >
                     Blog
@@ -176,7 +176,7 @@ export function Nav({ content, section, homeOrigin = '' }: NavProps) {
                   href={resumeDownloadUrl}
                   download
                   onClick={() => setOpen(false)}
-                  className="flex items-center justify-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-surface"
+                  className="flex items-center justify-center gap-2 rounded-full bg-ink px-5 py-2.5 text-sm font-semibold text-surface"
                 >
                   <Download size={15} />
                   Download Resume

@@ -11,14 +11,6 @@ export const en: StaticResumeContent = {
     greeting: "Hi, I'm Alison.",
     downloadResume: 'Download Resume',
     contactMe: 'Get in Touch',
-    terminalIntro: 'git log --oneline -3',
-    // Paraphrased, in commit-message shorthand, from the real BairesDev
-    // description below — not new claims, just a different presentation.
-    terminalCommits: [
-      'perf: endpoint latency, seconds → ms',
-      'refactor: file pipeline → streaming',
-      'lead: 3rd-party integrations',
-    ],
   },
   sectionTitles: {
     experience: 'Experience',

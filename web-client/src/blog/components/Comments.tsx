@@ -26,7 +26,7 @@ function CommentRow({ comment }: { comment: BlogComment }) {
     <div>
       <div className="flex items-baseline gap-2">
         <span className="font-medium text-ink">{comment.authorName}</span>
-        <span className="font-mono text-xs text-ink-dim">{formatRelativeTime(comment.createdAt)}</span>
+        <span className="text-xs text-ink-dim">{formatRelativeTime(comment.createdAt)}</span>
       </div>
       <p className="mt-1 whitespace-pre-wrap text-sm leading-relaxed text-ink-dim">{comment.body}</p>
     </div>
@@ -115,12 +115,12 @@ function CommentForm({
         onChange={(e) => setBody(e.target.value)}
         maxLength={5000}
       />
-      {error && <p className="text-sm text-red-400">{error}</p>}
+      {error && <p className="text-sm text-red-600">{error}</p>}
       <div>
         <button
           type="submit"
           disabled={submitting}
-          className="rounded-full bg-accent px-4 py-2 text-sm font-semibold text-surface transition-opacity hover:opacity-90 disabled:opacity-50"
+          className="rounded-full bg-ink px-4 py-2 text-sm font-semibold text-surface transition-opacity hover:opacity-90 disabled:opacity-50"
         >
           {submitting ? 'Posting…' : parentId ? 'Post reply' : 'Post comment'}
         </button>
@@ -138,7 +138,7 @@ function TopLevelComment({ slug, comment }: { slug: string; comment: BlogComment
       <button
         type="button"
         onClick={() => setReplying((v) => !v)}
-        className="mt-2 inline-flex items-center gap-1 text-xs text-ink-dim transition-colors hover:text-accent"
+        className="mt-2 inline-flex items-center gap-1 text-xs text-ink-dim transition-colors hover:text-accent-dim"
       >
         <CornerDownRight size={12} />
         {replying ? 'Cancel' : 'Reply'}

@@ -42,7 +42,7 @@ export function Stats({ content }: StatsProps) {
         >
           {stats.map((stat) => (
             <div key={stat.label} className="px-4 py-5 text-center">
-              <p className="font-mono text-2xl font-bold text-accent sm:text-3xl">{stat.value}</p>
+              <p className="text-2xl font-bold text-ink sm:text-3xl">{stat.value}</p>
               <p className="mt-1 text-xs text-ink-dim">{stat.label}</p>
             </div>
           ))}
