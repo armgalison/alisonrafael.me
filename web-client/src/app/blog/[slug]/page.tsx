@@ -9,6 +9,7 @@ import { ShareButtons } from '../../../blog/components/ShareButtons'
 import { ViewRegistrar } from '../../../blog/components/ViewRegistrar'
 import { blogListPath } from '../../../blog/routes'
 import { blogPostUrl } from '../../../blog/url'
+import { Section } from '../../../components/Section'
 import { LiveCursorOverlay } from '../../../live-cursors/components/LiveCursorOverlay'
 
 const SITE_NAME = 'Alison Rafael Marinho Gonçalves — Full-Stack Engineer'
@@ -109,7 +110,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 const backLinkClass = 'mono-label underline decoration-1 underline-offset-[0.16em] hover:decoration-2'
 
 // The same two-column rail-and-body grid every Section uses, without the
-// big headline — for the article body and the comments.
+// big headline — the post's own h1 in the header above already is one.
 const railClass =
   'gap-[clamp(1.5rem,5vw,7rem)] border-b border-rule px-(--gutter) py-[clamp(3rem,6vw,6rem)] min-[721px]:grid min-[721px]:grid-cols-[minmax(9rem,0.33fr)_minmax(0,1fr)]'
 
@@ -144,40 +145,60 @@ export default async function BlogPostPage({ params }: Props) {
       <ViewRegistrar slug={post.slug} />
       <LiveCursorOverlay room={`post:${post.slug}`} key={post.slug} />
 
-      <header className="border-b border-rule px-(--gutter) pt-[clamp(2rem,4vw,4rem)] pb-[clamp(3rem,8vw,7rem)]">
-        <Link href={backToBlog} className={backLinkClass}>
-          ← Back to Blog
-        </Link>
-        <p className="mono-label mt-[clamp(3rem,8vw,7rem)] text-ink-dim">
-          {post.publishedAt && `${formatDate(post.publishedAt)} / `}
-          {post.viewCount.toLocaleString('en-US')} views
-        </p>
-        <h1 className="mt-6 max-w-[20ch] font-serif text-[clamp(2.5rem,6vw,6.5rem)] leading-[0.94] font-normal tracking-[-0.06em]">
-          {post.title}
-        </h1>
+      <header
+        className={`grid border-b border-rule ${
+          post.coverImageUrl
+            ? 'min-[721px]:min-h-[min(48rem,calc(100svh-3.6rem))] min-[721px]:grid-cols-[minmax(0,1.12fr)_minmax(15rem,0.88fr)]'
+            : ''
+        }`}
+      >
+        <div className="flex flex-col items-start justify-between px-(--gutter) pt-[clamp(2rem,6vw,6rem)] pb-[clamp(2rem,4vw,4rem)] max-[720px]:min-h-[30rem]">
+          <div className="flex w-full flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
+            <Link href={backToBlog} className={backLinkClass}>
+              ← Back to Blog
+            </Link>
+            <p className="mono-label text-ink-dim">
+              {post.publishedAt && `${formatDate(post.publishedAt)} / `}
+              {post.viewCount.toLocaleString('en-US')} views
+            </p>
+          </div>
+
+          <h1 className="mt-[clamp(3rem,8vw,7rem)] mb-[clamp(3rem,6vw,5rem)] max-w-[18ch] text-[clamp(2.25rem,5.6vw,6rem)] leading-[0.9] font-normal tracking-[-0.075em] break-words">
+            {post.title}
+          </h1>
+
+          <p className="max-w-xl font-serif text-[clamp(1.15rem,1.65vw,1.55rem)] leading-[1.25]">{post.excerpt}</p>
+        </div>
+
+        {post.coverImageUrl && (
+          <figure className="relative m-0 flex flex-col overflow-hidden border-rule bg-[#e5e5e5] after:pointer-events-none after:absolute after:inset-0 after:bg-[linear-gradient(rgba(255,255,255,0.08)_1px,transparent_1px)] after:bg-[length:100%_4px] after:mix-blend-soft-light after:content-[''] max-[720px]:min-h-[27rem] max-[720px]:border-t min-[721px]:border-l">
+            <img
+              src={post.coverImageUrl}
+              alt=""
+              className="h-full min-h-[26rem] w-full object-cover mix-blend-multiply brightness-105 contrast-125 grayscale"
+            />
+            <figcaption className="mono-label absolute inset-x-0 bottom-0 z-10 flex justify-between gap-4 bg-black/85 px-4 py-[0.9rem] text-white">
+              <span>Cover image</span>
+              <span>B&amp;W</span>
+            </figcaption>
+          </figure>
+        )}
       </header>
 
       <section className={railClass}>
-        <p className="mono-label mb-14 text-ink-dim min-[721px]:mb-0">Article</p>
+        <p className="mono-label mb-14 text-ink-dim min-[721px]:mb-0">01 / Article</p>
         <article className="max-w-[46rem] min-w-0">
-          {post.coverImageUrl && (
-            <div className="mb-10 overflow-hidden border border-line">
-              <img src={post.coverImageUrl} alt="" loading="lazy" className="block max-h-[420px] w-full object-cover" />
-            </div>
-          )}
-
           <Markdown components={markdownComponents}>{sanitizedContent}</Markdown>
 
           <ShareButtons slug={post.slug} title={post.title} />
         </article>
       </section>
 
-      <section className={`${railClass} border-b-0`}>
-        <p className="mono-label mb-14 text-ink-dim min-[721px]:mb-0">Discussion</p>
-        <div className="max-w-[46rem] min-w-0">
+      <Section index="02 / Discussion" title="Comments.">
+        <div className="max-w-[46rem]">
           <Comments slug={post.slug} initialComments={comments} />
         </div>
-      </section>
+      </Section>
     </main>
   )
 }

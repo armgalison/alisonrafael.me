@@ -87,7 +87,7 @@ function CommentForm({
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid items-start gap-3 sm:grid-cols-2">
         <input
           className={inputClass}
           placeholder="Name"
@@ -172,8 +172,6 @@ function TopLevelComment({ slug, comment }: { slug: string; comment: BlogComment
 export function Comments({ slug, initialComments }: { slug: string; initialComments: BlogComment[] }) {
   return (
     <section>
-      <h2 className="mb-8 font-serif text-[clamp(1.75rem,3.5vw,3rem)] leading-none font-normal tracking-[-0.05em]">Comments</h2>
-
       {initialComments.length === 0 && (
         <p className="mb-8 text-sm text-ink-dim">No comments yet — be the first.</p>
       )}
