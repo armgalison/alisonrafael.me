@@ -37,7 +37,6 @@ export function Hero({ content }: HeroProps) {
         />
         <figcaption className="mono-label absolute inset-x-0 bottom-0 z-10 flex justify-between gap-4 bg-black/85 px-4 py-[0.9rem] text-white">
           <span>{content.meta.name.split(' ')[0]} {last}</span>
-          <span>{content.meta.location}</span>
         </figcaption>
       </figure>
     </section>
