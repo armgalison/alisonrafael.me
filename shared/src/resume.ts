@@ -66,7 +66,7 @@ export interface ResumeProfile {
 export const resumeProfile: ResumeProfile = {
   name: 'Alison Rafael Marinho Gonçalves',
   headline:
-    'Full-Stack Engineer · Delivering high-impact products\nTurning complex problems into scalable solutions',
+    'Software Engineer · Delivering high-impact products\nTurning complex problems into scalable solutions',
   location: 'Pouso Alegre, Minas Gerais, Brazil',
   links: {
     phone: '+55 35 99198-3363',

@@ -10,7 +10,7 @@ function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 }
 
-const SITE_NAME = 'Alison Rafael Marinho Gonçalves — Full-Stack Engineer'
+const SITE_NAME = 'Alison Rafael Marinho Gonçalves — Software Engineer'
 
 // Without this, the list page silently inherited the root layout's
 // alternates.canonical: '/' — wrong even before the Blog moved to its own

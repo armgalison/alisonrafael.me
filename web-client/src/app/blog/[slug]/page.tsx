@@ -12,7 +12,7 @@ import { blogPostUrl } from '../../../blog/url'
 import { Section } from '../../../components/Section'
 import { LiveCursorOverlay } from '../../../live-cursors/components/LiveCursorOverlay'
 
-const SITE_NAME = 'Alison Rafael Marinho Gonçalves — Full-Stack Engineer'
+const SITE_NAME = 'Alison Rafael Marinho Gonçalves — Software Engineer'
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })

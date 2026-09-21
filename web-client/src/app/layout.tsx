@@ -2,9 +2,9 @@ import type { Metadata } from 'next'
 import type { ReactNode } from 'react'
 import './globals.css'
 
-const SITE_NAME = 'Alison Rafael Marinho Gonçalves — Full-Stack Engineer'
+const SITE_NAME = 'Alison Rafael Marinho Gonçalves — Software Engineer'
 const SITE_DESCRIPTION =
-  'Alison Rafael Marinho Gonçalves — Full-Stack Engineer. Resume, experience, and skills.'
+  'Alison Rafael Marinho Gonçalves — Software Engineer. Resume, experience, and skills.'
 
 // Site-wide fallback link-preview tags — apply to every route that doesn't
 // set its own metadata (the resume, the /blog list, a 404). A Post's

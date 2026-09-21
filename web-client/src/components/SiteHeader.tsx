@@ -39,8 +39,8 @@ export function SiteHeader({ content, section, homeOrigin = '' }: SiteHeaderProp
       <div className="flex items-center gap-4 max-[720px]:gap-2">
         <span className="mono-label max-w-80 text-right text-ink-dim max-[720px]:hidden">
           {role}
-          <br />
-          {content.meta.location}
+          {/* <br />
+          {content.meta.location} */}
         </span>
         <a
           href={BLOG_ORIGIN}

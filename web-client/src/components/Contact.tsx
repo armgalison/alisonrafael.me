@@ -35,21 +35,6 @@ export function Contact({ content }: ContactProps) {
           </Entry>
         ))}
       </div>
-
-      <aside className="border border-rule p-[clamp(1.4rem,3vw,2.4rem)]" aria-label="Primary contact">
-        <p className="mb-8 max-w-80 font-serif text-[clamp(1.4rem,2.5vw,2.2rem)] leading-[1.03] tracking-[-0.045em]">
-          Let's build something great together.
-        </p>
-        <p className="mb-8 text-[0.95rem] leading-[1.35] text-ink-dim">
-          Reach out any time — I usually reply within a day.
-        </p>
-        <a
-          href={`mailto:${contact.email}`}
-          className="inline-flex items-center gap-3 font-mono text-[0.78rem] font-semibold tracking-[0.04em] break-all uppercase no-underline after:text-[1.1rem] after:content-['↗']"
-        >
-          Write to {contact.email}
-        </a>
-      </aside>
     </div>
   )
 }

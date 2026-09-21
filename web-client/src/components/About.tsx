@@ -18,7 +18,7 @@ export function About({ content }: { content: ResumeContent }) {
   const roleCount = content.experience.flatMap((entry) => entry.roles).length
 
   const stats = [
-    years !== null ? { value: `${years}+`, label: 'Years of experience' } : null,
+    years !== null ? { value: `${years}`, label: 'Years of experience' } : null,
     { value: String(content.experience.length), label: 'Companies' },
     { value: String(roleCount), label: 'Roles held' },
     { value: String(content.certifications.length), label: 'Certifications' },
