@@ -19,14 +19,14 @@ function formatRelativeTime(iso: string): string {
 }
 
 const inputClass =
-  'w-full rounded-none border border-line bg-surface-raised px-3 py-2 text-sm outline-none focus:border-accent-dim'
+  'w-full rounded-none border border-rule bg-surface px-3 py-2 text-[0.95rem]'
 
 function CommentRow({ comment }: { comment: BlogComment }) {
   return (
     <div>
       <div className="flex items-baseline gap-2">
-        <span className="font-medium text-ink">{comment.authorName}</span>
-        <span className="text-xs text-ink-dim">{formatRelativeTime(comment.createdAt)}</span>
+        <span className="font-semibold">{comment.authorName}</span>
+        <span className="mono-label text-ink-dim">{formatRelativeTime(comment.createdAt)}</span>
       </div>
       <p className="mt-1 whitespace-pre-wrap text-sm leading-relaxed text-ink-dim">{comment.body}</p>
     </div>
@@ -87,7 +87,7 @@ function CommentForm({
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid items-start gap-3 sm:grid-cols-2">
         <input
           className={inputClass}
           placeholder="Name"
@@ -115,12 +115,12 @@ function CommentForm({
         onChange={(e) => setBody(e.target.value)}
         maxLength={5000}
       />
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-sm text-red-700">{error}</p>}
       <div>
         <button
           type="submit"
           disabled={submitting}
-          className="rounded-none bg-ink px-4 py-2 text-sm font-semibold text-surface transition-opacity hover:opacity-90 disabled:opacity-50"
+          className="rounded-none border border-ink bg-ink px-4 py-2.5 font-mono text-[0.7rem] font-semibold tracking-[0.06em] text-surface uppercase transition-colors hover:bg-surface hover:text-ink disabled:opacity-50"
         >
           {submitting ? 'Posting…' : parentId ? 'Post reply' : 'Post comment'}
         </button>
@@ -138,7 +138,7 @@ function TopLevelComment({ slug, comment }: { slug: string; comment: BlogComment
       <button
         type="button"
         onClick={() => setReplying((v) => !v)}
-        className="mt-2 inline-flex items-center gap-1 text-xs text-ink-dim transition-colors hover:text-accent-dim"
+        className="mt-2 inline-flex items-center gap-1 text-xs text-ink-dim transition-colors hover:text-ink hover:underline"
       >
         <CornerDownRight size={12} />
         {replying ? 'Cancel' : 'Reply'}
@@ -172,8 +172,6 @@ function TopLevelComment({ slug, comment }: { slug: string; comment: BlogComment
 export function Comments({ slug, initialComments }: { slug: string; initialComments: BlogComment[] }) {
   return (
     <section>
-      <h2 className="mb-6 text-2xl font-semibold text-ink">Comments</h2>
-
       {initialComments.length === 0 && (
         <p className="mb-8 text-sm text-ink-dim">No comments yet — be the first.</p>
       )}
@@ -187,7 +185,7 @@ export function Comments({ slug, initialComments }: { slug: string; initialComme
       )}
 
       <div>
-        <h3 className="mb-3 text-sm font-semibold text-ink">Leave a comment</h3>
+        <h3 className="mono-label mb-3 text-ink-dim">Leave a comment</h3>
         <CommentForm slug={slug} />
       </div>
     </section>

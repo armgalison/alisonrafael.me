@@ -1,16 +1,8 @@
 import type { StaticResumeContent } from './types'
 
 export const en: StaticResumeContent = {
-  nav: {
-    experience: 'Experience',
-    skills: 'Skills',
-    credentials: 'Credentials',
-    contact: 'Contact',
-  },
   hero: {
     greeting: "Hi, I'm Alison.",
-    downloadResume: 'Download Resume',
-    contactMe: 'Get in Touch',
   },
   sectionTitles: {
     experience: 'Experience',

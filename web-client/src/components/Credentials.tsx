@@ -1,6 +1,5 @@
-import { Award, GraduationCap } from 'lucide-react'
 import type { EducationEntry } from '../content/types'
-import { Reveal } from './Reveal'
+import { copyClass } from './Section'
 
 interface CredentialsProps {
   educationTitle: string
@@ -16,41 +15,38 @@ export function Credentials({
   certifications,
 }: CredentialsProps) {
   return (
-    <Reveal>
-      <div className="divide-y divide-line rounded-none border border-line bg-surface-raised">
-        <div className="p-5">
-          <h3 className="mb-3 flex items-center gap-2 text-xs font-medium tracking-wide text-ink-dim uppercase">
-            <GraduationCap size={14} />
-            {educationTitle}
-          </h3>
-          <ul className="space-y-3">
-            {education.map((entry) => (
-              <li key={entry.school}>
-                <p className="text-sm font-medium text-ink">{entry.school}</p>
-                <p className="mt-0.5 text-sm text-ink-dim">{entry.degree}</p>
-                <p className="mt-0.5 text-xs text-ink-dim">{entry.period}</p>
+    <div
+      className={`grid gap-[clamp(3rem,10vw,11rem)] ${
+        certifications.length > 0 ? 'min-[721px]:grid-cols-2' : ''
+      }`}
+    >
+      <div>
+        <h3 className="mono-label mb-4 text-ink-dim">{educationTitle}</h3>
+        <ul className="border-t border-line">
+          {education.map((entry) => (
+            <li key={entry.school} className="border-b border-line py-6">
+              <p className="mono-label mb-3 text-ink-dim">{entry.period}</p>
+              <p className="font-serif text-[clamp(1.4rem,2.5vw,2.2rem)] leading-[1.03] tracking-[-0.045em]">
+                {entry.school}
+              </p>
+              <p className={`${copyClass} mt-2 text-ink-dim`}>{entry.degree}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {certifications.length > 0 && (
+        <div>
+          <h3 className="mono-label mb-4 text-ink-dim">{certificationsTitle}</h3>
+          <ul className="border-t border-line">
+            {certifications.map((certification) => (
+              <li key={certification} className="border-b border-line py-6 text-[1.05rem] leading-[1.45]">
+                {certification}
               </li>
             ))}
           </ul>
         </div>
-
-        { certifications.length > 0 && (
-          <div className="p-5">
-            <h3 className="mb-3 flex items-center gap-2 text-xs font-medium tracking-wide text-ink-dim uppercase">
-              <Award size={14} />
-              {certificationsTitle}
-            </h3>
-            <ul className="space-y-2.5">
-              {certifications.map((certification) => (
-                <li key={certification} className="flex items-start gap-2.5 text-sm text-ink">
-                  <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-accent" />
-                  {certification}
-                </li>
-              ))}
-            </ul>
-          </div>
       )}
-      </div>
-    </Reveal>
+    </div>
   )
 }

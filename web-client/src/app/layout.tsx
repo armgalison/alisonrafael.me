@@ -1,10 +1,6 @@
 import type { Metadata } from 'next'
 import type { ReactNode } from 'react'
-import { FontStylesheet } from '../components/FontStylesheet'
 import './globals.css'
-
-const FONT_HREF =
-  'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap'
 
 const SITE_NAME = 'Alison Rafael Marinho Gonçalves — Full-Stack Engineer'
 const SITE_DESCRIPTION =
@@ -47,15 +43,6 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" style={{ backgroundColor: '#ffffff' }}>
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link rel="preload" as="style" href={FONT_HREF} />
-        <FontStylesheet href={FONT_HREF} />
-        <noscript>
-          <link href={FONT_HREF} rel="stylesheet" />
-        </noscript>
-      </head>
       <body suppressHydrationWarning>{children}</body>
     </html>
   )

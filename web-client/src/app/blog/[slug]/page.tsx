@@ -1,4 +1,3 @@
-import { ArrowLeft, Calendar, Eye } from 'lucide-react'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
@@ -10,7 +9,7 @@ import { ShareButtons } from '../../../blog/components/ShareButtons'
 import { ViewRegistrar } from '../../../blog/components/ViewRegistrar'
 import { blogListPath } from '../../../blog/routes'
 import { blogPostUrl } from '../../../blog/url'
-import { Reveal } from '../../../components/Reveal'
+import { Section } from '../../../components/Section'
 import { LiveCursorOverlay } from '../../../live-cursors/components/LiveCursorOverlay'
 
 const SITE_NAME = 'Alison Rafael Marinho Gonçalves — Full-Stack Engineer'
@@ -35,33 +34,40 @@ function stripRawHtmlTags(markdown: string) {
 // Renders the post's markdown `content` with this site's own theme tokens
 // instead of react-markdown's unstyled defaults — kept local to the Blog
 // route rather than a shared "prose" stylesheet, since nothing else in
-// the public site renders arbitrary markdown.
+// the public site renders arbitrary markdown. Headings are serif like the
+// rest of the site; running text stays in the sans.
 const markdownComponents: Components = {
-  h1: (props) => <h1 className="mt-10 mb-4 text-3xl font-bold text-ink first:mt-0" {...props} />,
-  h2: (props) => <h2 className="mt-10 mb-4 text-2xl font-semibold text-ink first:mt-0" {...props} />,
-  h3: (props) => <h3 className="mt-8 mb-3 text-xl font-semibold text-ink" {...props} />,
-  p: (props) => <p className="mb-5 leading-relaxed text-ink-dim" {...props} />,
+  h1: (props) => (
+    <h1 className="mt-14 mb-5 font-serif text-[clamp(2rem,3.5vw,3rem)] leading-none font-normal tracking-[-0.05em] first:mt-0" {...props} />
+  ),
+  h2: (props) => (
+    <h2 className="mt-14 mb-5 font-serif text-[clamp(1.75rem,3vw,2.5rem)] leading-none font-normal tracking-[-0.05em] first:mt-0" {...props} />
+  ),
+  h3: (props) => (
+    <h3 className="mt-10 mb-4 font-serif text-[clamp(1.4rem,2.2vw,1.9rem)] leading-tight font-normal tracking-[-0.04em]" {...props} />
+  ),
+  p: (props) => <p className="mb-6 text-[1.1rem] leading-[1.6]" {...props} />,
   a: (props) => (
     <a
-      className="text-accent-dim underline decoration-accent/40 underline-offset-2 hover:decoration-accent-dim"
+      className="underline decoration-1 underline-offset-[0.16em] hover:decoration-2"
       target="_blank"
       rel="noreferrer"
       {...props}
     />
   ),
-  strong: (props) => <strong className="font-semibold text-ink" {...props} />,
-  em: (props) => <em className="text-ink" {...props} />,
-  ul: (props) => <ul className="mb-5 list-disc space-y-1.5 pl-6 text-ink-dim" {...props} />,
-  ol: (props) => <ol className="mb-5 list-decimal space-y-1.5 pl-6 text-ink-dim" {...props} />,
-  li: (props) => <li className="leading-relaxed" {...props} />,
+  strong: (props) => <strong className="font-semibold" {...props} />,
+  em: (props) => <em {...props} />,
+  ul: (props) => <ul className="mb-6 list-disc space-y-2 pl-6 text-[1.1rem] leading-[1.6]" {...props} />,
+  ol: (props) => <ol className="mb-6 list-decimal space-y-2 pl-6 text-[1.1rem] leading-[1.6]" {...props} />,
+  li: (props) => <li {...props} />,
   blockquote: (props) => (
-    <blockquote className="mb-5 border-l-2 border-accent/40 pl-4 text-ink-dim italic" {...props} />
+    <blockquote className="mb-6 border-l-2 border-ink pl-5 font-serif text-[1.3rem] leading-[1.35] italic" {...props} />
   ),
   img: (props) => <MarkdownImage {...props} />,
   code: (props) => (
-    <code className="bg-surface-raised px-1.5 py-0.5 font-mono text-[0.85em] text-ink" {...props} />
+    <code className="bg-surface-raised px-1.5 py-0.5 font-mono text-[0.85em]" {...props} />
   ),
-  hr: (props) => <hr className="my-8 border-line" {...props} />,
+  hr: (props) => <hr className="my-10 border-line" {...props} />,
 }
 
 interface Props {
@@ -101,6 +107,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
+const backLinkClass = 'mono-label underline decoration-1 underline-offset-[0.16em] hover:decoration-2'
+
+// The same two-column rail-and-body grid every Section uses, without the
+// big headline — the post's own h1 in the header above already is one.
+const railClass =
+  'gap-[clamp(1.5rem,5vw,7rem)] border-b border-rule px-(--gutter) py-[clamp(3rem,6vw,6rem)] min-[721px]:grid min-[721px]:grid-cols-[minmax(9rem,0.33fr)_minmax(0,1fr)]'
+
 export default async function BlogPostPage({ params }: Props) {
   const { slug } = await params
 
@@ -115,17 +128,11 @@ export default async function BlogPostPage({ params }: Props) {
   } catch (err) {
     if (err instanceof ApiError && err.status === 404) notFound()
     return (
-      <main className="mx-auto max-w-3xl px-6 py-16">
-        <Link
-          href={backToBlog}
-          className="mb-8 inline-flex items-center gap-1.5 text-sm text-ink-dim transition-colors hover:text-accent-dim"
-        >
-          <ArrowLeft size={14} />
-          Back to Blog
+      <main className="border-b border-rule px-(--gutter) py-[clamp(2rem,4vw,4rem)]">
+        <Link href={backToBlog} className={backLinkClass}>
+          ← Back to Blog
         </Link>
-        <Reveal>
-          <p className="text-sm text-red-600">Could not load this post right now. Please try again later.</p>
-        </Reveal>
+        <p className="mt-12 text-red-700">Could not load this post right now. Please try again later.</p>
       </main>
     )
   }
@@ -134,54 +141,64 @@ export default async function BlogPostPage({ params }: Props) {
   const sanitizedContent = stripRawHtmlTags(post.content)
 
   return (
-    <main className="mx-auto max-w-3xl px-6 py-16">
+    <main>
       <ViewRegistrar slug={post.slug} />
       <LiveCursorOverlay room={`post:${post.slug}`} key={post.slug} />
-      <Link
-        href={backToBlog}
-        className="mb-8 inline-flex items-center gap-1.5 text-sm text-ink-dim transition-colors hover:text-accent-dim"
+
+      <header
+        className={`grid border-b border-rule ${
+          post.coverImageUrl
+            ? 'min-[721px]:min-h-[min(48rem,calc(100svh-3.6rem))] min-[721px]:grid-cols-[minmax(0,1.12fr)_minmax(15rem,0.88fr)]'
+            : ''
+        }`}
       >
-        <ArrowLeft size={14} />
-        Back to Blog
-      </Link>
-
-      <Reveal>
-        <article>
-          <header className="mb-8">
-            <p className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-ink-dim">
-              {post.publishedAt && (
-                <span className="flex items-center gap-1.5">
-                  <Calendar size={12} className="text-accent-dim" />
-                  {formatDate(post.publishedAt)}
-                </span>
-              )}
-              <span className="flex items-center gap-1.5">
-                <Eye size={12} className="text-accent-dim" />
-                {post.viewCount.toLocaleString('en-US')} views
-              </span>
+        <div className="flex flex-col items-start justify-between px-(--gutter) pt-[clamp(2rem,6vw,6rem)] pb-[clamp(2rem,4vw,4rem)] max-[720px]:min-h-[30rem]">
+          <div className="flex w-full flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
+            <Link href={backToBlog} className={backLinkClass}>
+              ← Back to Blog
+            </Link>
+            <p className="mono-label text-ink-dim">
+              {post.publishedAt && `${formatDate(post.publishedAt)} / `}
+              {post.viewCount.toLocaleString('en-US')} views
             </p>
-            <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">{post.title}</h1>
-          </header>
+          </div>
 
-          {post.coverImageUrl && (
-            <div className="mb-8 overflow-hidden border border-line">
-              <img
-                src={post.coverImageUrl}
-                alt=""
-                loading="lazy"
-                className="block max-h-[420px] w-full object-cover"
-              />
-            </div>
-          )}
+          <h1 className="mt-[clamp(3rem,8vw,7rem)] mb-[clamp(3rem,6vw,5rem)] max-w-[18ch] text-[clamp(2.25rem,5.6vw,6rem)] leading-[0.9] font-normal tracking-[-0.075em] break-words">
+            {post.title}
+          </h1>
 
+          <p className="max-w-xl font-serif text-[clamp(1.15rem,1.65vw,1.55rem)] leading-[1.25]">{post.excerpt}</p>
+        </div>
+
+        {post.coverImageUrl && (
+          <figure className="relative m-0 flex flex-col overflow-hidden border-rule bg-[#e5e5e5] after:pointer-events-none after:absolute after:inset-0 after:bg-[linear-gradient(rgba(255,255,255,0.08)_1px,transparent_1px)] after:bg-[length:100%_4px] after:mix-blend-soft-light after:content-[''] max-[720px]:min-h-[27rem] max-[720px]:border-t min-[721px]:border-l">
+            <img
+              src={post.coverImageUrl}
+              alt=""
+              className="h-full min-h-[26rem] w-full object-cover mix-blend-multiply brightness-105 contrast-125 grayscale"
+            />
+            <figcaption className="mono-label absolute inset-x-0 bottom-0 z-10 flex justify-between gap-4 bg-black/85 px-4 py-[0.9rem] text-white">
+              <span>Cover image</span>
+              <span>B&amp;W</span>
+            </figcaption>
+          </figure>
+        )}
+      </header>
+
+      <section className={railClass}>
+        <p className="mono-label mb-14 text-ink-dim min-[721px]:mb-0">01 / Article</p>
+        <article className="max-w-[46rem] min-w-0">
           <Markdown components={markdownComponents}>{sanitizedContent}</Markdown>
+
+          <ShareButtons slug={post.slug} title={post.title} />
         </article>
+      </section>
 
-        <ShareButtons slug={post.slug} title={post.title} />
-
-        <hr className="my-12 border-line" />
-        <Comments slug={post.slug} initialComments={comments} />
-      </Reveal>
+      <Section index="02 / Discussion" title="Comments.">
+        <div className="max-w-[46rem]">
+          <Comments slug={post.slug} initialComments={comments} />
+        </div>
+      </Section>
     </main>
   )
 }
