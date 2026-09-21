@@ -1,87 +1,35 @@
-'use client'
-
-import { Briefcase, MapPin } from 'lucide-react'
 import type { ExperienceEntry } from '../content/types'
-import { Reveal } from './Reveal'
 
 interface ExperienceProps {
   entries: ExperienceEntry[]
 }
 
-function RoleCard({
-  role,
-  company,
-  current = false,
-}: {
-  role: ExperienceEntry['roles'][number]
-  company: string
-  current?: boolean
-}) {
-  const dotColor = current ? 'bg-accent' : 'bg-line'
-  const dotRing = current
-    ? 'shadow-[0_0_0_4px_var(--color-accent-soft)]'
-    : 'shadow-[0_0_0_4px_var(--color-surface)]'
-
-  return (
-    <div className="relative pl-10">
-      {current && (
-        <span className="absolute top-6 left-[7px] h-3 w-3 -translate-x-1/2 animate-ping rounded-full bg-accent/60" />
-      )}
-      <span
-        className={`absolute top-6 left-[7px] h-3 w-3 -translate-x-1/2 rounded-full border-2 border-surface ${dotColor} ${dotRing}`}
-      />
-      <div
-        className={`rounded-none border p-6 transition-colors ${
-          current
-            ? 'border-accent/40 bg-surface-raised'
-            : 'border-line bg-surface-raised hover:border-accent/40 hover:bg-surface-raised-hover'
-        }`}
-      >
-        <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <h3 className="flex items-center gap-2 font-semibold text-ink">
-            {role.title}
-            {current && (
-              <span className="rounded-none bg-accent/15 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-accent-dim uppercase">
-                Current
-              </span>
-            )}
-          </h3>
-          <span className="text-xs text-ink-dim">{role.period}</span>
-        </div>
-        <p className="mt-1.5 flex items-center gap-1.5 text-sm text-ink-dim">
-          <Briefcase size={13} className="text-accent-dim" />
-          {company}
-          <span className="text-line">·</span>
-          <MapPin size={13} className="text-accent-dim" />
-          {role.location}
-        </p>
-        <p className="mt-3 text-sm leading-relaxed text-ink-dim">{role.description}</p>
-      </div>
-    </div>
-  )
-}
-
+// A full-bleed list of rows separated by full-strength rules — one row per
+// role, newest first. The first role overall is the current one.
 export function Experience({ entries }: ExperienceProps) {
-  return (
-    <div className="relative">
-      <div className="absolute top-2 bottom-2 left-[7px] w-px bg-gradient-to-b from-line via-line to-transparent" />
+  const roles = entries.flatMap((entry) => entry.roles.map((role) => ({ role, company: entry.company })))
 
-      <div className="space-y-5">
-        {entries.map((entry, entryIndex) => (
-          <Reveal key={entry.company}>
-            <div className="space-y-5">
-              {entry.roles.map((role, roleIndex) => (
-                <RoleCard
-                  key={`${entry.company}-${role.title}-${role.period}`}
-                  role={role}
-                  company={entry.company}
-                  current={entryIndex === 0 && roleIndex === 0}
-                />
-              ))}
+  return (
+    <ul className="-mx-(--gutter) border-t border-rule">
+      {roles.map(({ role, company }, index) => (
+        <li key={`${company}-${role.title}-${role.period}`} className="border-b border-rule last:border-b-0">
+          <div className="grid items-baseline gap-x-5 gap-y-3 px-(--gutter) py-[clamp(1.5rem,3.2vw,3.2rem)] min-[721px]:grid-cols-[minmax(9rem,0.4fr)_minmax(0,1.1fr)_minmax(16rem,1fr)]">
+            <p className="mono-label text-ink-dim">
+              {role.period}
+              {index === 0 && <span className="mt-1 block text-ink">Current role</span>}
+            </p>
+            <div>
+              <h3 className="font-serif text-[clamp(1.75rem,3.5vw,4rem)] leading-[0.92] font-normal tracking-[-0.055em]">
+                {role.title}
+              </h3>
+              <p className="mono-label mt-3 text-ink-dim">
+                {company} / {role.location}
+              </p>
             </div>
-          </Reveal>
-        ))}
-      </div>
-    </div>
+            <p className="max-w-[34rem] text-[0.95rem] leading-[1.45]">{role.description}</p>
+          </div>
+        </li>
+      ))}
+    </ul>
   )
 }

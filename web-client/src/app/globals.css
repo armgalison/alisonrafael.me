@@ -1,16 +1,32 @@
 @import 'tailwindcss';
 
 @theme {
-  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
-  --color-ink: #161616;
+  /* System font stacks, matching the reference site: a Helvetica sans for
+     body/display, a serif for headlines, a mono for tiny uppercase labels. */
+  --font-sans: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-serif: 'Iowan Old Style', Baskerville, 'Times New Roman', Times, serif;
+  --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+
+  --color-ink: #111111;
   --color-ink-dim: #5c5c5c;
   --color-surface: #ffffff;
-  --color-surface-raised: #f6f5f4;
-  --color-surface-raised-hover: #efeeec;
-  --color-line: #e5e5e5;
-  --color-accent: #c0a3af;
-  --color-accent-soft: #c0a3af33;
-  --color-accent-dim: #8c5a68;
+  --color-surface-raised: #f4f4f4;
+  --color-surface-raised-hover: #ebebeb;
+  /* Two rule weights: a full-strength one for structural dividers, a quiet
+     one for hairlines inside a section. */
+  --color-rule: #161616;
+  --color-line: #d8d8d8;
+
+  /* The public site is strictly black-and-white. These stay defined (as ink)
+     only because the Admin Panel, which shares these tokens, still styles
+     its buttons/links with them. */
+  --color-accent: #111111;
+  --color-accent-soft: #1111111a;
+  --color-accent-dim: #111111;
+}
+
+:root {
+  --gutter: clamp(1.25rem, 4vw, 4.5rem);
 }
 
 html {
@@ -19,34 +35,33 @@ html {
 }
 
 body {
+  margin: 0;
+  min-width: 320px;
   background-color: var(--color-surface);
   color: var(--color-ink);
   font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 ::selection {
-  background: var(--color-accent);
-  color: var(--color-ink);
-}
-
-::-webkit-scrollbar {
-  width: 10px;
-}
-::-webkit-scrollbar-track {
-  background: var(--color-surface);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--color-line);
-  border-radius: 999px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--color-accent-dim);
+  background: var(--color-ink);
+  color: var(--color-surface);
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-accent-dim);
-  outline-offset: 3px;
-  border-radius: 0;
+  outline: 2px solid var(--color-ink);
+  outline-offset: 4px;
+}
+
+/* Tiny uppercase mono label — section indexes, eyebrows, kickers, footer. */
+@utility mono-label {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  font-weight: 500;
+  letter-spacing: 0.065em;
+  line-height: 1.35;
+  text-transform: uppercase;
 }
 
 /* Same pattern, but faded from the vertical center instead of the top —

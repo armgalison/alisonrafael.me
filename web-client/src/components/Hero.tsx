@@ -1,78 +1,45 @@
-'use client'
-
-import { motion } from 'framer-motion'
-import { Download } from 'lucide-react'
 import type { ResumeContent } from '../content/types'
-import { easeOut } from '../lib/motion'
-import { resumeDownloadUrl } from '../lib/resumeUrl'
 
 interface HeroProps {
   content: ResumeContent
 }
 
-const container = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.1, delayChildren: 0.15 } },
-}
-
-const item = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: easeOut } },
-}
-
+// Two columns: an oversized name and a serif statement on the left, a
+// full-bleed black-and-white portrait with a caption bar on the right.
 export function Hero({ content }: HeroProps) {
+  const [first, ...rest] = content.meta.name.split(' ')
+  const last = rest.at(-1) ?? ''
+
   return (
-    <section id="top" className="relative overflow-hidden px-6 pt-24 pb-10">
-      <motion.div
-        variants={container}
-        initial="hidden"
-        animate="show"
-        className="mx-auto grid max-w-6xl items-end gap-12 lg:grid-cols-[1fr_360px]"
-      >
-        <div>
-          <motion.p variants={item} className="mb-6 text-sm font-medium tracking-wide text-ink-dim uppercase">
-            {content.hero.greeting}
-          </motion.p>
+    <section
+      id="top"
+      className="grid border-b border-rule min-[721px]:min-h-[min(48rem,calc(100svh-3.6rem))] min-[721px]:grid-cols-[minmax(0,1.12fr)_minmax(15rem,0.88fr)]"
+    >
+      <div className="flex flex-col items-start justify-between px-(--gutter) pt-[clamp(2rem,6vw,6rem)] pb-[clamp(2rem,4vw,4rem)] max-[720px]:min-h-[36rem]">
+        <p className="mono-label">{content.hero.greeting}</p>
 
-          <motion.h1
-            variants={item}
-            className="text-4xl font-extrabold tracking-tight text-ink sm:text-6xl"
-          >
-            {content.meta.name}
-          </motion.h1>
-          <motion.p
-            variants={item}
-            className="mt-5 max-w-xl text-lg leading-relaxed whitespace-pre-line text-ink-dim"
-          >
-            {content.meta.headline}
-          </motion.p>
+        <h1 className="mt-[clamp(3rem,10vw,8rem)] mb-[clamp(3rem,8vw,6.5rem)] max-w-[9ch] text-[clamp(4.5rem,11.1vw,11.5rem)] leading-[0.78] font-normal tracking-[-0.085em]">
+          {first}
+          <br />
+          {last}
+        </h1>
 
-          <motion.div variants={item} className="mt-9 flex flex-wrap items-center gap-4">
-            <a
-              href={resumeDownloadUrl}
-              download
-              className="group inline-flex items-center gap-2 rounded-none bg-ink px-6 py-3 text-sm font-semibold text-surface transition-transform hover:scale-[1.03] active:scale-[0.98]"
-            >
-              <Download size={16} className="transition-transform group-hover:-translate-y-0.5" />
-              {content.hero.downloadResume}
-            </a>
-            <a
-              href="#contact"
-              className="inline-flex items-center gap-2 rounded-none border border-ink/25 px-6 py-3 text-sm font-semibold text-ink transition-colors hover:border-accent-dim hover:bg-accent/8 hover:text-accent-dim"
-            >
-              {content.hero.contactMe}
-            </a>
-          </motion.div>
-        </div>
+        <p className="max-w-xl font-serif text-[clamp(1.15rem,1.65vw,1.55rem)] leading-[1.25] whitespace-pre-line">
+          {content.meta.headline}
+        </p>
+      </div>
 
-        <motion.div variants={item} className="hidden overflow-hidden lg:block">
-          <img
-            src="/avatar.png"
-            alt={content.meta.name}
-            className="aspect-[3/4] w-full object-cover grayscale"
-          />
-        </motion.div>
-      </motion.div>
+      <figure className="relative m-0 flex flex-col overflow-hidden border-rule bg-[#e5e5e5] after:pointer-events-none after:absolute after:inset-0 after:bg-[linear-gradient(rgba(255,255,255,0.08)_1px,transparent_1px)] after:bg-[length:100%_4px] after:mix-blend-soft-light after:content-[''] max-[720px]:min-h-[27rem] max-[720px]:border-t min-[721px]:border-l">
+        <img
+          src="/avatar.png"
+          alt={`Portrait of ${content.meta.name}`}
+          className="h-full min-h-[26rem] w-full object-cover mix-blend-multiply brightness-105 contrast-125 grayscale"
+        />
+        <figcaption className="mono-label absolute inset-x-0 bottom-0 z-10 flex justify-between gap-4 bg-black/85 px-4 py-[0.9rem] text-white">
+          <span>{content.meta.name.split(' ')[0]} {last}</span>
+          <span>{content.meta.location}</span>
+        </figcaption>
+      </figure>
     </section>
   )
 }

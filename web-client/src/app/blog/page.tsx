@@ -1,11 +1,9 @@
-import { Calendar, Eye, MessageSquare, Newspaper } from 'lucide-react'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { blogApi } from '../../blog/api'
 import { blogPathPrefix } from '../../blog/routes'
 import { blogListUrl } from '../../blog/url'
-import { Reveal } from '../../components/Reveal'
-import { SectionHeading } from '../../components/Section'
+import { Section } from '../../components/Section'
 import { LiveCursorOverlay } from '../../live-cursors/components/LiveCursorOverlay'
 
 function formatDate(iso: string) {
@@ -28,83 +26,52 @@ export const metadata: Metadata = {
 export default async function BlogListPage() {
   const posts = await blogApi.listPosts({ cache: 'no-store' }).catch(() => null)
   const pathPrefix = await blogPathPrefix()
-
-  if (!posts) {
-    return (
-      <main className="mx-auto max-w-5xl px-6 py-16">
-        <LiveCursorOverlay room="blog" />
-        <SectionHeading title="Blog" icon={Newspaper} />
-        <Reveal>
-          <p className="text-sm text-red-600">Could not load posts right now. Please try again later.</p>
-        </Reveal>
-      </main>
-    )
-  }
+  const hasPosts = !!posts && posts.length > 0
 
   return (
-    <main className="mx-auto max-w-5xl px-6 py-16">
+    <main>
       <LiveCursorOverlay room="blog" />
-      <SectionHeading title="Blog" icon={Newspaper} />
+      <Section
+        index={posts ? `Index / ${String(posts.length).padStart(2, '0')} posts` : 'Index'}
+        title="Blog."
+        flush={hasPosts}
+      >
+        {!posts && <p className="text-red-700">Could not load posts right now. Please try again later.</p>}
 
-      {posts.length === 0 && (
-        <Reveal>
-          <p className="rounded-none border border-dashed border-line px-4 py-10 text-center text-sm text-ink-dim">
-            No posts published yet — check back soon.
-          </p>
-        </Reveal>
-      )}
+        {posts && posts.length === 0 && (
+          <p className="text-[1.05rem] text-ink-dim">No posts published yet — check back soon.</p>
+        )}
 
-      {posts.length > 0 && (
-        <ul className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-          {posts.map((post, index) => (
-            <li key={post.id} className="h-full">
-              <Reveal delay={index * 0.05} className="h-full">
+        {hasPosts && (
+          <ul className="-mx-(--gutter) border-t border-rule">
+            {posts.map((post) => (
+              <li key={post.id} className="border-b border-rule last:border-b-0">
                 <Link
                   href={`${pathPrefix}/${post.slug}`}
-                  className="group flex h-full flex-col overflow-hidden rounded-none border border-line bg-surface-raised transition-colors hover:border-accent-dim/60"
+                  className="group grid items-baseline gap-x-5 gap-y-3 px-(--gutter) py-[clamp(1.5rem,3.2vw,3.2rem)] no-underline transition-colors hover:bg-ink hover:text-surface focus-visible:bg-ink focus-visible:text-surface focus-visible:outline-offset-[-5px] max-[720px]:grid-cols-[1fr_auto] min-[721px]:grid-cols-[minmax(9rem,0.4fr)_minmax(0,1.1fr)_minmax(16rem,1fr)_auto]"
                 >
-                  {post.coverImageUrl ? (
-                    <div className="aspect-[16/9] overflow-hidden border-b border-line">
-                      <img
-                        src={post.coverImageUrl}
-                        alt=""
-                        loading="lazy"
-                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
-                      />
-                    </div>
-                  ) : (
-                    <div className="flex aspect-[16/9] items-center justify-center border-b border-line bg-surface">
-                      <Newspaper size={20} className="text-ink-dim/30" />
-                    </div>
-                  )}
-
-                  <div className="flex flex-1 flex-col p-5">
-                    {post.publishedAt && (
-                      <p className="flex items-center gap-1.5 text-xs text-ink-dim">
-                        <Calendar size={12} className="text-accent-dim" />
-                        {formatDate(post.publishedAt)}
-                      </p>
-                    )}
-                    <h2 className="mt-2 text-lg font-semibold text-ink">{post.title}</h2>
-                    <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-ink-dim">{post.excerpt}</p>
-                    <div className="flex-1" />
-                    <div className="mt-4 flex items-center gap-4 text-xs text-ink-dim">
-                      <span className="flex items-center gap-1">
-                        <Eye size={12} />
-                        {post.viewCount.toLocaleString('en-US')}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <MessageSquare size={12} />
-                        {post.commentCount ?? 0}
-                      </span>
-                    </div>
-                  </div>
+                  <span className="mono-label text-ink-dim group-hover:text-surface group-focus-visible:text-surface max-[720px]:col-span-full">
+                    {post.publishedAt ? formatDate(post.publishedAt) : 'Draft'}
+                    <span className="mt-1 block">
+                      {post.viewCount.toLocaleString('en-US')} views / {post.commentCount ?? 0} comments
+                    </span>
+                  </span>
+                  <span className="font-serif text-[clamp(1.75rem,3.5vw,4rem)] leading-[0.92] tracking-[-0.055em]">
+                    {post.title}
+                  </span>
+                  <span className="line-clamp-3 max-w-[25rem] text-[0.95rem] leading-[1.35]">{post.excerpt}</span>
+                  <span
+                    aria-hidden
+                    className="text-[1.4rem] leading-none transition-transform group-hover:translate-x-1.5 group-focus-visible:translate-x-1.5 max-[720px]:col-start-2 max-[720px]:row-span-2 max-[720px]:self-center"
+                  >
+                    →
+                  </span>
                 </Link>
-              </Reveal>
-            </li>
-          ))}
-        </ul>
-      )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </Section>
     </main>
   )
 }

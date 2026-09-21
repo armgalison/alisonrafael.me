@@ -1,94 +1,46 @@
-import {
-  BrainCircuit,
-  Braces,
-  Code2,
-  Languages as LanguagesIcon,
-  Layers,
-  ShieldCheck,
-  Sparkles,
-} from 'lucide-react'
 import type { LanguageSkill } from '../content/types'
-import { Reveal } from './Reveal'
+import { Entry } from './Section'
 
 interface SkillsProps {
   topSkills: string[]
   technologyGroups: Array<{ label: string; items: string[] }>
   languages: LanguageSkill[]
+  languagesTitle: string
 }
 
-const skillIcons: Record<string, typeof Sparkles> = {
-  'AI-Native Development': BrainCircuit,
-  'Functional Programming': Braces,
-  'Full-Stack Engineering': Layers,
-  'Site Reliability Engineering': ShieldCheck,
-}
-
-export function Skills({ topSkills, technologyGroups, languages }: SkillsProps) {
+export function Skills({ topSkills, technologyGroups, languages, languagesTitle }: SkillsProps) {
   return (
-    <div className="space-y-8">
-      <Reveal>
-        <h3 className="mb-4 text-xs font-medium tracking-wide text-ink-dim uppercase">
-          Top Skills
-        </h3>
-        <ul className="flex flex-wrap gap-2">
-          {topSkills.map((skill) => {
-            const Icon = skillIcons[skill] ?? Sparkles
-            return (
-              <li
-                key={skill}
-                className="flex items-center gap-2 rounded-none border border-accent/25 bg-accent/5 px-3 py-1.5 text-xs font-medium text-ink transition-colors hover:border-accent/50"
-              >
-                <Icon size={13} className="shrink-0 text-accent" />
+    <div className="grid gap-[clamp(3rem,10vw,11rem)] min-[721px]:grid-cols-[minmax(0,0.95fr)_minmax(16rem,0.75fr)]">
+      <div>
+        <h3 className="mono-label mb-4 text-ink-dim">Top skills</h3>
+        <ol className="border-t border-line">
+          {topSkills.map((skill, index) => (
+            <li key={skill} className="flex items-baseline gap-4 border-b border-line py-5">
+              <span className="mono-label w-8 shrink-0 text-ink-dim">{String(index + 1).padStart(2, '0')}</span>
+              <span className="font-serif text-[clamp(1.4rem,2.5vw,2.2rem)] leading-[1.03] tracking-[-0.045em]">
                 {skill}
-              </li>
-            )
-          })}
-        </ul>
-      </Reveal>
-
-      <Reveal delay={0.05}>
-        <h3 className="mb-4 flex items-center gap-2 text-xs font-medium tracking-wide text-ink-dim uppercase">
-          <Code2 size={14} />
-          Technologies
-        </h3>
-        <div className="space-y-3">
-          {technologyGroups.map((group) => (
-            <div key={group.label} className="flex flex-wrap items-center gap-2">
-              <span className="w-full text-[11px] text-ink-dim/70 sm:w-auto sm:min-w-[110px]">
-                {group.label}
-              </span>
-              {group.items.map((tech) => (
-                <span
-                  key={tech}
-                  className="rounded-none border border-line bg-surface px-3 py-1 text-xs text-ink-dim"
-                >
-                  {tech}
-                </span>
-              ))}
-            </div>
-          ))}
-        </div>
-      </Reveal>
-
-      <Reveal delay={0.1}>
-        <h3 className="mb-4 flex items-center gap-2 text-xs font-medium tracking-wide text-ink-dim uppercase">
-          <LanguagesIcon size={14} />
-          Languages
-        </h3>
-        <ul className="space-y-2">
-          {languages.map((language) => (
-            <li
-              key={language.name}
-              className="flex items-center justify-between rounded-none border border-line bg-surface px-3 py-2 text-sm"
-            >
-              <span className="text-ink">{language.name}</span>
-              <span className="rounded-none bg-surface-raised px-2.5 py-0.5 text-xs text-ink-dim">
-                {language.level}
               </span>
             </li>
           ))}
-        </ul>
-      </Reveal>
+        </ol>
+      </div>
+
+      <div className="divide-y divide-line">
+        {technologyGroups.map((group) => (
+          <Entry key={group.label} label={group.label}>
+            <p className="text-[1.05rem] leading-[1.45]">{group.items.join(', ')}</p>
+          </Entry>
+        ))}
+        <Entry label={languagesTitle}>
+          <ul className="space-y-1 text-[1.05rem] leading-[1.45]">
+            {languages.map((language) => (
+              <li key={language.name}>
+                {language.name} <span className="text-ink-dim">— {language.level}</span>
+              </li>
+            ))}
+          </ul>
+        </Entry>
+      </div>
     </div>
   )
 }

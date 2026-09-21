@@ -10,16 +10,8 @@ import type { EducationEntry, ExperienceEntry, LanguageSkill, ResumeLinks } from
 // getResumeContent) so an Admin edit in Settings shows up without a
 // redeploy.
 export interface StaticResumeContent {
-  nav: {
-    experience: string
-    skills: string
-    credentials: string
-    contact: string
-  }
   hero: {
     greeting: string
-    downloadResume: string
-    contactMe: string
   }
   sectionTitles: {
     experience: string

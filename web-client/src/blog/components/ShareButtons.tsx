@@ -23,7 +23,7 @@ function BrandIcon({ path }: { path: string }) {
 }
 
 const controlClass =
-  'flex h-9 w-9 items-center justify-center rounded-none border border-line text-ink-dim transition-colors hover:border-accent-dim hover:text-ink'
+  'flex h-9 w-9 items-center justify-center rounded-none border border-ink text-ink transition-colors hover:bg-ink hover:text-surface'
 
 interface ShareButtonsProps {
   slug: string
@@ -77,8 +77,8 @@ export function ShareButtons({ slug, title }: ShareButtonsProps) {
   ]
 
   return (
-    <div className="mt-12">
-      <p className="mb-3 text-sm font-semibold text-ink">Share this post</p>
+    <div className="mt-14 border-t border-line pt-8">
+      <p className="mono-label mb-3 text-ink-dim">Share this post</p>
       <div className="flex flex-wrap items-center gap-2">
         {links.map((link) => (
           <a
@@ -101,7 +101,7 @@ export function ShareButtons({ slug, title }: ShareButtonsProps) {
           title={copied ? 'Copied!' : 'Copy link'}
           className={controlClass}
         >
-          {copied ? <Check size={15} className="text-accent-dim" /> : <Link2 size={15} />}
+          {copied ? <Check size={15} /> : <Link2 size={15} />}
         </button>
 
         {canNativeShare && (
