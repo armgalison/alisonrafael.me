@@ -27,6 +27,10 @@
 
 :root {
   --gutter: clamp(1.25rem, 4vw, 4.5rem);
+  /* Rendered height of SiteHeader (pt-5 + outlined controls + pb-[1.1rem] +
+     1px rule ≈ 70.3px). Hero subtracts it so header + hero fill exactly one
+     viewport; update this if SiteHeader's padding or control size changes. */
+  --header-h: 4.4rem;
 }
 
 html {
