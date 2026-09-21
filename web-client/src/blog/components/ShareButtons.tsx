@@ -34,10 +34,15 @@ export function ShareButtons({ slug, title }: ShareButtonsProps) {
   const url = blogPostUrl(slug)
   const [copied, setCopied] = useState(false)
   const copyTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
-  // Resolve once, on mount, so it doesn't flash in or out.
-  const [canNativeShare] = useState(
-    () => typeof navigator !== 'undefined' && typeof navigator.share === 'function',
-  )
+  // Must start `false` (what the server renders) and only be detected after
+  // mount — reading `navigator` in the initializer makes the first client
+  // render differ from the server HTML and fails hydration. The button is the
+  // last one in the row, so it appearing post-hydration shifts nothing.
+  const [canNativeShare, setCanNativeShare] = useState(false)
+
+  useEffect(() => {
+    setCanNativeShare(typeof navigator.share === 'function')
+  }, [])
 
   useEffect(() => () => {
     if (copyTimeout.current) clearTimeout(copyTimeout.current)
