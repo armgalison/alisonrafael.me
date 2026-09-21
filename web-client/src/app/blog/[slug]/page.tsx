@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 import Markdown, { type Components } from 'react-markdown'
 import { ApiError, blogApi } from '../../../blog/api'
 import { Comments } from '../../../blog/components/Comments'
+import { CoverImage } from '../../../blog/components/CoverImage'
 import { MarkdownImage } from '../../../blog/components/MarkdownImage'
 import { ShareButtons } from '../../../blog/components/ShareButtons'
 import { ViewRegistrar } from '../../../blog/components/ViewRegistrar'
@@ -170,19 +171,7 @@ export default async function BlogPostPage({ params }: Props) {
           <p className="max-w-xl font-serif text-[clamp(1.15rem,1.65vw,1.55rem)] leading-[1.25]">{post.excerpt}</p>
         </div>
 
-        {post.coverImageUrl && (
-          <figure className="relative m-0 flex flex-col overflow-hidden border-rule bg-[#e5e5e5] after:pointer-events-none after:absolute after:inset-0 after:bg-[linear-gradient(rgba(255,255,255,0.08)_1px,transparent_1px)] after:bg-[length:100%_4px] after:mix-blend-soft-light after:content-[''] max-[720px]:min-h-[27rem] max-[720px]:border-t min-[721px]:border-l">
-            <img
-              src={post.coverImageUrl}
-              alt=""
-              className="h-full min-h-[26rem] w-full object-cover mix-blend-multiply brightness-105 contrast-125 grayscale"
-            />
-            <figcaption className="mono-label absolute inset-x-0 bottom-0 z-10 flex justify-between gap-4 bg-black/85 px-4 py-[0.9rem] text-white">
-              <span>Cover image</span>
-              <span>B&amp;W</span>
-            </figcaption>
-          </figure>
-        )}
+        {post.coverImageUrl && <CoverImage src={post.coverImageUrl} alt={post.title} />}
       </header>
 
       <section className={railClass}>
