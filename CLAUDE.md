@@ -22,7 +22,7 @@ From the repo root:
 - `npm run dev:api` — NestJS watch mode (port 3000)
 - `npm run build:shared` / `build:web` / `build:api` / `build`
 
-Per workspace (`--workspace=<name>` or `cd`): `web-client` has `lint` (oxlint) and `typecheck` (`tsc --noEmit`); `server` has `lint` (oxlint), `test` (vitest) and `test:e2e`. Test coverage is thin today (one e2e spec in `server/`, none in `web-client/`), so a green build proves little — verify UI changes in a browser.
+Per workspace (`--workspace=<name>` or `cd`): `web-client` has `lint` (oxlint) and `typecheck` (`tsc --noEmit`); `server` has `lint` (oxlint), `test` (vitest) and `test:e2e`. `server`'s `test:e2e` boots the whole app and needs a MariaDB plus the env from `server/.env.example` (`docker-compose.local.yml` provides the database). CI (`.github/workflows/ci.yml`) runs all of the above on every PR and before every deploy. Test coverage is still thin (one e2e spec in `server/`, no unit tests, none in `web-client/`), so a green build proves little — verify UI changes in a browser.
 
 `web-client`'s `npm run start` runs the same `output: 'standalone'` build Docker ships. Plain `next start` does **not** work with that config; the script copies `.next/static` and `public/` into the standalone tree by hand, like `web-client/Dockerfile`.
 
@@ -72,7 +72,7 @@ One DigitalOcean droplet, Dockerized: `web`, `api` and `mariadb` behind a shared
 
 - `web` answers on `alisonrafael.me`, `www.` and `blog.`; `api` on `api.alisonrafael.me`; `mariadb` is only on the internal network. `web` sets `VIRTUAL_PORT: 3000` explicitly.
 - **Both Dockerfiles use the repo root as build context** (they need `shared/`), e.g. `docker build -f server/Dockerfile .`. The server image also copies `server/assets` (the boot-time seed PDF).
-- `.github/workflows/deploy.yml` runs on **every push to `main`** — there is no test or lint gate yet: it builds and pushes both images to GHCR, `scp`s `docker-compose.yml`, regenerates the droplet's `.env` from GitHub Actions secrets (never hand-edit it), and runs `docker compose pull && up -d`. Secrets: `DROPLET_HOST`, `DROPLET_USER`, `DROPLET_SSH_KEY`, `DROPLET_APP_DIR`, `DB_ROOT_PASSWORD`, `DB_PASSWORD`, `JWT_SECRET`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `ANTHROPIC_API_KEY`. The root `.env.example` is the shape of that droplet `.env`; `server/.env.example` is for running the API locally without Docker.
+- `.github/workflows/deploy.yml` runs on **every push to `main`**. It first calls `ci.yml` (`needs: ci`, [ADR 0018](./docs/adr/0018-deploy-depends-on-ci.md)) — nothing ships if that is red — then builds and pushes both images to GHCR, `scp`s `docker-compose.yml`, regenerates the droplet's `.env` from GitHub Actions secrets (never hand-edit it), and runs `docker compose pull && up -d`. Secrets: `DROPLET_HOST`, `DROPLET_USER`, `DROPLET_SSH_KEY`, `DROPLET_APP_DIR`, `DB_ROOT_PASSWORD`, `DB_PASSWORD`, `JWT_SECRET`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `ANTHROPIC_API_KEY`. The root `.env.example` is the shape of that droplet `.env`; `server/.env.example` is for running the API locally without Docker.
 - `deploy/proxy/vhost.d/api.alisonrafael.me` raises proxy timeouts to 180s for the trend endpoints; a normal deploy does not apply changes to that stack.
 
 ## Working process

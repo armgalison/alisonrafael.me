@@ -1,0 +1,115 @@
+name: CI
+
+# Runs on every pull request, and is also called by deploy.yml before anything
+# is built or shipped — so a broken commit that reaches `main` (a direct push,
+# or a merge that only breaks in combination) stops at CI instead of at
+# production. See docs/adr/0018-deploy-depends-on-ci.md.
+on:
+  pull_request:
+  workflow_call:
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: 22 # keep in step with the Dockerfiles' node:22-alpine
+  NEXT_TELEMETRY_DISABLED: 1
+
+concurrency:
+  group: ci-${{ github.ref }}
+  # Only supersede stale pull-request runs; never cancel one gating a deploy.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  checks:
+    name: Lint, typecheck, build, unit tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - run: npm ci
+
+      # Both apps import shared's compiled dist/, so it goes first.
+      - name: Build shared
+        run: npm run build:shared
+
+      - name: Lint web-client
+        run: npm run lint --workspace=web-client
+
+      - name: Typecheck web-client
+        run: npm run typecheck --workspace=web-client
+
+      - name: Lint server
+        run: npm run lint --workspace=server
+
+      - name: Build server
+        run: npm run build:api
+
+      # `next build` also type-checks and prerenders. It reads the committed
+      # .env.production, so it may fetch the live Resume Profile; that fetch
+      # falls back to shared's seed on failure (see resumeProfileApi.ts), so a
+      # flaky API never fails this step.
+      - name: Build web-client
+        run: npm run build:web
+
+      # No *.spec.ts exists yet, and vitest exits 1 when it finds none. Drop
+      # --passWithNoTests once the first unit test lands, so an accidentally
+      # empty suite fails loudly again.
+      - name: Server unit tests
+        run: npm run test --workspace=server -- --passWithNoTests
+
+  api-e2e:
+    name: API e2e (MariaDB)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      mariadb:
+        image: mariadb:11 # same major as docker-compose.yml
+        env:
+          MARIADB_ROOT_PASSWORD: ci-root
+          MARIADB_DATABASE: ci
+          MARIADB_USER: ci
+          MARIADB_PASSWORD: ci
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=20
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - run: npm ci
+
+      - name: Build shared
+        run: npm run build:shared
+
+      # The e2e suite boots the whole AppModule against a real database.
+      # Everything below is a throwaway CI value, not a secret: the database
+      # is destroyed with the job, and nothing here calls the Anthropic API
+      # (the key only has to exist for the app to start).
+      - name: Server e2e tests
+        run: npm run test:e2e --workspace=server
+        env:
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_USER: ci
+          DB_PASSWORD: ci
+          DB_NAME: ci
+          JWT_SECRET: ci-only-not-a-secret
+          JWT_EXPIRES_IN_SECONDS: 3600
+          ADMIN_EMAIL: ci@example.com
+          ADMIN_PASSWORD: ci-only-not-a-secret
+          ANTHROPIC_API_KEY: ci-only-not-a-key
