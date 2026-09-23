@@ -87,6 +87,7 @@ export const en: AdminContent = {
     empty: 'No comments.',
     emptyPending: 'Nothing awaiting moderation.',
     emailNote: 'visible to you only',
+    offensiveSuffix: 'offensive',
     replyTag: 'reply',
     onPostPrefix: 'on',
     approve: 'Approve',

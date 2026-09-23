@@ -85,6 +85,7 @@ export interface AdminContent {
     empty: string
     emptyPending: string
     emailNote: string
+    offensiveSuffix: string
     replyTag: string
     onPostPrefix: string
     approve: string
