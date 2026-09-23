@@ -22,7 +22,9 @@ From the repo root:
 - `npm run dev:api` — NestJS watch mode (port 3000)
 - `npm run build:shared` / `build:web` / `build:api` / `build`
 
-Per workspace (`--workspace=<name>` or `cd`): `web-client` has `lint` (oxlint) and `typecheck` (`tsc --noEmit`); `server` has `lint` (oxlint), `test` (vitest) and `test:e2e`. `server`'s `test:e2e` boots the whole app and needs a MariaDB plus the env from `server/.env.example` (`docker-compose.local.yml` provides the database). CI (`.github/workflows/ci.yml`) runs all of the above on every PR and before every deploy. Test coverage is still thin (one e2e spec in `server/`, no unit tests, none in `web-client/`), so a green build proves little — verify UI changes in a browser.
+Per workspace (`--workspace=<name>` or `cd`): `web-client` has `lint` (oxlint), `typecheck` (`tsc --noEmit`) and `test:e2e` (Playwright); `server` has `lint` (oxlint), `test` (vitest) and `test:e2e`. `server`'s `test:e2e` boots the whole app and needs a MariaDB plus the env from `server/.env.example` (`docker-compose.local.yml` provides the database). CI (`.github/workflows/ci.yml`) runs all of the above on every PR and before every deploy, except `web-client`'s `test:e2e`, which is local-only for now. Test coverage is still thin (one e2e spec in `server/`, no unit tests), so a green build proves little — verify UI changes in a browser.
+
+`web-client`'s `test:e2e` covers every page through a browser. It needs a running API and a build from `npm run build:e2e`, which bakes in the local API URL; a plain `npm run build` points the pages at the production API. It also needs the admin credentials in env and writes to that API's database. Details in `web-client/e2e/README.md`.
 
 `web-client`'s `npm run start` runs the same `output: 'standalone'` build Docker ships. Plain `next start` does **not** work with that config; the script copies `.next/static` and `public/` into the standalone tree by hand, like `web-client/Dockerfile`.
 
