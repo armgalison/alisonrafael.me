@@ -1,10 +1,10 @@
 import type { Metadata } from 'next'
 import type { ReactNode } from 'react'
+import { AVATAR_URL, SITE_ORIGIN, SITE_SHORT_NAME, SITE_TITLE } from '../seo/site'
 import './globals.css'
 
-const SITE_NAME = 'Alison Rafael Marinho Gonçalves — Software Engineer'
 const SITE_DESCRIPTION =
-  'Alison Rafael Marinho Gonçalves — Software Engineer. Resume, experience, and skills.'
+  'Alison Rafael Marinho Gonçalves (Alison Rafael) — Full Stack Software Engineer. Resume, experience, skills, and blog.'
 
 // Site-wide fallback link-preview tags — apply to every route that doesn't
 // set its own metadata (the resume, the /blog list, a 404). A Post's
@@ -13,9 +13,10 @@ const SITE_DESCRIPTION =
 // (which replaced the old ADR 0011/0012 approach of injecting these same
 // tags into an otherwise still-client-rendered SPA shell).
 export const metadata: Metadata = {
-  metadataBase: new URL('https://alisonrafael.me'),
-  title: SITE_NAME,
+  metadataBase: new URL(SITE_ORIGIN),
+  title: { default: SITE_TITLE, template: `%s — ${SITE_SHORT_NAME}` },
   description: SITE_DESCRIPTION,
+  authors: [{ name: 'Alison Rafael Marinho Gonçalves', url: SITE_ORIGIN }],
   alternates: { canonical: '/' },
   icons: {
     icon: [
@@ -28,15 +29,17 @@ export const metadata: Metadata = {
   manifest: '/site.webmanifest',
   openGraph: {
     type: 'website',
-    url: 'https://alisonrafael.me',
-    title: SITE_NAME,
+    url: SITE_ORIGIN,
+    title: SITE_TITLE,
     description: SITE_DESCRIPTION,
-    siteName: SITE_NAME,
+    siteName: SITE_TITLE,
+    images: [{ url: AVATAR_URL, alt: 'Portrait of Alison Rafael Marinho Gonçalves' }],
   },
   twitter: {
     card: 'summary',
-    title: SITE_NAME,
+    title: SITE_TITLE,
     description: SITE_DESCRIPTION,
+    images: [AVATAR_URL],
   },
 }
 

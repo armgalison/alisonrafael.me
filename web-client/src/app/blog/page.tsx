@@ -5,20 +5,34 @@ import { blogPathPrefix } from '../../blog/routes'
 import { blogListUrl } from '../../blog/url'
 import { Section } from '../../components/Section'
 import { LiveCursorOverlay } from '../../live-cursors/components/LiveCursorOverlay'
+import { JsonLd } from '../../seo/JsonLd'
+import { PERSON_ID, SITE_TITLE } from '../../seo/site'
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 }
 
-const SITE_NAME = 'Alison Rafael Marinho Gonçalves — Software Engineer'
+const BLOG_TITLE = 'Blog'
+const BLOG_DESCRIPTION =
+  'Blog by Alison Rafael Marinho Gonçalves (Alison Rafael), Full Stack Software Engineer — notes on software engineering, AI-native development and the web.'
 
 // Without this, the list page silently inherited the root layout's
 // alternates.canonical: '/' — wrong even before the Blog moved to its own
 // subdomain, and actively wrong now that "/" means something different
 // depending on host.
+// openGraph is set explicitly for the same reason: the inherited one
+// pointed og:url at the resume.
 export const metadata: Metadata = {
-  title: `Blog — ${SITE_NAME}`,
+  title: BLOG_TITLE,
+  description: BLOG_DESCRIPTION,
   alternates: { canonical: blogListUrl() },
+  openGraph: {
+    type: 'website',
+    url: blogListUrl(),
+    title: `${BLOG_TITLE} — Alison Rafael`,
+    description: BLOG_DESCRIPTION,
+    siteName: SITE_TITLE,
+  },
 }
 
 // Server Component — fetches directly, no loading state needed (the page
@@ -30,10 +44,21 @@ export default async function BlogListPage() {
 
   return (
     <main>
+      <JsonLd
+        data={{
+          '@context': 'https://schema.org',
+          '@type': 'Blog',
+          url: blogListUrl(),
+          name: `${BLOG_TITLE} — Alison Rafael`,
+          description: BLOG_DESCRIPTION,
+          author: { '@id': PERSON_ID },
+        }}
+      />
       <LiveCursorOverlay room="blog" />
       <Section
         index={posts ? `Index / ${String(posts.length).padStart(2, '0')} posts` : 'Index'}
         title="Blog."
+        headingLevel="h1"
         flush={hasPosts}
       >
         {!posts && <p className="text-red-700">Could not load posts right now. Please try again later.</p>}

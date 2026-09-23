@@ -11,13 +11,18 @@ interface SectionProps {
   // Lets a full-bleed list (rows that run edge to edge) sit flush against the
   // section's bottom rule instead of stopping short of it.
   flush?: boolean
+  // A page whose only headline is this Section's (the Blog list) makes it
+  // the page's h1.
+  headingLevel?: 'h1' | 'h2'
   children: ReactNode
 }
 
 // Every page section: a full-width block closed by a 1px rule, with the
 // index label in a narrow left rail and a large serif headline + content on
 // the right (stacked on small screens).
-export function Section({ id, index, title, flush = false, children }: SectionProps) {
+export function Section({ id, index, title, flush = false, headingLevel = 'h2', children }: SectionProps) {
+  const Heading = headingLevel
+
   return (
     <section
       id={id}
@@ -27,9 +32,9 @@ export function Section({ id, index, title, flush = false, children }: SectionPr
     >
       <p className="mono-label mb-14 text-ink-dim min-[721px]:mb-0">{index}</p>
       <div className="min-w-0">
-        <h2 className="mb-[clamp(2.25rem,5vw,4.75rem)] max-w-[16ch] font-serif text-[clamp(2.3rem,5.1vw,5.7rem)] leading-[0.94] font-normal tracking-[-0.06em]">
+        <Heading className="mb-[clamp(2.25rem,5vw,4.75rem)] max-w-[16ch] font-serif text-[clamp(2.3rem,5.1vw,5.7rem)] leading-[0.94] font-normal tracking-[-0.06em]">
           {title}
-        </h2>
+        </Heading>
         {children}
       </div>
     </section>
