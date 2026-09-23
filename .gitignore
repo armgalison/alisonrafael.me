@@ -29,3 +29,7 @@ server/uploads
 *.sln
 *.sw?
 *.envrc
+
+# Playwright (web-client e2e)
+test-results
+playwright-report

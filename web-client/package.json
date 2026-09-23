@@ -3,15 +3,17 @@
   "version": "1.0.0",
   "description": "Resume site frontend (Next.js)",
   "license": "ISC",
-  "author": "Alison Rafael Marinho Gonçalves",
+  "author": "Alison Rafael Marinho Gon\u00e7alves",
   "type": "module",
   "private": true,
   "scripts": {
     "dev": "next dev -p 5173",
     "build": "next build",
+    "build:e2e": "NEXT_PUBLIC_API_URL=${E2E_API_URL:-http://localhost:3000} next build",
     "start": "mkdir -p .next/standalone/web-client/.next/static .next/standalone/web-client/public && cp -r .next/static/. .next/standalone/web-client/.next/static/ && cp -r public/. .next/standalone/web-client/public/ && PORT=5173 node .next/standalone/web-client/server.js",
     "lint": "oxlint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@portifolio/shared": "file:../shared",
@@ -26,6 +28,7 @@
     "socket.io-client": "^4.8.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@tailwindcss/postcss": "^4.3.3",
     "@types/node": "^24.13.3",
     "@types/react": "^19.2.18",
