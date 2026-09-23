@@ -12,8 +12,8 @@ import { blogListPath } from '../../../blog/routes'
 import { blogPostUrl } from '../../../blog/url'
 import { Section } from '../../../components/Section'
 import { LiveCursorOverlay } from '../../../live-cursors/components/LiveCursorOverlay'
-
-const SITE_NAME = 'Alison Rafael Marinho Gonçalves — Software Engineer'
+import { JsonLd } from '../../../seo/JsonLd'
+import { PERSON_ID, SITE_ORIGIN, SITE_TITLE } from '../../../seo/site'
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
@@ -37,9 +37,12 @@ function stripRawHtmlTags(markdown: string) {
 // route rather than a shared "prose" stylesheet, since nothing else in
 // the public site renders arbitrary markdown. Headings are serif like the
 // rest of the site; running text stays in the sans.
+//
+// A `#` in the post body renders as an h2 styled like an h1: the post title
+// in the header is the page's one h1.
 const markdownComponents: Components = {
   h1: (props) => (
-    <h1 className="mt-14 mb-5 font-serif text-[clamp(2rem,3.5vw,3rem)] leading-none font-normal tracking-[-0.05em] first:mt-0" {...props} />
+    <h2 className="mt-14 mb-5 font-serif text-[clamp(2rem,3.5vw,3rem)] leading-none font-normal tracking-[-0.05em] first:mt-0" {...props} />
   ),
   h2: (props) => (
     <h2 className="mt-14 mb-5 font-serif text-[clamp(1.75rem,3vw,2.5rem)] leading-none font-normal tracking-[-0.05em] first:mt-0" {...props} />
@@ -95,9 +98,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       url: canonical,
       title: post.title,
       description: post.excerpt,
-      siteName: SITE_NAME,
+      siteName: SITE_TITLE,
       images,
       publishedTime: post.publishedAt ?? undefined,
+      modifiedTime: post.updatedAt,
+      authors: [SITE_ORIGIN],
     },
     twitter: {
       card: post.coverImageUrl ? 'summary_large_image' : 'summary',
@@ -140,9 +145,24 @@ export default async function BlogPostPage({ params }: Props) {
 
   const comments = await blogApi.listComments(slug, { cache: 'no-store' })
   const sanitizedContent = stripRawHtmlTags(post.content)
+  const canonical = blogPostUrl(post.slug)
 
   return (
     <main>
+      <JsonLd
+        data={{
+          '@context': 'https://schema.org',
+          '@type': 'BlogPosting',
+          headline: post.title,
+          description: post.excerpt,
+          url: canonical,
+          mainEntityOfPage: canonical,
+          ...(post.coverImageUrl && { image: post.coverImageUrl }),
+          ...(post.publishedAt && { datePublished: post.publishedAt }),
+          dateModified: post.updatedAt,
+          author: { '@type': 'Person', '@id': PERSON_ID, name: 'Alison Rafael Marinho Gonçalves', url: SITE_ORIGIN },
+        }}
+      />
       <ViewRegistrar slug={post.slug} />
       <LiveCursorOverlay room={`post:${post.slug}`} key={post.slug} />
 
