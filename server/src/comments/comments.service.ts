@@ -1,9 +1,20 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { Interval } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { IsNull, LessThanOrEqual, Repository } from 'typeorm';
 import { BlogService } from '../blog/blog.service.js';
 import { CreateCommentDto } from './dto/create-comment.dto.js';
 import { Comment, CommentStatus } from './entities/comment.entity.js';
+
+// How many times the async Jev check retries before giving up on a Comment
+// (offensiveRate then stays null forever — moderation still works, it just
+// won't show the Jev pill).
+const MAX_OFFENSIVE_CHECK_ATTEMPTS = 10;
+
+// How many due Comments a single sweep tick processes, so one slow/large
+// batch can't starve newer pending checks for multiple ticks.
+const OFFENSIVE_CHECK_BATCH_SIZE = 20;
 
 // What a Visitor sees — no email, no status, one level of replies.
 export interface PublicComment {
@@ -22,6 +33,7 @@ export interface AdminComment {
   authorEmail: string | null;
   body: string;
   status: CommentStatus;
+  offensiveRate: number | null;
   parentId: string | null;
   postId: string;
   postTitle: string;
@@ -32,9 +44,12 @@ export interface AdminComment {
 
 @Injectable()
 export class CommentsService {
+  private readonly logger = new Logger(CommentsService.name);
+
   constructor(
     @InjectRepository(Comment) private readonly comments: Repository<Comment>,
     private readonly blog: BlogService,
+    private readonly config: ConfigService,
   ) {}
 
   // Approved comments for a published Post, nested one level. `authorEmail`
@@ -74,6 +89,103 @@ export class CommentsService {
     return [...roots.values()];
   }
 
+  // Asks the Jev decision API (jev_decide, see https://www.jevai.org/docs) how
+  // offensive a comment reads, via a `noul` question — a single 0-1 probability,
+  // returned as-is (the caller decides what to do with it).
+  async isCommentOffensive(comment: Pick<CreateCommentDto, 'authorName' | 'body'>): Promise<number> {
+    const apiKey = this.config.getOrThrow<string>('JEV_API_KEY');
+
+    const res = await fetch('https://www.jevai.org/api/v1/decisions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: 'typesafe-ai/jev',
+        state: { authorName: comment.authorName, body: comment.body },
+        questions: {
+          offensive: {
+            type: 'noul',
+            instructions:
+              'Is this blog comment offensive, hateful, harassing, or abusive toward a person or group? Return the probability that it is.',
+          },
+        },
+      }),
+    });
+
+    if (!res.ok) {
+      throw new Error(`Jev decision request failed: ${res.status} ${res.statusText}`);
+    }
+
+    const payload = (await res.json()) as {
+      code: number;
+      message: string;
+      data?: { answers?: { offensive?: { noul?: number } } };
+    };
+
+    if (payload.code !== 0) {
+      throw new Error(`Jev decision failed: ${payload.message}`);
+    }
+
+    return payload.data?.answers?.offensive?.noul ?? 0;
+  }
+
+  // Backoff between Jev retry attempts: 30s, 1m, 2m, 4m, ... capped at 30
+  // minutes, so MAX_OFFENSIVE_CHECK_ATTEMPTS spreads out over several hours
+  // instead of hammering a struggling API.
+  private offensiveCheckBackoffMs(attempts: number): number {
+    return Math.min(30_000 * 2 ** (attempts - 1), 30 * 60_000);
+  }
+
+  // Runs one Jev attempt for a queued Comment and updates its queue state:
+  // 'done' with the rate on success, another 'pending' attempt with backoff
+  // on failure, or 'failed' once MAX_OFFENSIVE_CHECK_ATTEMPTS is reached
+  // (offensiveRate then stays null for good).
+  private async attemptOffensiveCheck(comment: Comment): Promise<void> {
+    try {
+      const offensiveRate = await this.isCommentOffensive(comment);
+      await this.comments.update(comment.id, { offensiveRate, offensiveCheckStatus: 'done' });
+    } catch (err) {
+      const attempts = comment.offensiveCheckAttempts + 1;
+      if (attempts >= MAX_OFFENSIVE_CHECK_ATTEMPTS) {
+        this.logger.warn(
+          `Jev offensive check gave up on comment ${comment.id} after ${attempts} attempts, offensiveRate stays null: ${err}`,
+        );
+        await this.comments.update(comment.id, { offensiveCheckStatus: 'failed', offensiveCheckAttempts: attempts });
+      } else {
+        this.logger.warn(`Jev offensive check attempt ${attempts} failed for comment ${comment.id}, retrying: ${err}`);
+        await this.comments.update(comment.id, {
+          offensiveCheckAttempts: attempts,
+          offensiveCheckNextRunAt: new Date(Date.now() + this.offensiveCheckBackoffMs(attempts)),
+        });
+      }
+    }
+  }
+
+  // The Jev retry queue's sweep: picks up Comments due for a check and
+  // attempts each in turn. "Due" covers new comments and backed-off retries
+  // (offensiveCheckNextRunAt <= now) as well as comments that predate this
+  // column and so never got a value for it (offensiveCheckNextRunAt IS
+  // NULL) — those are treated as due immediately, which is how older
+  // comments get swept into the queue. Best-effort by design — every
+  // comment is already gated behind manual admin approval, so a
+  // moderation-API outage only delays the Jev pill, never submission.
+  @Interval(10000 )
+  async processOffensiveCheckQueue(): Promise<void> {
+    const due = await this.comments.find({
+      where: [
+        { offensiveCheckStatus: 'pending', offensiveCheckNextRunAt: LessThanOrEqual(new Date()) },
+        { offensiveCheckStatus: 'pending', offensiveCheckNextRunAt: IsNull() },
+      ],
+      order: { offensiveCheckNextRunAt: 'ASC' },
+      take: OFFENSIVE_CHECK_BATCH_SIZE,
+    });
+    for (const comment of due) {
+      await this.attemptOffensiveCheck(comment);
+    }
+  }
+
   async create(slug: string, dto: CreateCommentDto): Promise<{ id: string; status: 'pending' }> {
     const postId = await this.blog.findPublishedIdBySlug(slug);
 
@@ -87,6 +199,9 @@ export class CommentsService {
       }
     }
 
+    // The Jev check runs asynchronously off processOffensiveCheckQueue, not
+    // here — comment submission never waits on it. offensiveCheckNextRunAt
+    // is "now" so the next sweep tick picks it up immediately.
     const saved = await this.comments.save(
       this.comments.create({
         authorName: dto.authorName,
@@ -95,6 +210,10 @@ export class CommentsService {
         postId,
         parentId: dto.parentId ?? null,
         status: 'pending',
+        offensiveRate: null,
+        offensiveCheckStatus: 'pending',
+        offensiveCheckAttempts: 0,
+        offensiveCheckNextRunAt: new Date(),
       }),
     );
     // Deliberately doesn't echo the body or email.
@@ -150,6 +269,7 @@ export class CommentsService {
       authorEmail: row.authorEmail,
       body: row.body,
       status: row.status,
+      offensiveRate: row.offensiveRate,
       parentId: row.parentId,
       postId: row.post.id,
       postTitle: row.post.title,

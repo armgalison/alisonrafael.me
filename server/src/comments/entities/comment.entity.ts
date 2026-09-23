@@ -15,6 +15,13 @@ import { Post } from '../../blog/entities/post.entity.js';
 // plain varchar + @Index is the lighter choice.
 export type CommentStatus = 'pending' | 'approved' | 'rejected';
 
+// State of the async Jev offensive-check queue for a Comment (see
+// CommentsService.processOffensiveCheckQueue). 'pending' means it's due for
+// an attempt (immediately, on create, or after a backoff delay); 'done'
+// means offensiveRate was set successfully; 'failed' means all retries were
+// exhausted without a successful call.
+export type OffensiveCheckStatus = 'pending' | 'done' | 'failed';
+
 // The first relational entity in the schema (see ADR 0009): a real
 // @ManyToOne to Post and a self-referencing @ManyToOne to a parent
 // Comment, both `onDelete: 'CASCADE'` so deleting a Post takes its
@@ -38,6 +45,31 @@ export class Comment {
   @Index()
   @Column({ type: 'varchar', length: 16, default: 'pending' })
   status: CommentStatus;
+
+  // The Jev decision API's 0-1 "offensive" probability, filled in
+  // asynchronously by the retry queue below (see
+  // CommentsService.processOffensiveCheckQueue). Null until that queue
+  // lands a successful call — comment creation never blocks on it.
+  @Column({ type: 'float', nullable: true })
+  offensiveRate: number | null;
+
+  // Queue state for the async Jev check, retried up to
+  // MAX_OFFENSIVE_CHECK_ATTEMPTS times (comments.service.ts) with backoff.
+  @Index()
+  @Column({ type: 'varchar', length: 16, default: 'pending' })
+  offensiveCheckStatus: OffensiveCheckStatus;
+
+  @Column({ type: 'int', default: 0 })
+  offensiveCheckAttempts: number;
+
+  // When the queue sweep should next attempt this Comment. Set to "now" on
+  // create so the next sweep tick picks it up immediately. Nullable so that
+  // comments predating this column (backfilled to offensiveCheckStatus
+  // 'pending' by that column's DB default, since it has no default of its
+  // own) are treated as due immediately too, instead of being stuck with a
+  // zero-date or failing the migration outright.
+  @Column({ type: 'timestamp', nullable: true })
+  offensiveCheckNextRunAt: Date | null;
 
   @ManyToOne(() => Post, (post) => post.comments, { onDelete: 'CASCADE', nullable: false })
   @JoinColumn({ name: 'postId' })
