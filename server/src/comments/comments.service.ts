@@ -2,6 +2,7 @@ import { BadRequestException, Injectable, Logger, NotFoundException } from '@nes
 import { ConfigService } from '@nestjs/config';
 import { Interval } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
+import { noul, TypeSafeClient } from '@typesafe-ai/sdk';
 import { IsNull, LessThanOrEqual, Repository } from 'typeorm';
 import { BlogService } from '../blog/blog.service.js';
 import { CreateCommentDto } from './dto/create-comment.dto.js';
@@ -45,6 +46,7 @@ export interface AdminComment {
 @Injectable()
 export class CommentsService {
   private readonly logger = new Logger(CommentsService.name);
+  private jev: TypeSafeClient | undefined;
 
   constructor(
     @InjectRepository(Comment) private readonly comments: Repository<Comment>,
@@ -89,46 +91,32 @@ export class CommentsService {
     return [...roots.values()];
   }
 
-  // Asks the Jev decision API (jev_decide, see https://www.jevai.org/docs) how
-  // offensive a comment reads, via a `noul` question — a single 0-1 probability,
-  // returned as-is (the caller decides what to do with it).
-  async isCommentOffensive(comment: Pick<CreateCommentDto, 'authorName' | 'body'>): Promise<number> {
-    const apiKey = this.config.getOrThrow<string>('JEV_API_KEY');
-
-    const res = await fetch('https://www.jevai.org/api/v1/decisions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: 'typesafe-ai/jev',
-        state: { authorName: comment.authorName, body: comment.body },
-        questions: {
-          offensive: {
-            type: 'noul',
-            instructions:
-              'Is this blog comment offensive, hateful, harassing, or abusive toward a person or group? Return the probability that it is.',
-          },
-        },
-      }),
+  // Built on first use rather than in the constructor: TypeSafeClient throws
+  // without an API key, and a missing TYPESAFE_API_KEY should only fail the
+  // (retried, best-effort) check, never app boot.
+  private getJevClient(): TypeSafeClient {
+    this.jev ??= new TypeSafeClient({
+      apiKey: this.config.getOrThrow<string>('TYPESAFE_API_KEY'),
+      // The offensive-check queue owns retries and backoff; SDK-level
+      // retries would multiply calls against Jev's rate limit.
+      retry: { maxRetries: 0 },
     });
+    return this.jev;
+  }
 
-    if (!res.ok) {
-      throw new Error(`Jev decision request failed: ${res.status} ${res.statusText}`);
-    }
-
-    const payload = (await res.json()) as {
-      code: number;
-      message: string;
-      data?: { answers?: { offensive?: { noul?: number } } };
-    };
-
-    if (payload.code !== 0) {
-      throw new Error(`Jev decision failed: ${payload.message}`);
-    }
-
-    return payload.data?.answers?.offensive?.noul ?? 0;
+  // Asks Jev (via @typesafe-ai/sdk's systemOne) how offensive a comment
+  // reads, via a `noul` question — a single 0-1 probability, returned as-is
+  // (the caller decides what to do with it).
+  async isCommentOffensive(comment: Pick<CreateCommentDto, 'authorName' | 'body'>): Promise<number> {
+    const { answers } = await this.getJevClient().systemOne({
+      state: { authorName: comment.authorName, body: comment.body },
+      questions: {
+        offensive: noul(
+          'Is this blog comment offensive, hateful, harassing, or abusive toward a person or group? Return the probability that it is.',
+        ),
+      },
+    });
+    return answers.offensive.noul;
   }
 
   // Backoff between Jev retry attempts: 30s, 1m, 2m, 4m, ... capped at 30
