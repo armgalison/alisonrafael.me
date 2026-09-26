@@ -33,6 +33,18 @@ export interface EducationEntry {
   period: string
 }
 
+// A side project or product Alison worked on, as listed under Projects on
+// LinkedIn. `association` is the employer it was built at (matching an
+// `experience` company name); `description` may hold several paragraphs
+// separated by a blank line.
+export interface ProjectEntry {
+  name: string
+  period: string
+  association: string
+  description: string
+  skills: string[]
+}
+
 // The contact/profile links a resume needs (phone, email, LinkedIn, GitHub,
 // personal site) — Resume Profile data like everything else here, so the
 // ATS Resume Generator and Cover Letter Generator (server/) can read the
@@ -60,6 +72,7 @@ export interface ResumeProfile {
   languages: LanguageSkill[]
   certifications: string[]
   experience: ExperienceEntry[]
+  projects: ProjectEntry[]
   education: EducationEntry[]
 }
 
@@ -149,6 +162,34 @@ export const resumeProfile: ResumeProfile = {
           description: 'I spent over four years at Inatel Competence Center, progressing from intern to Software Engineer while working on web applications for Telecom product management and an IoT platform built from the ground up. As an intern, I designed and implemented an IoT platform from scratch, supporting multiple communication protocols (HTTP, CoAP, and MQTT) and handling continuous data from over 200 devices, including campus lighting, sensors, and the main electrical panel, each sending requests at 1 request per second. I integrated the platform across the full INATEL campus and built a comprehensive application for real-time visualization of device data. In an earlier intern role, I supported project validation by researching new frameworks and technologies, producing proof-of-concepts and estimations that improved the accuracy and speed of project scoping for senior engineers. Moving into the Software Engineer role, I worked on a Telecom Plans Design System application for Ericsson, focusing on frontend development to support telecom product management, working closely with cross-functional teams to improve user experience and platform functionality',
         },
       ],
+    },
+  ],
+  projects: [
+    {
+      name: 'wemlo LBS',
+      period: 'Sep 2021 - Present',
+      association: 'BairesDev',
+      description:
+        'Full-stack mortgage origination and processing platform used by brokers, processors, and internal teams to run the loan lifecycle, from borrower intake through compliance, documents, and secondary-market integrations.\n\n' +
+        'The Vue 3 single-page app covers the loan pipeline, disclosures, loan estimates, documents, and e-sign flows. A Node.js and Express API on MongoDB handles business rules, authentication (JWT, SAML, and Azure AD), and background jobs. The system also generates PDFs and integrates credit, title orders, MISMO, Fannie Mae, and Freddie Mac, and runs on AWS (EKS, S3).\n\n' +
+        'Work spans a monorepo of services (web, API, jobs, and document generation), with a focus on regulated flows (RESPA, NMLS, disclosures) where data consistency and auditability matter as much as the interface.',
+      skills: ['Node.js', 'Vue.js', 'Express', 'MongoDB', 'AWS', 'Azure AD'],
+    },
+    {
+      name: 'Simplifique Contmatic',
+      period: 'Aug 2020 - Sep 2021',
+      association: 'labsit',
+      description:
+        'Simplifique is a cloud-based Enterprise Resource Planning (ERP) software developed by Contmatic Phoenix. It is designed to automate daily business operations for small and medium-sized enterprises (SMEs), retailers, service providers, and transport companies.',
+      skills: ['Angular', 'RxJS'],
+    },
+    {
+      name: 'Inatel Smart Campus',
+      period: 'Jun 2016 - Jan 2017',
+      association: 'Inatel Competence Center',
+      description:
+        'The Inatel Smart Campus is an open, convergent living laboratory at the National Institute of Telecommunications in Santa Rita do Sapucaí, Minas Gerais, designed for researching, testing, and validating Internet of Things (IoT) and smart city technologies.',
+      skills: ['Node.js', 'MongoDB', 'IoT'],
     },
   ],
   education: [

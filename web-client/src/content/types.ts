@@ -1,11 +1,11 @@
 // Canonically owned in shared/ (see ADR 0008) since server's cover-letter
 // generator needs the same shapes.
-export type { ExperienceRole, ExperienceEntry, LanguageSkill, EducationEntry, ResumeLinks } from '@portifolio/shared'
-import type { EducationEntry, ExperienceEntry, LanguageSkill, ResumeLinks } from '@portifolio/shared'
+export type { ExperienceRole, ExperienceEntry, LanguageSkill, EducationEntry, ProjectEntry, ResumeLinks } from '@portifolio/shared'
+import type { EducationEntry, ExperienceEntry, LanguageSkill, ProjectEntry, ResumeLinks } from '@portifolio/shared'
 
 // The hand-authored UI copy that stays a static file — everything else
 // (name/headline/location, contact links, topSkills, technologyGroups,
-// languages, certifications, experience, education) is Resume Profile
+// languages, certifications, experience, projects, education) is Resume Profile
 // data, now fetched live from the API (see src/i18n/index.ts's
 // getResumeContent) so an Admin edit in Settings shows up without a
 // redeploy.
@@ -15,6 +15,7 @@ export interface StaticResumeContent {
   }
   sectionTitles: {
     experience: string
+    projects: string
     topSkills: string
     languages: string
     credentials: string
@@ -39,5 +40,6 @@ export interface ResumeContent extends StaticResumeContent {
   languages: LanguageSkill[]
   certifications: string[]
   experience: ExperienceEntry[]
+  projects: ProjectEntry[]
   education: EducationEntry[]
 }

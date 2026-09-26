@@ -26,7 +26,11 @@ export class ResumeProfileService implements OnModuleInit {
     const row = await this.profiles.findOne({ where: {} });
     // Can't happen outside a fresh DB mid-seed race — onModuleInit always
     // leaves exactly one row behind before the app finishes starting.
-    return row?.data ?? resumeProfile;
+    if (!row) return resumeProfile;
+    // Rows saved before `projects` joined the profile lack it, and the seed
+    // above never re-runs — backfill from the bundled default so the field
+    // is always present (and the next Settings save persists it).
+    return { ...row.data, projects: row.data.projects ?? resumeProfile.projects };
   }
 
   async update(data: ResumeProfile): Promise<ResumeProfile> {

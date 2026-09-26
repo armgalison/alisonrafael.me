@@ -5,6 +5,7 @@ import { Credentials } from '../components/Credentials'
 import { Experience } from '../components/Experience'
 import { Footer } from '../components/Footer'
 import { Hero } from '../components/Hero'
+import { Projects } from '../components/Projects'
 import { Section } from '../components/Section'
 import { SiteHeader } from '../components/SiteHeader'
 import { Skills } from '../components/Skills'
@@ -115,7 +116,13 @@ export default async function Home() {
           <Experience entries={content.experience} />
         </Section>
 
-        <Section id="skills" index="03 / Skills" title={`${sectionTitles.topSkills}.`}>
+        {content.projects.length > 0 && (
+          <Section id="projects" index="03 / Projects" title={`${sectionTitles.projects}.`} flush>
+            <Projects entries={content.projects} />
+          </Section>
+        )}
+
+        <Section id="skills" index="04 / Skills" title={`${sectionTitles.topSkills}.`}>
           <Skills
             topSkills={content.topSkills}
             technologyGroups={content.technologyGroups}
@@ -124,7 +131,7 @@ export default async function Home() {
           />
         </Section>
 
-        <Section id="credentials" index="04 / Credentials" title={`${sectionTitles.credentials}.`}>
+        <Section id="credentials" index="05 / Credentials" title={`${sectionTitles.credentials}.`}>
           <Credentials
             educationTitle={sectionTitles.education}
             certificationsTitle={sectionTitles.certifications}
@@ -133,7 +140,7 @@ export default async function Home() {
           />
         </Section>
 
-        <Section id="contact" index="05 / Contact" title={`${sectionTitles.contact}.`}>
+        <Section id="contact" index="06 / Contact" title={`${sectionTitles.contact}.`}>
           <Contact content={content} />
         </Section>
       </main>

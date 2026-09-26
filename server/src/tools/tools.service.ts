@@ -52,6 +52,12 @@ export function formatResumeProfile(profile: ResumeProfile): string {
       entry.roles.map((role) => `- ${role.title} at ${entry.company} (${role.period}): ${role.description}`),
     )
     .join('\n');
+  const projects = profile.projects
+    .map(
+      (project) =>
+        `- ${project.name} at ${project.association} (${project.period}): ${project.description.replace(/\s*\n+\s*/g, ' ')} [skills: ${project.skills.join(', ')}]`,
+    )
+    .join('\n');
   const education = profile.education.map((entry) => `- ${entry.degree}, ${entry.school} (${entry.period})`).join('\n');
   const technologyGroups = profile.technologyGroups.map((group) => `${group.label}: ${group.items.join(', ')}`).join('\n');
 
@@ -62,6 +68,7 @@ export function formatResumeProfile(profile: ResumeProfile): string {
     `Top skills: ${profile.topSkills.join(', ')}`,
     `Technology stack:\n${technologyGroups}`,
     `Experience:\n${experience}`,
+    `Projects:\n${projects}`,
     `Education:\n${education}`,
     `Certifications: ${profile.certifications.join(', ')}`,
     `Languages: ${profile.languages.map((language) => `${language.name} (${language.level})`).join(', ')}`,

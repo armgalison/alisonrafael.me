@@ -36,6 +36,9 @@ export async function getResumeContent(locale: Locale = defaultLocale): Promise<
     languages: profile.languages,
     certifications: profile.certifications,
     experience: profile.experience,
+    // `?? []` covers a build that prerenders against an API older than the
+    // projects field (see content/resumeProfileApi.ts).
+    projects: profile.projects ?? [],
     education: profile.education,
   }
 }

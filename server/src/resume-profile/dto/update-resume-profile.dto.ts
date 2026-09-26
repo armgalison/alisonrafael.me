@@ -3,6 +3,7 @@ import { IsArray, IsString, ValidateNested } from 'class-validator';
 import { EducationEntryDto } from './education-entry.dto.js';
 import { ExperienceEntryDto } from './experience-entry.dto.js';
 import { LanguageSkillDto } from './language-skill.dto.js';
+import { ProjectEntryDto } from './project-entry.dto.js';
 import { ResumeLinksDto } from './resume-links.dto.js';
 import { TechnologyGroupDto } from './technology-group.dto.js';
 
@@ -44,6 +45,11 @@ export class UpdateResumeProfileDto {
   @ValidateNested({ each: true })
   @Type(() => ExperienceEntryDto)
   experience: ExperienceEntryDto[];
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => ProjectEntryDto)
+  projects: ProjectEntryDto[];
 
   @IsArray()
   @ValidateNested({ each: true })

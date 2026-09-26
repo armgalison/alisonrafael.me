@@ -6,6 +6,7 @@ export const en: StaticResumeContent = {
   },
   sectionTitles: {
     experience: 'Experience',
+    projects: 'Projects',
     topSkills: 'Skills',
     languages: 'Languages',
     credentials: 'Credentials',
