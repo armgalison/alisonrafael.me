@@ -8,6 +8,7 @@ export interface AdminContent {
     comments: string
     settings: string
     tools: string
+    accessLog: string
   }
   login: {
     title: string
@@ -93,6 +94,37 @@ export interface AdminContent {
     delete: string
     deleteConfirm: (name: string) => string
     actionError: string
+  }
+  accessLog: {
+    heading: string
+    subtitle: string
+    days: (n: number) => string
+    loading: string
+    loadError: string
+    empty: string
+    pageViews: string
+    uniqueIps: string
+    perDay: string
+    topPages: string
+    topReferrers: string
+    topNetworks: string
+    noReferrers: string
+    unknownNetwork: string
+    filtersHeading: string
+    hostPlaceholder: string
+    pathPlaceholder: string
+    ipPlaceholder: string
+    apply: string
+    clear: string
+    filterByIp: string
+    colTime: string
+    colPage: string
+    colVisitor: string
+    colReferrer: string
+    previous: string
+    next: string
+    pageOf: (page: number, pages: number, total: number) => string
+    attribution: string
   }
   settings: {
     heading: string

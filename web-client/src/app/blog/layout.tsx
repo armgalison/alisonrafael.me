@@ -3,6 +3,7 @@ import { isOnBlogHost } from '../../blog/routes'
 import { Footer } from '../../components/Footer'
 import { SiteHeader } from '../../components/SiteHeader'
 import { getResumeContent } from '../../i18n'
+import { PageViewBeacon } from '../../page-views/PageViewBeacon'
 
 // Shared chrome for /blog and /blog/[slug] (including that segment's
 // not-found fallback) — each page still owns its own <main> since the
@@ -21,6 +22,9 @@ export default async function BlogLayout({ children }: { children: ReactNode }) 
   const homeOrigin = (await isOnBlogHost()) ? 'https://alisonrafael.me' : ''
   return (
     <div className="min-h-screen bg-surface text-ink">
+      {/* In the layout, not each page, so one mount sees every client-side
+          navigation between the list and Posts. */}
+      <PageViewBeacon />
       <SiteHeader content={content} section="blog" homeOrigin={homeOrigin} />
       {children}
       <Footer content={content} />

@@ -16,5 +16,6 @@ export const en: StaticResumeContent = {
   },
   footer: {
     rights: 'Built with React, Tailwind, Claude Code, and a healthy dose of caffeine.',
+    accessLogNotice: 'This site logs page visits, including IP address, for 90 days.',
   },
 }

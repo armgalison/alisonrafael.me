@@ -49,7 +49,15 @@ _Avoid_: Thumbnail, hero image, banner — this codebase's term is Cover image.
 
 **View count**:
 A single integer per Post (`viewCount`) incremented once on every load of that Post's reading page, via an explicit `POST /posts/:slug/views` fired from the Blog reading UI. Deliberately **not** de-duplicated by Visitor or IP, and deliberately **not** a side effect of `GET /posts/:slug` (which stays idempotent). Refresh-inflation is a known, accepted inaccuracy (see [ADR 0010](./docs/adr/0010-view-counter-intentionally-undeduplicated.md)).
-_Avoid_: Unique views, analytics, visits — it is a raw, intentionally naive counter.
+_Avoid_: Unique views, analytics, visits — it is a raw, intentionally naive counter. Independent of Page Views: a lifetime counter that is neither derived from nor reconciled with the Access Log.
+
+**Page View**:
+One record of one browser load of a public page (the resume or the Blog, including client-side navigation between pages): timestamp, host, path, referrer, raw User-Agent, full IP address, and the country and network/organization that IP belongs to. Only a browser running the page's JavaScript produces one, so crawlers and link unfurlers mostly don't; `/admin/*` never produces one, and neither does a browser where the Admin is logged in. Never de-duplicated — a refresh is another Page View — and deleted after 90 days (see [ADR 0019](./docs/adr/0019-access-log-stores-visitor-ips-for-90-days.md)).
+_Avoid_: Visit, hit, session, View (bare) — a Visit implies grouping loads into sessions, which this does not do; "View" alone collides with View count.
+
+**Access Log**:
+The set of Page Views from the last 90 days, and the Admin Panel page that shows them: a filterable table of individual Page Views plus 7/30-day summaries (per day, top pages, top referrers, top networks). Its two uses are traffic insight and spotting that a specific company looked at the resume.
+_Avoid_: Analytics, observability, metrics, tracking — this is one first-party table of page loads, not an analytics product or operational telemetry.
 
 **Comment**:
 A reader-submitted plain-text note on a Post: a required display name (`authorName`), an optional private `authorEmail` (stored for the Admin only — never returned on a public endpoint, never shown in the Blog reading UI), a body rendered as plain text with newlines preserved (no markdown, no HTML), and a moderation status. Threading is exactly one level: a Comment may reply to a top-level Comment, but a reply cannot itself be replied to.
@@ -64,7 +72,7 @@ The Admin Panel route (`/admin/comments`) for moderating Comments: filter by sta
 _Avoid_: Moderation dashboard — this codebase's term is Comments page.
 
 **Share buttons**:
-A row of controls at the foot of a Post's reading view that hand the Post's canonical URL (`https://alisonrafael.me/blog/<slug>`) to LinkedIn, Facebook, or X's share dialog, plus a copy-link action and — on devices that support it — the native share sheet. No Instagram button (Instagram has no link-share URL, so copy-link covers that case) and no click tracking, consistent with the project's no-visitor-analytics stance.
+A row of controls at the foot of a Post's reading view that hand the Post's canonical URL (`https://alisonrafael.me/blog/<slug>`) to LinkedIn, Facebook, or X's share dialog, plus a copy-link action and — on devices that support it — the native share sheet. No Instagram button (Instagram has no link-share URL, so copy-link covers that case) and no click tracking — the Access Log records page loads only, never interactions.
 _Avoid_: Social widgets, share bar — this codebase's term is Share buttons.
 
 **Link preview**:

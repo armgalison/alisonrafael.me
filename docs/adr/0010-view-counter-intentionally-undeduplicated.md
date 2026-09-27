@@ -20,3 +20,5 @@ unfurlers, and crawlers reading a Post never move the counter.
   crawler would silently inflate the count.
 - A real analytics product: rejected — an external dependency and far more than this
   needs.
+
+> **Note (2026-09):** The site now stores Visitor IPs in the Access Log ([ADR 0019](./0019-access-log-stores-visitor-ips-for-90-days.md)). The View count itself is unchanged and still not de-duplicated. The two are deliberately independent.

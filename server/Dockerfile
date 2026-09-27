@@ -24,5 +24,9 @@ RUN npm ci --omit=dev
 COPY --from=build /app/shared/dist ./shared/dist
 COPY --from=build /app/server/dist ./server/dist
 COPY server/assets ./assets
+# IP -> country/network databases for the Access Log (ADR 0019). Best-effort:
+# the script never fails the build, the API just skips enrichment without them.
+COPY server/scripts/fetch-geoip.sh /tmp/fetch-geoip.sh
+RUN sh /tmp/fetch-geoip.sh ./geoip && rm /tmp/fetch-geoip.sh
 EXPOSE 3000
 CMD ["node", "server/dist/main.js"]

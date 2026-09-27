@@ -17,6 +17,7 @@ dist-ssr
 .next
 next-env.d.ts
 server/uploads
+server/geoip
 
 # Editor directories and files
 .vscode/*

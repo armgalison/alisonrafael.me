@@ -96,6 +96,44 @@ export interface AtsResume {
   approvedAt: string | null
 }
 
+// One Page View — mirrors server/src/page-views' PageView entity (ADR 0019).
+export interface PageView {
+  id: string
+  createdAt: string
+  host: string
+  path: string
+  referrer: string | null
+  userAgent: string | null
+  ip: string
+  country: string | null
+  asn: number | null
+  asnOrg: string | null
+}
+
+export interface PageViewList {
+  items: PageView[]
+  total: number
+  page: number
+  pageSize: number
+}
+
+export interface PageViewFilters {
+  days: number
+  host?: string
+  path?: string
+  ip?: string
+  page: number
+}
+
+export interface PageViewSummary {
+  days: number
+  totals: { pageViews: number; uniqueIps: number }
+  perDay: { day: string; count: number }[]
+  topPages: { host: string; path: string; count: number }[]
+  topReferrers: { host: string; count: number }[]
+  topNetworks: { asnOrg: string | null; country: string | null; count: number; uniqueIps: number }[]
+}
+
 export class ApiError extends Error {
   status: number
 
@@ -258,4 +296,15 @@ export const api = {
 
   updateResumeProfile: (token: string, data: ResumeProfile) =>
     request<ResumeProfile>('/resume-profile', { method: 'PATCH', body: JSON.stringify(data) }, token),
+
+  listPageViews: (token: string, filters: PageViewFilters) => {
+    const params = new URLSearchParams({ days: String(filters.days), page: String(filters.page) })
+    if (filters.host) params.set('host', filters.host)
+    if (filters.path) params.set('path', filters.path)
+    if (filters.ip) params.set('ip', filters.ip)
+    return request<PageViewList>(`/page-views/admin?${params}`, {}, token)
+  },
+
+  getPageViewSummary: (token: string, days: 7 | 30) =>
+    request<PageViewSummary>(`/page-views/admin/summary?days=${days}`, {}, token),
 }
