@@ -12,6 +12,7 @@ import { Skills } from '../components/Skills'
 import type { ResumeContent } from '../content/types'
 import { getResumeContent } from '../i18n'
 import { LiveCursorOverlay } from '../live-cursors/components/LiveCursorOverlay'
+import { PageViewBeacon } from '../page-views/PageViewBeacon'
 import { JsonLd } from '../seo/JsonLd'
 import { AVATAR_URL, PERSON_ID, SITE_ORIGIN, SITE_TITLE } from '../seo/site'
 
@@ -97,7 +98,8 @@ function profileJsonLd(content: ResumeContent) {
 // `content` is fetched from the API per request (cached until the Admin's
 // next Settings save, see i18n/index.ts's getResumeContent), the rest is
 // still the static ../content/en.ts copy. There is no client-side JS in the
-// page's own markup — only the Live Cursor overlay is a client island — see
+// page's own markup — only the Live Cursor overlay and the Page View beacon
+// are client islands — see
 // docs/adr/0013-migrate-web-client-to-nextjs-app-router.md.
 export default async function Home() {
   const content = await getResumeContent()
@@ -107,6 +109,7 @@ export default async function Home() {
     <div className="min-h-screen bg-surface text-ink">
       <JsonLd data={profileJsonLd(content)} />
       <LiveCursorOverlay room="home" />
+      <PageViewBeacon />
       <SiteHeader content={content} />
       <main>
         <Hero content={content} />

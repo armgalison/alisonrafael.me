@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { FileText, LayoutDashboard, LogOut, MessageSquare, Settings as SettingsIcon, Wrench } from 'lucide-react'
+import { Activity, FileText, LayoutDashboard, LogOut, MessageSquare, Settings as SettingsIcon, Wrench } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import type { ReactNode } from 'react'
@@ -21,6 +21,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
   const links = [
     { to: '/admin/posts', label: content.nav.posts, icon: FileText, badge: 0 },
     { to: '/admin/comments', label: content.nav.comments, icon: MessageSquare, badge: pendingCount },
+    { to: '/admin/access-log', label: content.nav.accessLog, icon: Activity, badge: 0 },
     { to: '/admin/tools', label: content.nav.tools, icon: Wrench, badge: 0 },
     { to: '/admin/settings', label: content.nav.settings, icon: SettingsIcon, badge: 0 },
   ]
@@ -49,7 +50,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
                   <li key={link.to}>
                     <Link
                       href={link.to}
-                      className={`relative flex items-center gap-1.5 rounded-full px-3 py-1.5 transition-colors hover:text-ink ${
+                      className={`relative flex items-center gap-1.5 rounded-full px-3 py-1.5 whitespace-nowrap transition-colors hover:text-ink ${
                         active ? 'text-ink' : ''
                       }`}
                     >
@@ -75,11 +76,11 @@ export function AdminLayout({ children }: { children: ReactNode }) {
           </div>
 
           <div className="flex items-center gap-4 text-sm">
-            <span className="hidden text-ink-dim sm:inline">{email}</span>
+            <span className="hidden text-ink-dim xl:inline">{email}</span>
             <button
               type="button"
               onClick={logout}
-              className="inline-flex items-center gap-1.5 rounded-full border border-ink-dim/40 px-3.5 py-1.5 text-xs font-semibold text-ink transition-colors hover:border-accent hover:text-accent"
+              className="inline-flex items-center gap-1.5 rounded-full border whitespace-nowrap border-ink-dim/40 px-3.5 py-1.5 text-xs font-semibold text-ink transition-colors hover:border-accent hover:text-accent"
             >
               <LogOut size={13} />
               {content.panel.logout}

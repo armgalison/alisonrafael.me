@@ -25,6 +25,8 @@ export interface StaticResumeContent {
   }
   footer: {
     rights: string
+    // The Access Log's public notice (ADR 0019).
+    accessLogNotice: string
   }
 }
 

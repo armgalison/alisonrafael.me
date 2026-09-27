@@ -359,7 +359,7 @@ rebuild), and the rules that survived are:
 | **Uploads** | Admin-only; images only (JPEG, PNG, WebP, GIF), 5 MB cap. |
 | **Public résumé download** | `GET /resume` is intentionally unguarded — it serves the PDF the Admin approved. |
 | **`POST /api/revalidate-resume`** | Intentionally unguarded: it only busts a cache tag and mutates nothing. |
-| **Analytics** | None. No tracking scripts, no cookies; the view counter is a naive integer, not analytics. |
+| **Access Log** | First-party only: a beacon records each public page load (path, referrer, User-Agent, full IP, and country/network from the offline DB-IP Lite databases) to MariaDB; rows are deleted after 90 days and the footer says so. No third-party scripts, no cookies. `POST /page-views` is unauthenticated, checked against the site's origins and public routes, and rate-limited per IP. See ADR 0019. |
 | **Secrets** | Live only in GitHub Actions secrets; the deploy job writes a `chmod 600` `.env` on the droplet each time. MariaDB is on an internal Docker network with no published port. |
 
 ---

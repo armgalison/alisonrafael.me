@@ -34,11 +34,11 @@ Per workspace (`--workspace=<name>` or `cd`): `web-client` has `lint` (oxlint) a
 ## Where things live
 
 - `web-client/src/app/` — routes only; mostly thin composition or re-exports. `admin/` re-exports `src/admin/`.
-- `web-client/src/components/` — the public site (Server Components). `content/` + `i18n/` — static UI copy. `blog/` — the Blog's API client, URL helpers and client islands. `admin/` — the Admin Panel. `live-cursors/` — the Live Cursor overlay. `proxy.ts` — host routing (below).
-- `server/src/` — one Nest module per folder: `auth`, `blog`, `comments`, `uploads`, `trends`, `tools`, `ats-resume`, `resume-profile`, `live-cursors`, `health`.
+- `web-client/src/components/` — the public site (Server Components). `content/` + `i18n/` — static UI copy. `blog/` — the Blog's API client, URL helpers and client islands. `admin/` — the Admin Panel. `live-cursors/` — the Live Cursor overlay. `page-views/` — the Page View beacon. `proxy.ts` — host routing (below).
+- `server/src/` — one Nest module per folder: `auth`, `blog`, `comments`, `uploads`, `trends`, `tools`, `ats-resume`, `resume-profile`, `live-cursors`, `page-views`, `health`.
 - `shared/src/` — `tech-stack.ts` (the Tech Stack) and `resume.ts` (the Resume Profile type and its seed default).
 
-Feature background: Admin Panel [0005](./docs/adr/0005-admin-panel-in-web-client.md)/[0006](./docs/adr/0006-admin-session-model.md), Comments [0009](./docs/adr/0009-reader-comments-pre-moderated-pseudonymous-one-level-rate-limited.md), View count [0010](./docs/adr/0010-view-counter-intentionally-undeduplicated.md), ATS resume [0014](./docs/adr/0014-ats-resume-generator-replaces-static-download.md), Resume Profile [0015](./docs/adr/0015-resume-profile-becomes-db-backed-and-editable.md), Live Cursors [0017](./docs/adr/0017-live-cursors-unauthenticated-per-room-websocket-gateway.md), uploads [0004](./docs/adr/0004-local-disk-image-storage.md).
+Feature background: Admin Panel [0005](./docs/adr/0005-admin-panel-in-web-client.md)/[0006](./docs/adr/0006-admin-session-model.md), Comments [0009](./docs/adr/0009-reader-comments-pre-moderated-pseudonymous-one-level-rate-limited.md), View count [0010](./docs/adr/0010-view-counter-intentionally-undeduplicated.md), ATS resume [0014](./docs/adr/0014-ats-resume-generator-replaces-static-download.md), Resume Profile [0015](./docs/adr/0015-resume-profile-becomes-db-backed-and-editable.md), Live Cursors [0017](./docs/adr/0017-live-cursors-unauthenticated-per-room-websocket-gateway.md), Access Log [0019](./docs/adr/0019-access-log-stores-visitor-ips-for-90-days.md), uploads [0004](./docs/adr/0004-local-disk-image-storage.md).
 
 ## Traps — `web-client`
 
@@ -51,7 +51,7 @@ Feature background: Admin Panel [0005](./docs/adr/0005-admin-panel-in-web-client
 - **Blog host** ([ADR 0016](./docs/adr/0016-blog-on-dedicated-subdomain.md)): production serves the Blog at `blog.alisonrafael.me`, where `proxy.ts` internally rewrites `/x` to `/blog/x`; apex/`www` `/blog*` 308-redirects to the subdomain, and `www` 308-redirects to the apex. Build in-Blog links with `blogPathPrefix()` (`blog/routes.ts`) and absolute/canonical URLs with `blog/url.ts` — never hard-code `/blog` (it doubles up to `/blog/blog`). `proxy.ts` reads the protocol from `x-forwarded-proto` because nginx-proxy terminates TLS.
 - **Blog pages** fetch with `{ cache: 'no-store' }` and set per-post metadata in `generateMetadata` (the Link preview; [ADR 0013](./docs/adr/0013-migrate-web-client-to-nextjs-app-router.md)). `react-markdown` runs server-side only. `ViewRegistrar` must stay a genuine client component. Keep `blog/api.ts` and `admin/api.ts` separate.
 - **`/admin/*` is entirely client-rendered** (JWT in `localStorage`, so the server can't see it). `AuthContext` guards its `localStorage` read with `typeof window === 'undefined'`; the protected tree sits behind `Gate`. The markdown editor (`@uiw/react-md-editor`) loads through `next/dynamic({ ssr: false })` from a `'use client'` file.
-- **Live Cursors**: `LiveCursorOverlay` is the only client island on the resume page and is never mounted under `/admin/*`.
+- **Client islands on the resume page**: only `LiveCursorOverlay` and `PageViewBeacon`; neither is ever mounted under `/admin/*`. `PageViewBeacon` sits in `app/blog/layout.tsx` (not each page) so one mount sees client-side navigation, and it records `window.location.pathname`, not `usePathname()` (which is the rewritten `/blog/...` route on `blog.`).
 
 ## Traps — `server`
 
@@ -64,6 +64,7 @@ Feature background: Admin Panel [0005](./docs/adr/0005-admin-panel-in-web-client
 - **`Comment.authorEmail` is `select: false`** — it must never be returned by a public route.
 - **Claude calls**: system prompts demand a bare JSON reply, parsed with `extractJson()` (`trends.service.ts`). The two trend `POST`s rethrow failures as `BadGatewayException` with Claude's real message — deliberate, this is a single-admin tool. Tools that use resume facts read them live via `ResumeProfileService.get()`. The ATS Resume Generator must never add an employer, title, skill, achievement or date the Resume Profile doesn't contain.
 - **Uploads and `resume.pdf`** live on the persistent volume under `UPLOADS_DIR` (default `./uploads`); the public resume URL is always `GET /resume`.
+- **Page Views hold full Visitor IPs** (ADR 0019): `PAGE_VIEW_RETENTION_DAYS` in `page-views.constants.ts` must match the footer notice (`accessLogNotice` in `web-client`'s `content/en.ts`). The DB-IP Lite databases are downloaded at image build by `server/scripts/fetch-geoip.sh` into `/app/geoip`; locally, run it with `server/geoip` (gitignored) or the API just skips enrichment.
 - **The comment rate limit is a hardcoded constant.** If it ever becomes configurable, update both `.env.example` files, `docker-compose.yml`'s `api` env block, `deploy.yml`'s `.env` heredoc and the GitHub secret together.
 
 ## Deployment
