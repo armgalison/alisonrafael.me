@@ -50,3 +50,14 @@ so the very next visit after a save gets fresh content instead of serving one mo
   tag, mutates no data, and exposes nothing sensitive; same low-stakes pragmatism as this
   codebase's plain in-memory comment rate limiter (see
   [ADR 0009](./0009-reader-comments-pre-moderated-pseudonymous-one-level-rate-limited.md)).
+
+## Update: a structured form replaces the raw JSON editor
+
+The "revisit if the JSON editing proves error-prone" condition above was met: the Resume Profile
+is now edited through a structured form (`web-client/src/admin/resume-profile/`) on its own
+page, `/admin/settings/resume-profile`. It has one collapsible section per top-level field,
+plain inputs for scalars, and add/remove/reorder list editors for every array, including
+`experience`'s nested `roles`. The raw JSON editor was removed rather than kept as a fallback.
+The wire contract is unchanged: the form sends the same whole `ResumeProfile` to the same
+`PATCH /resume-profile` and the same `POST /api/revalidate-resume`. The one normalisation is
+that a blank `totalDuration` (the only optional field) is omitted rather than sent as `""`.

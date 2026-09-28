@@ -73,13 +73,15 @@ accepted and the condition under which it should be revisited.
 - **`/sitemap.xml` and `robots.txt`** — the sitemap is generated per request from the published posts
   and lists only canonical URLs.
 
-**The Admin Panel** (`/admin/*`, same Next.js app, single account)
+**The Admin Panel** (`/admin/*`, same Next.js app, single account), navigated from a sidebar with
+collapsible groups: Blog, Observability, Tools, Settings.
 
 - Post authoring with a live split-preview Markdown editor, drag/paste image upload, and cover images.
 - Comment moderation (`pending → approved / rejected`) with a pending-count badge.
 - **Tools** — three AI utilities built on the Anthropic API (see below).
-- **Settings** — change the password and edit the whole résumé as JSON; saving updates the live site
-  immediately.
+- **Access Log** (under Observability) — recent public page loads with 7/30-day summaries.
+- **Settings** — change the password, and edit the whole résumé through a structured form (sections,
+  add/remove/reorder list editors); saving updates the live site immediately.
 
 **The API** (`server`, NestJS + TypeORM + MariaDB) — auth, posts, comments, uploads, the résumé
 profile, the AI tools, the résumé PDF download, and the Live Cursors WebSocket gateway.
@@ -105,7 +107,7 @@ The parts of this repo that took real thought, in the order I'd show them to ano
    The price — in-page links must know which host they're on — is paid in one small module
    (`src/blog/routes.ts`) rather than scattered through components.
 2. **The résumé is data, and data reaches production without a build.** Facts live in one JSON row.
-   The public page fetches it with a Next.js Data Cache tag; saving in Settings calls
+   The public page fetches it with a Next.js Data Cache tag; saving the Resume Profile in Settings calls
    `revalidateTag('resume-profile', { expire: 0 })` so the *very next* visit is fresh
    ([ADR 0015](docs/adr/0015-resume-profile-becomes-db-backed-and-editable.md)). The same row feeds
    the AI tools, so one edit updates the site *and* every generated document.
@@ -180,7 +182,7 @@ sequenceDiagram
   participant DB as MariaDB
   actor Visitor
 
-  Admin->>Web: Edit résumé JSON in Settings, Save
+  Admin->>Web: Edit the Resume Profile form in Settings, Save
   Web->>API: PATCH /resume-profile (JWT)
   API->>DB: Replace the profile row
   Web->>Next: POST /api/revalidate-resume
@@ -414,7 +416,7 @@ seed content.
 - `ADMIN_EMAIL` / `ADMIN_PASSWORD` seed the Admin **only if no admin exists yet**; changing them later
   does nothing.
 - The résumé profile seeds itself from `shared/src/resume.ts` on first boot; after that, edit it from
-  the Admin Panel's Settings page.
+  the Admin Panel's Settings → Resume Profile page.
 
 `web-client` reads `NEXT_PUBLIC_API_URL` from `.env.development` (`http://localhost:3000`) — it is
 baked in at build time, which is why production has its own committed `.env.production`. If you use

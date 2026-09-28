@@ -1,7 +1,6 @@
 'use client'
 
-import { ArrowLeft, Check, Copy, Download, FileEdit } from 'lucide-react'
-import Link from 'next/link'
+import { Check, Copy, Download, FileEdit } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { api, ApiError, type ResumeProfile } from '../api'
 import { useAuth } from '../AuthContext'
@@ -62,11 +61,6 @@ export function ToolsCoverLetterPage() {
 
   return (
     <div>
-      <Link href="/admin/tools" className="mb-6 inline-flex items-center gap-1.5 text-sm text-ink-dim hover:text-ink">
-        <ArrowLeft size={14} />
-        {content.toolsCoverLetter.backToTools}
-      </Link>
-
       <div className="mb-6 flex items-center gap-3">
         <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10 text-accent">
           <FileEdit size={18} />

@@ -25,7 +25,7 @@ The single account (Alison himself) authorized to manage Blog content via the AP
 _Avoid_: User — there is no multi-user account system, just this one operator.
 
 **Admin Panel**:
-The authoring UI for the Admin — routes under `/admin/*` inside `web-client` (not a separate app/deploy). Lets the Admin log in, manage their password, and create/edit/publish Posts with a markdown editor. Not reachable by a Visitor without the Admin's credentials, and it doesn't render public Blog reading pages — that's a separate concern, the Blog reading UI (see [ADR 0005](./docs/adr/0005-admin-panel-in-web-client.md)).
+The authoring UI for the Admin — routes under `/admin/*` inside `web-client` (not a separate app/deploy). Lets the Admin log in, manage their password, and create/edit/publish Posts with a markdown editor. Navigated from a sidebar of collapsible groups: Blog (Posts, Comments), Observability (Access Log), Tools, and Settings (Change Password, Resume Profile). Not reachable by a Visitor without the Admin's credentials, and it doesn't render public Blog reading pages — that's a separate concern, the Blog reading UI (see [ADR 0005](./docs/adr/0005-admin-panel-in-web-client.md)).
 _Avoid_: Dashboard, CMS — this codebase's term is Admin Panel.
 
 **Blog reading UI**:
@@ -57,7 +57,7 @@ _Avoid_: Visit, hit, session, View (bare) — a Visit implies grouping loads int
 
 **Access Log**:
 The set of Page Views from the last 90 days, and the Admin Panel page that shows them: a filterable table of individual Page Views plus 7/30-day summaries (per day, top pages, top referrers, top networks). Its two uses are traffic insight and spotting that a specific company looked at the resume.
-_Avoid_: Analytics, observability, metrics, tracking — this is one first-party table of page loads, not an analytics product or operational telemetry.
+_Avoid_: Analytics, observability, metrics, tracking — this is one first-party table of page loads, not an analytics product or operational telemetry. ("Observability" is only the name of the sidebar group the Access Log sits under, not a name for the feature itself.)
 
 **Comment**:
 A reader-submitted plain-text note on a Post: a required display name (`authorName`), an optional private `authorEmail` (stored for the Admin only — never returned on a public endpoint, never shown in the Blog reading UI), a body rendered as plain text with newlines preserved (no markdown, no HTML), and a moderation status. Threading is exactly one level: a Comment may reply to a top-level Comment, but a reply cannot itself be replied to.
@@ -92,7 +92,7 @@ Alison's own professional skill list — the `technologyGroups` shown in the pub
 _Avoid_: "my stack" / "the stack" unqualified — always say Tech Stack (career-wide) vs. this repo's own stack when the distinction matters.
 
 **Tools**:
-The Admin Panel section (`/admin/tools`) holding personal utilities the Admin builds for themselves — distinct from the Blog's authoring pages. Three tools live here: the Cover Letter Generator, Get Top Trends (formerly linked directly from the Posts page, moved here since it's also a personal utility rather than Blog-authoring itself), and the ATS Resume Generator. The section is deliberately a small directory so more can be added without restructuring the nav.
+The Admin Panel section (`/admin/tools/*`) holding personal utilities the Admin builds for themselves — distinct from the Blog's authoring pages. Three tools live here: the Cover Letter Generator, Get Top Trends (formerly linked directly from the Posts page, moved here since it's also a personal utility rather than Blog-authoring itself), and the ATS Resume Generator. Each Tool is an item in the sidebar's Tools group, so adding one means adding a sub-item, not restructuring the nav; bare `/admin/tools` redirects to the first Tool (it used to be a card-grid directory page).
 _Avoid_: Utilities, dashboard widgets — this codebase's term is Tools, matching the nav label and route.
 
 **Cover Letter Generator**:
@@ -104,7 +104,7 @@ A Tool that, given a job description (pasted by the Admin, same input shape as t
 _Avoid_: Resume builder, CV generator — this codebase's term is ATS Resume Generator, matching the nav label and the "ATS" framing (optimized for parsing, not visual design).
 
 **Resume Profile**:
-The subset of resume content both apps need: name, headline, location, top skills, the Tech Stack, experience, projects, education, certifications, languages. DB-backed and Admin-editable — a single row (`server/src/resume-profile/`, `ResumeProfileEntity.data`, seeded once from `shared/`'s static `resumeProfile` default) edited as raw JSON from the Admin Panel's Settings page, not a source file the Admin has to hand-edit and redeploy (see [ADR 0015](./docs/adr/0015-resume-profile-becomes-db-backed-and-editable.md)). `server`'s Cover Letter Generator and ATS Resume Generator both fetch the live row via `ResumeProfileService.get()` rather than importing the static default, and the public resume page fetches it too (cached until the Admin's next save, via Next.js on-demand tag revalidation), so an edit reaches every consumer without a code change or rebuild. Purely UI copy (nav labels, hero text, section titles, contact details, footer) stays local to `web-client`'s `en.ts` (now typed `StaticResumeContent`) — only the resume *facts* are Resume Profile.
+The subset of resume content both apps need: name, headline, location, top skills, the Tech Stack, experience, projects, education, certifications, languages. DB-backed and Admin-editable — a single row (`server/src/resume-profile/`, `ResumeProfileEntity.data`, seeded once from `shared/`'s static `resumeProfile` default) edited through a structured form on the Admin Panel's Settings → Resume Profile page (it was raw JSON at first — see ADR 0015's update), not a source file the Admin has to hand-edit and redeploy (see [ADR 0015](./docs/adr/0015-resume-profile-becomes-db-backed-and-editable.md)). `server`'s Cover Letter Generator and ATS Resume Generator both fetch the live row via `ResumeProfileService.get()` rather than importing the static default, and the public resume page fetches it too (cached until the Admin's next save, via Next.js on-demand tag revalidation), so an edit reaches every consumer without a code change or rebuild. Purely UI copy (nav labels, hero text, section titles, contact details, footer) stays local to `web-client`'s `en.ts` (now typed `StaticResumeContent`) — only the resume *facts* are Resume Profile.
 _Avoid_: Resume data, resume content (bare) — Resume Profile is this project's term for the specific editable subset, not the whole `ResumeContent` type (which also holds `web-client`-only UI copy).
 
 **Dev Agent**:

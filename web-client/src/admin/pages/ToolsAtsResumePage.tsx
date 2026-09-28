@@ -1,8 +1,7 @@
 'use client'
 
-import { ArrowLeft, FileText, RefreshCw } from 'lucide-react'
+import { FileText, RefreshCw } from 'lucide-react'
 import dynamic from 'next/dynamic'
-import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { resumeDownloadUrl } from '../../lib/resumeUrl'
 import { api, ApiError, type AtsResume } from '../api'
@@ -87,11 +86,6 @@ export function ToolsAtsResumePage() {
 
   return (
     <div>
-      <Link href="/admin/tools" className="mb-6 inline-flex items-center gap-1.5 text-sm text-ink-dim hover:text-ink">
-        <ArrowLeft size={14} />
-        {content.toolsAtsResume.backToTools}
-      </Link>
-
       <div className="mb-6 flex items-center gap-3">
         <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10 text-accent">
           <FileText size={18} />

@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { ArrowLeft, CheckCircle2, RefreshCw, Sparkles, XCircle } from 'lucide-react'
+import { CheckCircle2, RefreshCw, Sparkles, XCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { easeOut } from '../../lib/motion'
@@ -164,11 +164,6 @@ export function TrendsPage() {
 
   return (
     <div>
-      <Link href="/admin/tools" className="mb-6 inline-flex items-center gap-1.5 text-sm text-ink-dim hover:text-ink">
-        <ArrowLeft size={14} />
-        {content.trends.backToTools}
-      </Link>
-
       <div className="mb-6 flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10 text-accent">
