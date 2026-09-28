@@ -4,11 +4,20 @@ export interface AdminContent {
     logout: string
   }
   nav: {
+    blog: string
     posts: string
     comments: string
-    settings: string
-    tools: string
+    observability: string
     accessLog: string
+    tools: string
+    coverLetter: string
+    trends: string
+    atsResume: string
+    settings: string
+    changePassword: string
+    resumeProfile: string
+    openMenu: string
+    closeMenu: string
   }
   login: {
     title: string
@@ -36,7 +45,6 @@ export interface AdminContent {
   trends: {
     heading: string
     subtitle: string
-    backToTools: string
     lastSearchedPrefix: string
     noSearchYet: string
     searchNow: string
@@ -136,30 +144,75 @@ export interface AdminContent {
     success: string
     submit: string
     submitting: string
-    resumeProfileHeading: string
-    resumeProfileSubtitle: string
-    resumeProfileLoading: string
-    resumeProfileLoadError: string
-    resumeProfileInvalidJson: string
-    resumeProfileSaveError: string
-    resumeProfileSuccess: string
-    resumeProfileSave: string
-    resumeProfileSaving: string
   }
-  tools: {
+  resumeProfile: {
     heading: string
     subtitle: string
-    coverLetterName: string
-    coverLetterDescription: string
-    trendsName: string
-    trendsDescription: string
-    atsResumeName: string
-    atsResumeDescription: string
+    loading: string
+    loadError: string
+    saveError: string
+    success: string
+    save: string
+    saving: string
+    add: string
+    remove: string
+    moveUp: string
+    moveDown: string
+    sections: {
+      basics: string
+      links: string
+      topSkills: string
+      technologyGroups: string
+      languages: string
+      certifications: string
+      experience: string
+      projects: string
+      education: string
+    }
+    fields: {
+      name: string
+      headline: string
+      location: string
+      phone: string
+      email: string
+      linkedin: string
+      linkedinLabel: string
+      github: string
+      githubLabel: string
+      website: string
+      websiteLabel: string
+      skill: string
+      groupLabel: string
+      groupItems: string
+      technology: string
+      languageName: string
+      languageLevel: string
+      certification: string
+      company: string
+      totalDuration: string
+      emphasized: string
+      roles: string
+      role: string
+      title: string
+      period: string
+      description: string
+      projectName: string
+      association: string
+      skills: string
+      school: string
+      degree: string
+    }
+    items: {
+      technologyGroup: string
+      language: string
+      experience: string
+      project: string
+      education: string
+    }
   }
   toolsCoverLetter: {
     heading: string
     subtitle: string
-    backToTools: string
     jobDescriptionLabel: string
     jobDescriptionPlaceholder: string
     generate: string
@@ -174,7 +227,6 @@ export interface AdminContent {
   toolsAtsResume: {
     heading: string
     subtitle: string
-    backToTools: string
     jobDescriptionLabel: string
     jobDescriptionPlaceholder: string
     generate: string

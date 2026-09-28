@@ -7,11 +7,13 @@ export function PasswordInput({ className = '', ...props }: InputHTMLAttributes<
   const [visible, setVisible] = useState(false)
 
   return (
-    <div className="relative">
+    // `className` styles the wrapper, not the <input>: a margin on the input
+    // would stretch the `inset-y-0` toggle below the field and misalign the icon.
+    <div className={`relative ${className}`}>
       <input
         {...props}
         type={visible ? 'text' : 'password'}
-        className={`w-full rounded-md border border-line bg-surface px-3 py-2 pr-10 text-sm outline-none focus:border-accent-dim ${className}`}
+        className="block w-full rounded-md border border-line bg-surface px-3 py-2 pr-10 text-sm outline-none focus:border-accent-dim"
       />
       <button
         type="button"
