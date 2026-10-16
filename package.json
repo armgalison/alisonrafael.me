@@ -16,6 +16,7 @@
     "build:shared": "npm run build --workspace=shared",
     "build:web": "npm run build --workspace=web-client",
     "build:api": "npm run build --workspace=server",
-    "build": "npm run build:shared && npm run build:web && npm run build:api"
+    "build": "npm run build:shared && npm run build:web && npm run build:api",
+    "optimize:avatar": "node scripts/optimize-avatar.js"
   }
 }

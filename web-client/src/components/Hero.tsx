@@ -1,4 +1,5 @@
 import type { ResumeContent } from '../content/types'
+import { ProgressiveAvatar } from './ProgressiveAvatar'
 
 interface HeroProps {
   content: ResumeContent
@@ -36,8 +37,7 @@ export function Hero({ content }: HeroProps) {
       </div>
 
       <figure className="relative m-0 flex flex-col overflow-hidden border-rule bg-[#e5e5e5] after:pointer-events-none after:absolute after:inset-0 after:bg-[linear-gradient(rgba(255,255,255,0.08)_1px,transparent_1px)] after:bg-[length:100%_4px] after:mix-blend-soft-light after:content-[''] max-[720px]:min-h-[20rem] max-[720px]:border-t min-[721px]:border-l">
-        <img
-          src="/avatar.png"
+        <ProgressiveAvatar
           alt={`Portrait of ${content.meta.name}`}
           className="absolute inset-0 h-full w-full object-cover mix-blend-multiply brightness-105 contrast-125 grayscale"
         />
