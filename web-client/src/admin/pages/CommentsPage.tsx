@@ -34,6 +34,10 @@ function statusPill(status: CommentStatus): string {
   return 'border border-line text-ink-dim'
 }
 
+function offensiveRatePill(rate: number): string {
+  return rate >= 0.5 ? 'border border-red-400/30 text-red-400/80' : 'border border-line text-ink-dim'
+}
+
 export function CommentsPage() {
   const { token } = useAuth()
   const content = useAdminContent()
@@ -158,6 +162,13 @@ export function CommentsPage() {
                 <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${statusPill(comment.status)}`}>
                   {comment.status}
                 </span>
+                {comment.offensiveRate !== null && (
+                  <span
+                    className={`rounded-full px-2 py-0.5 text-xs font-medium ${offensiveRatePill(comment.offensiveRate)}`}
+                  >
+                    {Math.round(comment.offensiveRate * 100)}% {content.comments.offensiveSuffix}
+                  </span>
+                )}
                 {comment.parentId && (
                   <span className="rounded-full border border-line px-2 py-0.5 text-xs text-ink-dim">
                     {content.comments.replyTag}

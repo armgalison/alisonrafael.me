@@ -19,6 +19,10 @@ import { UploadsModule } from './uploads/uploads.module.js';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    // Powers CommentsService.processOffensiveCheckQueue (the Jev retry
+    // queue's @Interval sweep) — must be registered once, in the root
+    // module, for @Interval/@Cron to be picked up anywhere in the app.
+    ScheduleModule.forRoot(),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
