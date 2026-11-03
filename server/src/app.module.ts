@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AtsResumeModule } from './ats-resume/ats-resume.module.js';
 import { AuthModule } from './auth/auth.module.js';
 import { BlogModule } from './blog/blog.module.js';
+import { ChatModule } from './chat/chat.module.js';
 import { CommentsModule } from './comments/comments.module.js';
 import { HealthController } from './health/health.controller.js';
 import { LiveCursorsModule } from './live-cursors/live-cursors.module.js';
@@ -45,6 +46,7 @@ import { UploadsModule } from './uploads/uploads.module.js';
     ServeStaticModule.forRoot({ rootPath: UPLOADS_DIR, serveRoot: UPLOADS_ROUTE }),
     AuthModule,
     BlogModule,
+    ChatModule,
     CommentsModule,
     UploadsModule,
     TrendsModule,

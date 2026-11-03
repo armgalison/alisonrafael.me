@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import type { ReactNode } from 'react'
 import { AVATAR_URL, SITE_ORIGIN, SITE_SHORT_NAME, SITE_TITLE } from '../seo/site'
+import { ChatContainer } from '../chat/ChatContainer'
 import './globals.css'
 
 const SITE_DESCRIPTION =
@@ -46,7 +47,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" style={{ backgroundColor: '#ffffff' }}>
-      <body suppressHydrationWarning>{children}</body>
+      <body suppressHydrationWarning>
+        {children}
+        <ChatContainer />
+      </body>
     </html>
   )
 }

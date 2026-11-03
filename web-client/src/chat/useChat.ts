@@ -1,0 +1,160 @@
+'use client';
+
+import { useCallback, useEffect, useState } from 'react';
+import { chatApi, ChatStreamEvent } from './api'
+
+export type Message = {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  createdAt: Date;
+};
+
+type UseChatState = {
+  sessionId: string | null;
+  messages: Message[];
+  isStreaming: boolean;
+  error: string | null;
+  isLoading: boolean;
+};
+
+const SESSION_STORAGE_KEY = 'chat-session-id';
+
+export function useChat() {
+  const [state, setState] = useState<UseChatState>({
+    sessionId: null,
+    messages: [],
+    isStreaming: false,
+    error: null,
+    isLoading: true,
+  });
+
+  // Initialize session on mount
+  useEffect(() => {
+    const initSession = async () => {
+      try {
+        let sessionId = typeof window !== 'undefined' ? sessionStorage.getItem(SESSION_STORAGE_KEY) : null;
+
+        if (!sessionId) {
+          const result = await chatApi.createSession();
+          sessionId = result.sessionId;
+          if (typeof window !== 'undefined') {
+            sessionStorage.setItem(SESSION_STORAGE_KEY, sessionId);
+          }
+        }
+
+        // Load history
+        try {
+          const history = await chatApi.getHistory(sessionId);
+          const messages = history.map((msg, idx) => ({
+            id: `msg-${idx}`,
+            role: msg.role as 'user' | 'assistant',
+            content: msg.content,
+            createdAt: new Date(msg.createdAt),
+          }));
+
+          setState((prev) => ({
+            ...prev,
+            sessionId,
+            messages,
+            isLoading: false,
+          }));
+        } catch (err) {
+          // History might not exist, that's ok
+          setState((prev) => ({
+            ...prev,
+            sessionId,
+            isLoading: false,
+          }));
+        }
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Failed to initialize chat';
+        setState((prev) => ({
+          ...prev,
+          error: message,
+          isLoading: false,
+        }));
+      }
+    };
+
+    initSession();
+  }, []);
+
+  const sendMessage = useCallback(
+    async (content: string) => {
+      if (!state.sessionId || !content.trim()) return;
+
+      const userMessage: Message = {
+        id: `msg-${Date.now()}`,
+        role: 'user',
+        content: content.trim(),
+        createdAt: new Date(),
+      };
+
+      setState((prev) => ({
+        ...prev,
+        messages: [...prev.messages, userMessage],
+        isStreaming: true,
+        error: null,
+      }));
+
+      let assistantContent = '';
+      const assistantId = `msg-${Date.now()}-assistant`;
+
+      try {
+        await chatApi.streamMessage(state.sessionId, content, (event: ChatStreamEvent) => {
+          if (event.type === 'token') {
+            assistantContent += event.delta;
+            setState((prev) => {
+              const lastMsg = prev.messages[prev.messages.length - 1];
+              if (lastMsg?.id === assistantId) {
+                return {
+                  ...prev,
+                  messages: prev.messages.map((msg) =>
+                    msg.id === assistantId ? { ...msg, content: assistantContent } : msg,
+                  ),
+                };
+              }
+              return {
+                ...prev,
+                messages: [
+                  ...prev.messages,
+                  {
+                    id: assistantId,
+                    role: 'assistant',
+                    content: assistantContent,
+                    createdAt: new Date(),
+                  },
+                ],
+              };
+            });
+          } else if (event.type === 'done') {
+            setState((prev) => ({
+              ...prev,
+              isStreaming: false,
+            }));
+          } else if (event.type === 'error') {
+            setState((prev) => ({
+              ...prev,
+              error: event.message,
+              isStreaming: false,
+            }));
+          }
+        });
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Failed to send message';
+        setState((prev) => ({
+          ...prev,
+          error: message,
+          isStreaming: false,
+        }));
+      }
+    },
+    [state.sessionId],
+  );
+
+  return {
+    ...state,
+    sendMessage,
+  };
+}
