@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { ChatSession } from './entities/chat-session.entity.js';
 import { ChatMessage, ChatRole } from './entities/chat-message.entity.js';
 import { ChatStreamingService, ChatStreamEvent } from './chat-streaming.service.js';
-import { ResumeProfileService } from '../resume-profile/resume-profile.service.js';
+import { ChatConfigService } from './chat-config.service.js';
 
 type Emit = (event: ChatStreamEvent) => void;
 
@@ -16,7 +16,7 @@ export class ChatService {
     @InjectRepository(ChatMessage)
     private messages: Repository<ChatMessage>,
     private streaming: ChatStreamingService,
-    private profile: ResumeProfileService,
+    private configService: ChatConfigService,
   ) {}
 
   async getOrCreateSession(id?: string): Promise<ChatSession> {
@@ -53,10 +53,6 @@ export class ChatService {
     });
     await this.messages.save(userMsg);
 
-    // Build system prompt with resume context
-    const profile = await this.profile.get();
-    const systemPrompt = this.buildSystemPrompt(profile);
-
     // Prepare Claude messages
     const claudeMessages = conversationHistory.map((msg) => ({
       role: msg.role,
@@ -65,10 +61,13 @@ export class ChatService {
     claudeMessages.push({ role: 'user' as const, content: userMessage });
 
     try {
+      // Get rendered system prompt with current config
+      const renderedPrompt = await this.configService.getRendered();
+
       // Stream response from Claude
       const assistantResponse = await this.streaming.streamChatResponse(
         claudeMessages,
-        systemPrompt,
+        renderedPrompt,
         emit,
         signal,
       );
@@ -88,21 +87,5 @@ export class ChatService {
       // Error already emitted by streaming service
       throw err;
     }
-  }
-
-  private buildSystemPrompt(profile: any): string {
-    const skillsText = profile?.skills?.map((s: any) => s.name).join(', ') || '';
-    const headline = profile?.headline || 'Full-stack software engineer';
-
-    return `You are Alison Rafael, a ${headline}. You're on your professional website talking with visitors.
-
-Profile Summary:
-- Name: ${profile?.fullName || 'Alison Rafael'}
-- Headline: ${headline}
-- Skills: ${skillsText}
-
-Be conversational, friendly, and professional. Keep responses concise (2-3 sentences).
-If asked about specific experiences or projects, reference your background authentically.
-If asked something outside your knowledge, suggest connecting via email.`;
   }
 }

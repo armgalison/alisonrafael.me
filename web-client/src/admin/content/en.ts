@@ -18,6 +18,7 @@ export const en: AdminContent = {
     settings: 'Settings',
     changePassword: 'Change Password',
     resumeProfile: 'Resume Profile',
+    chatConfig: 'Chat Config',
     openMenu: 'Open menu',
     closeMenu: 'Close menu',
   },

@@ -14,6 +14,7 @@ import {
   Newspaper,
   Settings as SettingsIcon,
   Sparkles,
+  TextIcon,
   TrendingUp,
   UserRoundCog,
   Wrench,
@@ -203,6 +204,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
       items: [
         { to: '/admin/settings/password', label: content.nav.changePassword, icon: KeyRound, badge: 0 },
         { to: '/admin/settings/resume-profile', label: content.nav.resumeProfile, icon: UserRoundCog, badge: 0 },
+        { to: '/admin/settings/chat-config', label: content.nav.chatConfig, icon: TextIcon, badge: 0 },
       ],
     },
   ]
