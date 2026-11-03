@@ -47,15 +47,14 @@ export class ChatConfigService {
     const config = await this.getOrInitialize();
     const profile = await this.profile.get();
 
-    const skills = profile?.skills?.map((s: any) => s.name).join(', ') || 'Full-stack Development';
+    const skills = profile?.topSkills?.join(', ') || 'Full-stack Development';
     const headline = profile?.headline || 'Full-stack Software Engineer';
-    const summary = profile?.summary || 'Experienced software engineer with full-stack expertise';
 
     return config.systemPromptTemplate
-      .replace('{name}', profile?.fullName || 'Alison Rafael')
+      .replace('{name}', profile?.name || 'Alison Rafael')
       .replace('{headline}', headline)
       .replace('{skills}', skills)
-      .replace('{summary}', summary);
+      .replace('{summary}', skills);
   }
 
   async getTemplate(): Promise<ChatConfig> {
@@ -95,14 +94,13 @@ export class ChatConfigService {
   async renderPreview(template: string): Promise<string> {
     const profile = await this.profile.get();
 
-    const skills = profile?.skills?.map((s: any) => s.name).join(', ') || 'Full-stack Development';
+    const skills = profile?.topSkills?.join(', ') || 'Full-stack Development';
     const headline = profile?.headline || 'Full-stack Software Engineer';
-    const summary = profile?.summary || 'Experienced software engineer with full-stack expertise';
 
     return template
-      .replace('{name}', profile?.fullName || 'Alison Rafael')
+      .replace('{name}', profile?.name || 'Alison Rafael')
       .replace('{headline}', headline)
       .replace('{skills}', skills)
-      .replace('{summary}', summary);
+      .replace('{summary}', skills);
   }
 }

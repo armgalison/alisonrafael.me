@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { RefreshCw, Save, Eye, EyeOff } from 'lucide-react';
-import { easeOut } from '../../lib/motion.js';
+import { easeOut } from '../../lib/motion';
 
 interface ChatConfig {
   id: string;
