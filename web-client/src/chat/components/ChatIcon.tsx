@@ -32,19 +32,24 @@ export function ChatIcon({ isOpen, onToggle }: ChatIconProps) {
       {!isOpen && (
         <motion.button
           animate={{
-            y: [0, -8, 0],
+            y: [0, -14, 0],
+            boxShadow: [
+              '0 8px 16px rgba(0, 0, 0, 0.2)',
+              '0 4px 20px rgba(59, 130, 246, 0.4)',
+              '0 8px 16px rgba(0, 0, 0, 0.2)',
+            ],
           }}
           transition={{
-            duration: 2,
+            duration: 2.5,
             repeat: Infinity,
             ease: "easeInOut",
           }}
-          whileHover={{ scale: 1.1, y: 0 }}
+          whileHover={{ scale: 1.1, y: 0, boxShadow: '0 12px 24px rgba(59, 130, 246, 0.5)' }}
           whileTap={{ scale: 0.95 }}
           onClick={onToggle}
           onMouseEnter={() => setShowTooltip(true)}
           onMouseLeave={() => setShowTooltip(false)}
-          className="cursor-pointer bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-full p-4 shadow-lg transition-all duration-200 shrink-0"
+          className="cursor-pointer bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-full p-4 shadow-lg shrink-0"
           aria-label="Open chat"
         >
           <MessageCircle className="w-6 h-6" />
