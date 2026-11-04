@@ -16,6 +16,7 @@ export interface AdminContent {
     settings: string
     changePassword: string
     resumeProfile: string
+    chatConfig: string
     openMenu: string
     closeMenu: string
   }
