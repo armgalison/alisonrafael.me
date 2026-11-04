@@ -48,7 +48,33 @@ export class ChatStreamingService {
       }
       emit({ type: 'done', stopReason: 'end_turn' });
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Chat request failed';
+      // Detect specific error types
+      let message = 'Chat request failed';
+
+      if (err instanceof Error) {
+        const errorStr = err.message.toLowerCase();
+
+        // Check for quota/credit errors
+        if (errorStr.includes('quota') || errorStr.includes('rate limit') || errorStr.includes('429')) {
+          message = 'API quota exceeded. Please contact the administrator.';
+          this.logger.warn('API quota exceeded');
+        }
+        // Check for authentication errors
+        else if (errorStr.includes('unauthorized') || errorStr.includes('401') || errorStr.includes('invalid api key')) {
+          message = 'API key is invalid. Please check your configuration.';
+          this.logger.warn('API authentication failed');
+        }
+        // Check for server errors
+        else if (errorStr.includes('500') || errorStr.includes('server error')) {
+          message = 'The AI service is temporarily unavailable. Please try again later.';
+          this.logger.error('Anthropic API server error');
+        }
+        // Default: use the actual error message
+        else {
+          message = err.message;
+        }
+      }
+
       this.logger.error('streamChatResponse failed', err instanceof Error ? err.stack : String(err));
       emit({ type: 'error', message });
       throw err;

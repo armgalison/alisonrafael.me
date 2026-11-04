@@ -50,7 +50,7 @@ export function ChatConfigPage() {
   const loadConfig = async () => {
     try {
       setLoading(true);
-      const token = typeof window !== 'undefined' ? sessionStorage.getItem('admin.token') : null;
+      const token = typeof window !== 'undefined' ? localStorage.getItem('admin.token') : null;
 
       const res = await fetch(`${API_URL}/chat/config/template`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -104,7 +104,7 @@ export function ChatConfigPage() {
     try {
       setSaving(true);
       setError(null);
-      const token = typeof window !== 'undefined' ? sessionStorage.getItem('admin.token') : null;
+      const token = typeof window !== 'undefined' ? localStorage.getItem('admin.token') : null;
 
       const res = await fetch(`${API_URL}/chat/config/template`, {
         method: 'PUT',
