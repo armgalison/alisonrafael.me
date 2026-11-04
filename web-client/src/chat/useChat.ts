@@ -51,11 +51,13 @@ export function useChat() {
               sessionId,
               messages,
               isLoading: false,
+              error: null,
             }));
             return;
           } catch (err) {
-            // Session failed, clear it and create a new one
-            console.warn('Failed to load session, creating new one:', err);
+            // Session failed (expired, deleted, or invalid), clear it and create a new one
+            const errorMsg = err instanceof Error ? err.message : '';
+            console.warn('Chat session invalid, starting fresh:', errorMsg);
             if (typeof window !== 'undefined') {
               sessionStorage.removeItem(SESSION_STORAGE_KEY);
             }
@@ -64,18 +66,28 @@ export function useChat() {
         }
 
         // Create new session if none exists or previous one failed
-        const result = await chatApi.createSession();
-        sessionId = result.sessionId;
-        if (typeof window !== 'undefined') {
-          sessionStorage.setItem(SESSION_STORAGE_KEY, sessionId);
-        }
+        try {
+          const result = await chatApi.createSession();
+          sessionId = result.sessionId;
+          if (typeof window !== 'undefined') {
+            sessionStorage.setItem(SESSION_STORAGE_KEY, sessionId);
+          }
 
-        setState((prev) => ({
-          ...prev,
-          sessionId,
-          messages: [],
-          isLoading: false,
-        }));
+          setState((prev) => ({
+            ...prev,
+            sessionId,
+            messages: [],
+            isLoading: false,
+            error: null,
+          }));
+        } catch (createErr) {
+          const message = createErr instanceof Error ? createErr.message : 'Failed to create session';
+          setState((prev) => ({
+            ...prev,
+            error: message,
+            isLoading: false,
+          }));
+        }
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Failed to initialize chat';
         setState((prev) => ({
