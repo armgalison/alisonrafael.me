@@ -43,7 +43,7 @@ export function ChatWidget({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 16 }}
             transition={{ duration: 0.2 }}
-            className="fixed bottom-24 right-6 z-40 w-96 max-h-96 rounded-lg shadow-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex flex-col overflow-hidden"
+            className="fixed bottom-0 right-0 z-40 md:bottom-24 md:right-6 w-full md:w-96 h-full md:max-h-96 md:rounded-lg shadow-2xl bg-white dark:bg-gray-800 border-t md:border border-gray-200 dark:border-gray-700 flex flex-col overflow-hidden rounded-t-lg md:rounded-t-none"
           >
             {/* Header */}
             <div className="bg-blue-500 text-white px-4 py-3 flex items-center justify-between">
