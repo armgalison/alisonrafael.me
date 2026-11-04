@@ -35,7 +35,7 @@ export function ChatIcon({ isOpen, onToggle }: ChatIconProps) {
         onClick={onToggle}
         onMouseEnter={() => setShowTooltip(true)}
         onMouseLeave={() => setShowTooltip(false)}
-        className="bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-full p-4 shadow-lg transition-all duration-200 shrink-0"
+        className="cursor-pointer bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-full p-4 shadow-lg transition-all duration-200 shrink-0"
         aria-label="Open chat"
       >
         <MessageCircle className="w-6 h-6" />
