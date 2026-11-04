@@ -35,38 +35,47 @@ export function useChat() {
       try {
         let sessionId = typeof window !== 'undefined' ? sessionStorage.getItem(SESSION_STORAGE_KEY) : null;
 
-        if (!sessionId) {
-          const result = await chatApi.createSession();
-          sessionId = result.sessionId;
-          if (typeof window !== 'undefined') {
-            sessionStorage.setItem(SESSION_STORAGE_KEY, sessionId);
+        // Try to load history from existing session
+        if (sessionId) {
+          try {
+            const history = await chatApi.getHistory(sessionId);
+            const messages = history.map((msg, idx) => ({
+              id: `msg-${idx}`,
+              role: msg.role as 'user' | 'assistant',
+              content: msg.content,
+              createdAt: new Date(msg.createdAt),
+            }));
+
+            setState((prev) => ({
+              ...prev,
+              sessionId,
+              messages,
+              isLoading: false,
+            }));
+            return;
+          } catch (err) {
+            // Session failed, clear it and create a new one
+            console.warn('Failed to load session, creating new one:', err);
+            if (typeof window !== 'undefined') {
+              sessionStorage.removeItem(SESSION_STORAGE_KEY);
+            }
+            sessionId = null;
           }
         }
 
-        // Load history
-        try {
-          const history = await chatApi.getHistory(sessionId);
-          const messages = history.map((msg, idx) => ({
-            id: `msg-${idx}`,
-            role: msg.role as 'user' | 'assistant',
-            content: msg.content,
-            createdAt: new Date(msg.createdAt),
-          }));
-
-          setState((prev) => ({
-            ...prev,
-            sessionId,
-            messages,
-            isLoading: false,
-          }));
-        } catch (err) {
-          // History might not exist, that's ok
-          setState((prev) => ({
-            ...prev,
-            sessionId,
-            isLoading: false,
-          }));
+        // Create new session if none exists or previous one failed
+        const result = await chatApi.createSession();
+        sessionId = result.sessionId;
+        if (typeof window !== 'undefined') {
+          sessionStorage.setItem(SESSION_STORAGE_KEY, sessionId);
         }
+
+        setState((prev) => ({
+          ...prev,
+          sessionId,
+          messages: [],
+          isLoading: false,
+        }));
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Failed to initialize chat';
         setState((prev) => ({
