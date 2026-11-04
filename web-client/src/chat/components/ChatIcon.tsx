@@ -31,7 +31,15 @@ export function ChatIcon({ isOpen, onToggle }: ChatIconProps) {
       {/* Icon Button - Hidden on mobile when chat is open */}
       {!isOpen && (
         <motion.button
-          whileHover={{ scale: 1.1 }}
+          animate={{
+            y: [0, -8, 0],
+          }}
+          transition={{
+            duration: 2,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+          whileHover={{ scale: 1.1, y: 0 }}
           whileTap={{ scale: 0.95 }}
           onClick={onToggle}
           onMouseEnter={() => setShowTooltip(true)}
