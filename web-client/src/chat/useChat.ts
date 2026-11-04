@@ -102,7 +102,7 @@ export function useChat() {
   }, []);
 
   const sendMessage = useCallback(
-    async (content: string) => {
+    async (content: string, retryCount = 0) => {
       if (!state.sessionId || !content.trim()) return;
 
       const userMessage: Message = {
@@ -164,6 +164,22 @@ export function useChat() {
         });
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Failed to send message';
+        const isSessionError = message.includes('ChatSession') || message.includes('not found');
+
+        // Auto-retry on session errors (up to 2 times)
+        if (isSessionError && retryCount < 2) {
+          console.warn(`Session error, retrying... (attempt ${retryCount + 1})`);
+          // Clear invalid session
+          if (typeof window !== 'undefined') {
+            sessionStorage.removeItem(SESSION_STORAGE_KEY);
+          }
+          // Retry after delay
+          setTimeout(() => {
+            sendMessage(content, retryCount + 1);
+          }, 1000);
+          return;
+        }
+
         setState((prev) => ({
           ...prev,
           error: message,
