@@ -1,0 +1,240 @@
+/* Industry design system (from Claude Design), scoped to .industry: the resume page and the Blog use it, the Admin Panel keeps the site's black-and-white tokens. */
+@import url('https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;700&family=Barlow+Condensed:wght@400;600&display=swap');
+
+/* In the components layer so Tailwind utilities on the same element still win. */
+@layer components {
+.industry {
+  --ind-bg: #f2f2f3;
+  --ind-surface: #e9e9ea;
+  --ind-text: #1d1f20;
+  --ind-accent: #5980a6;
+  --ind-accent-100: #eef6ff;
+  --ind-accent-600: #597ea3;
+  --ind-accent-700: #416180;
+  --ind-accent-800: #2c455d;
+  --ind-accent-900: #1d2d3d;
+  --ind-divider: rgba(29, 31, 32, 0.16);
+  --ind-heading: 'Barlow Condensed', system-ui, sans-serif;
+  --ind-body: 'Barlow', system-ui, sans-serif;
+  --ind-shadow-lg: 0 12px 32px rgba(43, 43, 45, 0.22);
+
+  background: var(--ind-bg);
+  color: var(--ind-text);
+  font-family: var(--ind-body);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+/* Dark theme: <html data-theme="dark">, set before first paint by app/layout.tsx. */
+:root[data-theme='dark'] .industry {
+  --ind-bg: #16191c;
+  --ind-surface: #1f2327;
+  --ind-text: #e7e9ec;
+  --ind-accent: #749dc4;
+  --ind-accent-100: #1d2d3d;
+  --ind-accent-600: #94bce3;
+  --ind-accent-700: #94bce3;
+  --ind-accent-800: #b5d9fd;
+  --ind-accent-900: #d6ebff;
+  --ind-divider: rgba(231, 233, 236, 0.14);
+  --ind-shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.5);
+}
+
+.industry h1,
+.industry h2,
+.industry h3,
+.industry .ind-heading {
+  font-family: var(--ind-heading);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.industry a { color: var(--ind-accent-700); text-underline-offset: 3px; }
+.industry a:hover { color: var(--ind-accent-900); }
+.industry :focus-visible { outline: 2px solid var(--ind-accent); outline-offset: 2px; }
+.industry ::selection { background: color-mix(in srgb, var(--ind-accent) 30%, transparent); color: inherit; }
+
+/* Blueprint frame: hairline border plus "+" registration marks drawn just outside each corner. */
+.industry .blueprint {
+  position: relative;
+  border: 1px solid var(--ind-divider);
+  border-radius: 0;
+}
+.industry .blueprint > .corner {
+  position: absolute;
+  width: 11px;
+  height: 11px;
+  color: color-mix(in srgb, var(--ind-text) 55%, transparent);
+  pointer-events: none;
+}
+.industry .blueprint > .corner::before,
+.industry .blueprint > .corner::after {
+  content: '';
+  position: absolute;
+  background: currentColor;
+}
+.industry .blueprint > .corner::before { left: 5px; top: 0; width: 1px; height: 100%; }
+.industry .blueprint > .corner::after { top: 5px; left: 0; width: 100%; height: 1px; }
+.industry .blueprint > .corner.tl { top: -6px; left: -6px; }
+.industry .blueprint > .corner.tr { top: -6px; right: -6px; }
+.industry .blueprint > .corner.bl { bottom: -6px; left: -6px; }
+.industry .blueprint > .corner.br { bottom: -6px; right: -6px; }
+
+.industry .card {
+  display: flex;
+  flex-direction: column;
+  gap: 6.8px;
+  padding: 10.2px;
+  background: transparent;
+}
+.industry .card-kicker {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ind-accent-700);
+}
+
+.industry .tag {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  padding: 3px 10px;
+  border-radius: 0;
+}
+.industry .tag-accent { background: var(--ind-accent-100); color: var(--ind-accent-800); }
+/* Text one step darker than the border: --ind-accent on the light bg is only 3.7:1. */
+.industry .tag-outline { border: 1px solid var(--ind-accent); color: var(--ind-accent-700); }
+
+.industry .input {
+  width: 100%;
+  min-height: 36px;
+  padding: 6px 10px;
+  font: inherit;
+  font-size: 14px;
+  color: var(--ind-text);
+  caret-color: var(--ind-accent);
+  background: var(--ind-surface);
+  border: 1px solid var(--ind-divider);
+  border-radius: 0;
+}
+.industry .input:hover { border-color: color-mix(in srgb, var(--ind-text) 45%, transparent); }
+.industry .input:focus-visible { outline: none; border-color: var(--ind-accent); }
+.industry .input::placeholder { color: color-mix(in srgb, var(--ind-text) 65%, transparent); }
+
+.industry .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  text-decoration: none;
+  font-family: var(--ind-heading);
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1.2;
+  color: var(--ind-text);
+  background: transparent;
+  border: 1px solid var(--ind-divider);
+  padding: 6px 12px;
+  border-radius: 0;
+}
+.industry .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.industry .btn-primary { background: var(--ind-accent); color: var(--ind-bg); border-color: var(--ind-accent); }
+.industry .btn-primary:hover:not(:disabled) { background: var(--ind-accent-600); color: var(--ind-bg); }
+.industry .btn-primary:active:not(:disabled) { background: var(--ind-accent-700); }
+.industry .btn-secondary:hover:not(:disabled) { background: color-mix(in srgb, var(--ind-text) 7%, transparent); color: var(--ind-text); }
+.industry .btn-secondary:active:not(:disabled) { background: color-mix(in srgb, var(--ind-text) 14%, transparent); }
+
+.industry .theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  cursor: pointer;
+  color: var(--ind-text);
+  background: transparent;
+  border: 1px solid var(--ind-divider);
+  border-radius: 0;
+}
+.industry .theme-toggle:hover { background: color-mix(in srgb, var(--ind-text) 7%, transparent); }
+.industry .theme-toggle:active { background: color-mix(in srgb, var(--ind-text) 14%, transparent); }
+.industry .theme-toggle:focus-visible { outline: 2px solid var(--ind-accent); outline-offset: 2px; }
+/* Both icons are rendered; the attribute picks one, so the server render never mismatches. */
+.industry .theme-toggle .icon-moon { display: none; }
+:root:not([data-theme='dark']) .industry .theme-toggle .icon-sun { display: none; }
+:root:not([data-theme='dark']) .industry .theme-toggle .icon-moon { display: block; }
+
+.industry .ind-label {
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ind-accent-700);
+}
+
+.industry .duotone { overflow: hidden; }
+/* A blueprint frame draws its corner marks outside the box, so it must not clip. */
+.industry .blueprint.duotone { overflow: visible; }
+.industry .duotone::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: var(--ind-accent);
+  mix-blend-mode: color;
+}
+
+.industry .ind-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.88em;
+  padding: 1px 5px;
+  background: var(--ind-surface);
+  border: 1px solid var(--ind-divider);
+}
+
+.industry .ind-pre {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 15px;
+  line-height: 1.55;
+  background: var(--ind-surface);
+  border: 1px solid var(--ind-divider);
+}
+.industry .ind-pre .ind-code { padding: 0; border: 0; background: none; font-size: inherit; }
+
+.industry .icon-btn {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  color: var(--ind-text);
+}
+
+.industry .label-accent {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ind-accent-700);
+}
+
+.industry .typing-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ind-accent);
+  animation: ind-blink 1.2s infinite;
+}
+}
+
+@keyframes ind-blink {
+  0%, 80%, 100% { opacity: 0.25; }
+  40% { opacity: 1; }
+}
+
+/* The canvas behind the page (overscroll, below short content) and native controls follow the
+   theme too. Only where .industry is mounted (resume page, Blog): the Admin Panel has no dark theme.
+   !important beats the inline white background app/layout.tsx puts on <html>. */
+:root:has(.industry) { background-color: #f2f2f3 !important; }
+:root[data-theme='dark']:has(.industry) { background-color: #16191c !important; color-scheme: dark; }
+:root:has(.industry) body { background-color: transparent; }

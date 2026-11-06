@@ -3,11 +3,12 @@ import { About } from '../components/About'
 import { Contact } from '../components/Contact'
 import { Credentials } from '../components/Credentials'
 import { Experience } from '../components/Experience'
-import { Footer } from '../components/Footer'
 import { Hero } from '../components/Hero'
+import { HomeFooter } from '../components/home/HomeFooter'
+import { HomeHeader } from '../components/home/HomeHeader'
+import { HomeSection } from '../components/home/HomeSection'
+import '../components/home/industry.css'
 import { Projects } from '../components/Projects'
-import { Section } from '../components/Section'
-import { SiteHeader } from '../components/SiteHeader'
 import { Skills } from '../components/Skills'
 import type { ResumeContent } from '../content/types'
 import { getResumeContent } from '../i18n'
@@ -94,61 +95,61 @@ function profileJsonLd(content: ResumeContent) {
   }
 }
 
-// Server Component — renders fully server-side. The Resume Profile part of
-// `content` is fetched from the API per request (cached until the Admin's
-// next Settings save, see i18n/index.ts's getResumeContent), the rest is
-// still the static ../content/en.ts copy. There is no client-side JS in the
-// page's own markup — only the Live Cursor overlay and the Page View beacon
-// are client islands — see
-// docs/adr/0013-migrate-web-client-to-nextjs-app-router.md.
+// Server Component. The Resume Profile part of `content` is fetched from the
+// API per request (cached until the Admin's next Settings save, see
+// i18n/index.ts's getResumeContent), the rest is the static ../content/en.ts
+// copy. Client islands: the Live Cursor overlay, the Page View beacon and the
+// hero chat (HeroChatWrapper) — see
+// docs/adr/0013-migrate-web-client-to-nextjs-app-router.md. Styling comes from
+// the `.industry` scope in components/home/industry.css, which only this page loads.
 export default async function Home() {
   const content = await getResumeContent()
   const { sectionTitles } = content
 
   return (
-    <div className="min-h-screen bg-surface text-ink">
+    <div id="top" className="industry flex min-h-screen flex-col">
       <JsonLd data={profileJsonLd(content)} />
       <LiveCursorOverlay room="home" />
       <PageViewBeacon />
-      <SiteHeader content={content} />
-      <main>
+      <HomeHeader content={content} />
+      <main className="mx-auto box-border w-full max-w-[1200px] px-[clamp(20px,4vw,48px)]">
         <Hero content={content} />
         <About content={content} />
 
-        <Section id="experience" index="02 / Experience" title={`${sectionTitles.experience}.`} flush>
+        <HomeSection id="experience" index="02 / Experience" title={`${sectionTitles.experience}.`}>
           <Experience entries={content.experience} />
-        </Section>
+        </HomeSection>
 
         {content.projects.length > 0 && (
-          <Section id="projects" index="03 / Projects" title={`${sectionTitles.projects}.`} flush>
+          <HomeSection id="projects" index="03 / Projects" title={`${sectionTitles.projects}.`}>
             <Projects entries={content.projects} />
-          </Section>
+          </HomeSection>
         )}
 
-        <Section id="skills" index="04 / Skills" title={`${sectionTitles.topSkills}.`}>
+        <HomeSection id="skills" index="04 / Skills" title={`${sectionTitles.topSkills}.`}>
           <Skills
             topSkills={content.topSkills}
             technologyGroups={content.technologyGroups}
             languages={content.languages}
             languagesTitle={sectionTitles.languages}
           />
-        </Section>
+        </HomeSection>
 
-        <Section id="credentials" index="05 / Credentials" title={`${sectionTitles.credentials}.`}>
+        <HomeSection id="credentials" index="05 / Credentials" title={`${sectionTitles.credentials}.`}>
           <Credentials
             educationTitle={sectionTitles.education}
             certificationsTitle={sectionTitles.certifications}
             education={content.education}
             certifications={content.certifications}
           />
-        </Section>
+        </HomeSection>
 
-        <Section id="contact" index="06 / Contact" title={`${sectionTitles.contact}.`}>
+        <HomeSection id="contact" index="06 / Contact" title={`${sectionTitles.contact}.`}>
           <Contact content={content} />
-        </Section>
+        </HomeSection>
       </main>
 
-      <Footer content={content} />
+      <HomeFooter content={content} />
     </div>
   )
 }

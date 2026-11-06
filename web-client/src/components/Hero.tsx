@@ -1,50 +1,43 @@
+import { HeroChatWrapper } from '../chat/HeroChatWrapper'
 import type { ResumeContent } from '../content/types'
+import { Corners } from './home/Corners'
 import { ProgressiveAvatar } from './ProgressiveAvatar'
 
-interface HeroProps {
-  content: ResumeContent
-}
-
-// Two columns: an oversized name and a serif statement on the left, a
-// full-bleed black-and-white portrait with a caption bar on the right.
-//
-// Height-adaptive: header + hero fill exactly one viewport (`100svh -
-// --header-h`, see globals.css), and the name's size and the vertical spacing
-// are capped by `svh` as well as `vw` so the content shrinks to fit short
-// screens instead of overflowing. `min-h` (not `h`) so content that genuinely
-// can't fit (e.g. a phone in landscape) just scrolls rather than clipping.
-export function Hero({ content }: HeroProps) {
-  const [first, ...rest] = content.meta.name.split(' ')
-  const last = rest.at(-1) ?? ''
+export function Hero({ content }: { content: ResumeContent }) {
+  const parts = content.meta.name.split(' ')
+  const [lead, ...restLines] = content.meta.headline
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean)
 
   return (
-    <section
-      id="top"
-      className="grid min-h-[calc(100svh-var(--header-h))] border-b border-rule max-[720px]:grid-rows-[auto_1fr] min-[721px]:grid-cols-[minmax(0,1.12fr)_minmax(15rem,0.88fr)]"
-    >
-      <div className="flex flex-col items-start justify-between px-(--gutter) pt-[clamp(2rem,min(6vw,6svh),6rem)] pb-[clamp(2rem,min(4vw,4svh),4rem)]">
-        <p className="mono-label">{content.hero.greeting}</p>
-
-        <h1 className="mt-[clamp(3rem,min(10vw,9svh),8rem)] mb-[clamp(3rem,min(8vw,7svh),6.5rem)] max-w-[9ch] text-[clamp(4.5rem,min(11.1vw,19svh),11.5rem)] leading-[0.78] font-normal tracking-[-0.085em]">
-          {first}
-          <br />
-          {last}
+    // On wide screens the hero fills the viewport below HomeHeader (63px tall) and the
+    // portrait stretches to the full height of the row.
+    <section className="grid grid-cols-1 gap-[clamp(32px,5vw,64px)] pt-[clamp(40px,7vw,88px)] pb-[clamp(48px,7vw,88px)] lg:min-h-[calc(100svh-63px)] lg:grid-cols-2 lg:py-10">
+      <div className="@container flex min-w-0 flex-col justify-center gap-5">
+        <p className="m-0 text-base text-(--ind-accent-700)">{content.hero.greeting}</p>
+        {/* Sized to the column (cqi) so the full name always fits on one line. */}
+        <h1 className="text-[min(104px,16cqi)] leading-[0.88] whitespace-nowrap">
+          {parts[0]} {parts.at(-1)}
         </h1>
-
-        <p className="max-w-xl font-serif text-[clamp(1.15rem,1.65vw,1.55rem)] leading-[1.25] whitespace-pre-line">
-          {content.meta.headline}
+        <p className="m-0 max-w-[480px] text-lg leading-normal text-pretty">
+          <span className="block">{lead}</span>
+          {restLines.map((line) => (
+            <span key={line} className="block opacity-70">
+              {line}
+            </span>
+          ))}
         </p>
+        <HeroChatWrapper />
       </div>
 
-      <figure className="relative m-0 flex flex-col overflow-hidden border-rule bg-[#e5e5e5] after:pointer-events-none after:absolute after:inset-0 after:bg-[linear-gradient(rgba(255,255,255,0.08)_1px,transparent_1px)] after:bg-[length:100%_4px] after:mix-blend-soft-light after:content-[''] max-[720px]:min-h-[20rem] max-[720px]:border-t min-[721px]:border-l">
+      <div className="blueprint aspect-[4/5] w-full max-w-[460px] lg:aspect-auto lg:h-full lg:max-w-[520px] lg:justify-self-end">
         <ProgressiveAvatar
           alt={`Portrait of ${content.meta.name}`}
-          className="absolute inset-0 h-full w-full object-cover mix-blend-multiply brightness-105 contrast-125 grayscale"
+          className="absolute inset-0 block h-full w-full object-cover grayscale"
         />
-        <figcaption className="mono-label absolute inset-x-0 bottom-0 z-10 flex justify-between gap-4 bg-black/85 px-4 py-[0.9rem] text-white">
-          <span>{content.meta.name.split(' ')[0]} {last}</span>
-        </figcaption>
-      </figure>
+        <Corners />
+      </div>
     </section>
   )
 }

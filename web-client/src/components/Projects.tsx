@@ -1,35 +1,35 @@
 import type { ProjectEntry } from '../content/types'
+import { Corners } from './home/Corners'
 
-interface ProjectsProps {
-  entries: ProjectEntry[]
-}
-
-// Same full-bleed row grid as Experience: period in the left column, name +
-// the employer it was built at in the middle, description and skills right.
-export function Projects({ entries }: ProjectsProps) {
+export function Projects({ entries }: { entries: ProjectEntry[] }) {
   return (
-    <ul className="-mx-(--gutter) border-t border-rule">
+    <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,320px),1fr))] items-stretch gap-6">
       {entries.map((project) => (
-        <li key={`${project.name}-${project.period}`} className="border-b border-rule last:border-b-0">
-          <div className="grid items-baseline gap-x-5 gap-y-3 px-(--gutter) py-[clamp(1.5rem,3.2vw,3.2rem)] min-[721px]:grid-cols-[minmax(9rem,0.4fr)_minmax(0,1.1fr)_minmax(16rem,1fr)]">
-            <p className="mono-label text-ink-dim">{project.period}</p>
-            <div>
-              <h3 className="font-serif text-[clamp(1.75rem,3.5vw,4rem)] leading-[0.92] font-normal tracking-[-0.055em]">
-                {project.name}
-              </h3>
-              <p className="mono-label mt-3 text-ink-dim">{project.association}</p>
-            </div>
-            <div className="max-w-[34rem] space-y-3 text-[0.95rem] leading-[1.45]">
-              {project.description.split(/\n\s*\n/).map((paragraph) => (
-                <p key={paragraph}>{paragraph}</p>
-              ))}
-              {project.skills.length > 0 && (
-                <p className="mono-label pt-2 text-ink-dim">{project.skills.join(' / ')}</p>
-              )}
-            </div>
+        <article key={`${project.name}-${project.period}`} className="card blueprint gap-3! p-6!">
+          <Corners />
+          <p className="card-kicker m-0">
+            {project.period}
+            {project.association && ` · ${project.association}`}
+          </p>
+          <h3 className="text-[28px] leading-[1.1]">{project.name}</h3>
+          <div className="flex flex-1 flex-col gap-2.5 text-sm leading-[1.6] opacity-85">
+            {project.description.split(/\n\s*\n/).map((paragraph) => (
+              <p key={paragraph} className="m-0">
+                {paragraph}
+              </p>
+            ))}
           </div>
-        </li>
+          {project.skills.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 pt-2">
+              {project.skills.map((skill) => (
+                <span key={skill} className="tag tag-outline">
+                  {skill}
+                </span>
+              ))}
+            </div>
+          )}
+        </article>
       ))}
-    </ul>
+    </div>
   )
 }

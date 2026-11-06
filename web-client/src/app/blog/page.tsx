@@ -3,7 +3,6 @@ import Link from 'next/link'
 import { blogApi } from '../../blog/api'
 import { blogPathPrefix } from '../../blog/routes'
 import { blogListUrl } from '../../blog/url'
-import { Section } from '../../components/Section'
 import { LiveCursorOverlay } from '../../live-cursors/components/LiveCursorOverlay'
 import { JsonLd } from '../../seo/JsonLd'
 import { PERSON_ID, SITE_TITLE } from '../../seo/site'
@@ -40,10 +39,9 @@ export const metadata: Metadata = {
 export default async function BlogListPage() {
   const posts = await blogApi.listPosts({ cache: 'no-store' }).catch(() => null)
   const pathPrefix = await blogPathPrefix()
-  const hasPosts = !!posts && posts.length > 0
 
   return (
-    <main>
+    <section className="flex flex-col gap-10 pt-[clamp(40px,7vw,88px)] pb-22">
       <JsonLd
         data={{
           '@context': 'https://schema.org',
@@ -55,48 +53,44 @@ export default async function BlogListPage() {
         }}
       />
       <LiveCursorOverlay room="blog" />
-      <Section
-        index={posts ? `Index / ${String(posts.length).padStart(2, '0')} posts` : 'Index'}
-        title="Blog."
-        headingLevel="h1"
-        flush={hasPosts}
-      >
-        {!posts && <p className="text-red-700">Could not load posts right now. Please try again later.</p>}
 
-        {posts && posts.length === 0 && (
-          <p className="text-[1.05rem] text-ink-dim">No posts published yet — check back soon.</p>
-        )}
+      <div className="flex flex-col gap-2">
+        <p className="ind-label m-0">{posts ? `Index / ${String(posts.length).padStart(2, '0')} posts` : 'Index'}</p>
+        <h1 className="text-[clamp(56px,8vw,104px)] leading-[0.88]">Blog.</h1>
+      </div>
 
-        {hasPosts && (
-          <ul className="-mx-(--gutter) border-t border-rule">
-            {posts.map((post) => (
-              <li key={post.id} className="border-b border-rule last:border-b-0">
-                <Link
-                  href={`${pathPrefix}/${post.slug}`}
-                  className="group grid items-baseline gap-x-5 gap-y-3 px-(--gutter) py-[clamp(1.5rem,3.2vw,3.2rem)] no-underline transition-colors hover:bg-ink hover:text-surface focus-visible:bg-ink focus-visible:text-surface focus-visible:outline-offset-[-5px] max-[720px]:grid-cols-[1fr_auto] min-[721px]:grid-cols-[minmax(9rem,0.4fr)_minmax(0,1.1fr)_minmax(16rem,1fr)_auto]"
-                >
-                  <span className="mono-label text-ink-dim group-hover:text-surface group-focus-visible:text-surface max-[720px]:col-span-full">
-                    {post.publishedAt ? formatDate(post.publishedAt) : 'Draft'}
-                    <span className="mt-1 block">
-                      {post.viewCount.toLocaleString('en-US')} views / {post.commentCount ?? 0} comments
-                    </span>
+      {!posts && <p className="m-0 text-base opacity-70">Could not load posts right now. Please try again later.</p>}
+
+      {posts && posts.length === 0 && <p className="m-0 text-base opacity-70">No posts published yet — check back soon.</p>}
+
+      {posts && posts.length > 0 && (
+        <ol className="m-0 flex list-none flex-col border-b border-(--ind-divider) p-0">
+          {posts.map((post) => (
+            <li key={post.id} className="border-t border-(--ind-divider)">
+              <Link
+                href={`${pathPrefix}/${post.slug}`}
+                className="-mx-3 flex flex-wrap gap-x-12 gap-y-3 px-3 py-7 text-(--ind-text)! no-underline hover:bg-(--ind-accent-100)"
+              >
+                <div className="flex flex-[1_1_200px] flex-col gap-1.5">
+                  <span className="text-sm">{post.publishedAt ? formatDate(post.publishedAt) : 'Draft'}</span>
+                  <span className="text-[13px] opacity-70">
+                    {post.viewCount.toLocaleString('en-US')} views / {post.commentCount ?? 0} comments
                   </span>
-                  <span className="font-serif text-[clamp(1.75rem,3.5vw,4rem)] leading-[0.92] tracking-[-0.055em]">
-                    {post.title}
-                  </span>
-                  <span className="line-clamp-3 max-w-[25rem] text-[0.95rem] leading-[1.35]">{post.excerpt}</span>
-                  <span
-                    aria-hidden
-                    className="text-[1.4rem] leading-none transition-transform group-hover:translate-x-1.5 group-focus-visible:translate-x-1.5 max-[720px]:col-start-2 max-[720px]:row-span-2 max-[720px]:self-center"
-                  >
+                </div>
+                <div className="flex min-w-0 flex-[3_1_480px] items-start gap-6">
+                  <div className="flex min-w-0 flex-1 flex-col gap-2">
+                    <h2 className="text-[28px] leading-[1.1] text-pretty">{post.title}</h2>
+                    <p className="m-0 max-w-[72ch] text-base leading-[1.6] text-pretty opacity-85">{post.excerpt}</p>
+                  </div>
+                  <span aria-hidden className="text-[22px] leading-[1.2] text-(--ind-accent-700)">
                     →
                   </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        )}
-      </Section>
-    </main>
+                </div>
+              </Link>
+            </li>
+          ))}
+        </ol>
+      )}
+    </section>
   )
 }
