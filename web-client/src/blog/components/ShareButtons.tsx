@@ -1,48 +1,35 @@
 'use client'
 
-import { Check, Link2, Share2 } from 'lucide-react'
+import { Link } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { blogPostUrl } from '../url'
 
-// Brand marks from Simple Icons (CC0), inlined rather than pulling an
-// icon package — lucide-react ships no brand glyphs.
-const BRAND_PATHS = {
-  linkedin:
-    'M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z',
-  facebook:
-    'M9.101 23.691v-7.98H6.627v-3.667h2.474v-1.58c0-4.085 1.848-5.978 5.858-5.978.401 0 .955.042 1.468.103a8.68 8.68 0 0 1 1.141.195v3.325a8.623 8.623 0 0 0-.653-.036 26.805 26.805 0 0 0-.733-.009c-.707 0-1.259.096-1.675.309a1.686 1.686 0 0 0-.679.622c-.258.42-.374.995-.374 1.752v1.297h3.919l-.386 2.103-.287 1.564h-3.246v8.245C19.396 23.238 24 18.179 24 12.044c0-6.628-5.373-12-12-12s-12 5.372-12 12c0 5.628 3.874 10.35 9.101 11.647Z',
-  x: 'M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z',
-} as const
-
-function BrandIcon({ path }: { path: string }) {
+// lucide-react 1.x dropped its brand icons; these are Lucide's own LinkedIn and
+// Facebook outlines (ISC), drawn like every other icon here (16px, stroke 1.5).
+function LinkedinIcon() {
   return (
-    <svg viewBox="0 0 24 24" width={15} height={15} fill="currentColor" aria-hidden="true">
-      <path d={path} />
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+      <rect width="4" height="12" x="2" y="9" />
+      <circle cx="4" cy="4" r="2" />
     </svg>
   )
 }
 
-const controlClass =
-  'flex h-9 w-9 items-center justify-center rounded-none border border-ink text-ink transition-colors hover:bg-ink hover:text-surface'
-
-interface ShareButtonsProps {
-  slug: string
-  title: string
+function FacebookIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+    </svg>
+  )
 }
 
-export function ShareButtons({ slug, title }: ShareButtonsProps) {
+const buttonClass = 'btn btn-secondary icon-btn text-(--ind-text)! no-underline'
+
+export function ShareButtons({ slug, title }: { slug: string; title: string }) {
   const url = blogPostUrl(slug)
   const [copied, setCopied] = useState(false)
   const copyTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
-  // Must start `false` (what the server renders) and only be detected after
-  // mount — reading `navigator` in the initializer makes the first client
-  // render differ from the server HTML and fails hydration. The button is the
-  // last one in the row, so it appearing post-hydration shifts nothing.
-  const [canNativeShare, setCanNativeShare] = useState(false)
-
-  useEffect(() => {
-    setCanNativeShare(typeof navigator.share === 'function')
-  }, [])
 
   useEffect(() => () => {
     if (copyTimeout.current) clearTimeout(copyTimeout.current)
@@ -59,32 +46,21 @@ export function ShareButtons({ slug, title }: ShareButtonsProps) {
     }
   }
 
-  function handleNativeShare() {
-    void navigator.share({ title, url }).catch(() => {})
-  }
-
+  const encoded = encodeURIComponent(url)
   const links = [
-    {
-      name: 'LinkedIn',
-      href: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`,
-      path: BRAND_PATHS.linkedin,
-    },
-    {
-      name: 'Facebook',
-      href: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
-      path: BRAND_PATHS.facebook,
-    },
+    { name: 'LinkedIn', href: `https://www.linkedin.com/sharing/share-offsite/?url=${encoded}`, icon: <LinkedinIcon /> },
+    { name: 'Facebook', href: `https://www.facebook.com/sharer/sharer.php?u=${encoded}`, icon: <FacebookIcon /> },
     {
       name: 'X',
-      href: `https://x.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}`,
-      path: BRAND_PATHS.x,
+      href: `https://x.com/intent/tweet?url=${encoded}&text=${encodeURIComponent(title)}`,
+      icon: <span className="ind-heading text-[15px]">X</span>,
     },
   ]
 
   return (
-    <div className="mt-14 border-t border-line pt-8">
-      <p className="mono-label mb-3 text-ink-dim">Share this post</p>
-      <div className="flex flex-wrap items-center gap-2">
+    <div className="flex flex-col gap-2.5">
+      <span className="text-[13px] opacity-65">Share this post</span>
+      <div className="flex gap-2">
         {links.map((link) => (
           <a
             key={link.name}
@@ -93,34 +69,18 @@ export function ShareButtons({ slug, title }: ShareButtonsProps) {
             rel="noopener noreferrer"
             aria-label={`Share on ${link.name}`}
             title={`Share on ${link.name}`}
-            className={controlClass}
+            className={buttonClass}
           >
-            <BrandIcon path={link.path} />
+            {link.icon}
           </a>
         ))}
-
-        <button
-          type="button"
-          onClick={handleCopy}
-          aria-label={copied ? 'Copied!' : 'Copy link'}
-          title={copied ? 'Copied!' : 'Copy link'}
-          className={controlClass}
-        >
-          {copied ? <Check size={15} /> : <Link2 size={15} />}
+        <button type="button" onClick={handleCopy} aria-label="Copy link" title="Copy link" className={buttonClass}>
+          <Link size={16} strokeWidth={1.5} aria-hidden />
         </button>
-
-        {canNativeShare && (
-          <button
-            type="button"
-            onClick={handleNativeShare}
-            aria-label="Share…"
-            title="Share…"
-            className={controlClass}
-          >
-            <Share2 size={15} />
-          </button>
-        )}
       </div>
+      <span className="min-h-[18px] text-xs text-(--ind-accent-700)" aria-live="polite">
+        {copied ? 'Link copied' : ''}
+      </span>
     </div>
   )
 }

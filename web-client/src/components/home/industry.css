@@ -1,4 +1,4 @@
-/* Industry design system (from Claude Design), scoped to .industry so it only styles the resume page — the Blog and Admin Panel keep the site's black-and-white tokens. */
+/* Industry design system (from Claude Design), scoped to .industry: the resume page and the Blog use it, the Admin Panel keeps the site's black-and-white tokens. */
 @import url('https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;700&family=Barlow+Condensed:wght@400;600&display=swap');
 
 /* In the components layer so Tailwind utilities on the same element still win. */
@@ -168,6 +168,49 @@
 :root:not([data-theme='dark']) .industry .theme-toggle .icon-sun { display: none; }
 :root:not([data-theme='dark']) .industry .theme-toggle .icon-moon { display: block; }
 
+.industry .ind-label {
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ind-accent-700);
+}
+
+.industry .duotone { overflow: hidden; }
+/* A blueprint frame draws its corner marks outside the box, so it must not clip. */
+.industry .blueprint.duotone { overflow: visible; }
+.industry .duotone::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: var(--ind-accent);
+  mix-blend-mode: color;
+}
+
+.industry .ind-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.88em;
+  padding: 1px 5px;
+  background: var(--ind-surface);
+  border: 1px solid var(--ind-divider);
+}
+
+.industry .ind-pre {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 15px;
+  line-height: 1.55;
+  background: var(--ind-surface);
+  border: 1px solid var(--ind-divider);
+}
+.industry .ind-pre .ind-code { padding: 0; border: 0; background: none; font-size: inherit; }
+
+.industry .icon-btn {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  color: var(--ind-text);
+}
+
 .industry .label-accent {
   font-size: 11px;
   letter-spacing: 0.1em;
@@ -190,7 +233,7 @@
 }
 
 /* The canvas behind the page (overscroll, below short content) and native controls follow the
-   theme too. Only on the resume page: the Blog and Admin Panel have no dark theme.
+   theme too. Only where .industry is mounted (resume page, Blog): the Admin Panel has no dark theme.
    !important beats the inline white background app/layout.tsx puts on <html>. */
 :root:has(.industry) { background-color: #f2f2f3 !important; }
 :root[data-theme='dark']:has(.industry) { background-color: #16191c !important; color-scheme: dark; }
