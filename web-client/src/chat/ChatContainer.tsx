@@ -6,10 +6,13 @@ import { ChatIcon } from './components/ChatIcon';
 import { ChatWidget } from './components/ChatWidget';
 import { useChat } from './useChat';
 
-// The resume page ("/") has its own chat in the hero (HeroChatWrapper), so the
-// corner widget only mounts elsewhere — and never runs a second session there.
+// Not on the resume page ("/"), which has its own chat in the hero
+// (HeroChatWrapper), nor on the Blog. On blog.alisonrafael.me usePathname() is
+// the rewritten "/blog/..." route, so the prefix check covers both hosts.
+// Returning before FloatingChat mounts means no chat session is opened there.
 export function ChatContainer() {
-  return usePathname() === '/' ? null : <FloatingChat />;
+  const pathname = usePathname();
+  return pathname === '/' || pathname.startsWith('/blog') ? null : <FloatingChat />;
 }
 
 function FloatingChat() {
