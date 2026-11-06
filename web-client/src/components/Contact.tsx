@@ -1,16 +1,7 @@
 import type { ResumeContent } from '../content/types'
-import { copyClass, Entry } from './Section'
+import { Corners } from './home/Corners'
 
-interface ContactProps {
-  content: ResumeContent
-}
-
-const linkClass =
-  'break-words underline decoration-1 underline-offset-[0.16em] hover:decoration-2'
-
-// Left: the secondary links as labelled entries. Right: the primary call to
-// action in a single outlined panel.
-export function Contact({ content }: ContactProps) {
+export function Contact({ content }: { content: ResumeContent }) {
   const { links: contact } = content
   const entries = [
     { label: 'LinkedIn', text: contact.linkedinLabel, href: contact.linkedin },
@@ -20,21 +11,23 @@ export function Contact({ content }: ContactProps) {
   ]
 
   return (
-    <div className="grid items-start gap-[clamp(3rem,10vw,11rem)] min-[721px]:grid-cols-[minmax(0,0.95fr)_minmax(16rem,0.75fr)]">
-      <div className="divide-y divide-line">
-        {entries.map((entry) => (
-          <Entry key={entry.href} label={entry.label}>
-            <a
-              href={entry.href}
-              target={entry.href.startsWith('http') ? '_blank' : undefined}
-              rel={entry.href.startsWith('http') ? 'noreferrer' : undefined}
-              className={`${copyClass} ${linkClass}`}
-            >
-              {entry.text}
-            </a>
-          </Entry>
-        ))}
-      </div>
+    <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,240px),1fr))] gap-6">
+      {entries.map((entry) => {
+        const external = entry.href.startsWith('http')
+        return (
+          <a
+            key={entry.href}
+            href={entry.href}
+            target={external ? '_blank' : undefined}
+            rel={external ? 'noreferrer' : undefined}
+            className="card blueprint gap-2! p-5! text-(--ind-text)! no-underline hover:bg-(--ind-accent-100)"
+          >
+            <Corners />
+            <span className="text-xs tracking-[0.1em] text-(--ind-accent-700) uppercase">{entry.label}</span>
+            <span className="text-base break-words">{entry.text}</span>
+          </a>
+        )
+      })}
     </div>
   )
 }
