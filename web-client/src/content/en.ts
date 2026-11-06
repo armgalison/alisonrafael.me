@@ -2,7 +2,7 @@ import type { StaticResumeContent } from './types'
 
 export const en: StaticResumeContent = {
   hero: {
-    greeting: "Hi, I'm",
+    greeting: "Hi, I'm Alison.",
   },
   sectionTitles: {
     experience: 'Experience',

@@ -44,9 +44,17 @@ export const metadata: Metadata = {
   },
 }
 
+// Runs before first paint so the stored theme (default dark) never flashes. The key
+// "ag-theme" must match THEME_STORAGE_KEY in components/home/ThemeToggle.tsx.
+const THEME_SCRIPT = `try{document.documentElement.setAttribute('data-theme',localStorage.getItem('ag-theme')==='light'?'light':'dark')}catch(e){document.documentElement.setAttribute('data-theme','dark')}`
+
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" style={{ backgroundColor: '#ffffff' }}>
+    // suppressHydrationWarning: THEME_SCRIPT sets data-theme before React hydrates.
+    <html lang="en" style={{ backgroundColor: '#ffffff' }} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+      </head>
       <body suppressHydrationWarning>
         {children}
         <ChatContainer />

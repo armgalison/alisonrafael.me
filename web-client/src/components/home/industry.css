@@ -25,6 +25,21 @@
   line-height: 1.55;
 }
 
+/* Dark theme: <html data-theme="dark">, set before first paint by app/layout.tsx. */
+:root[data-theme='dark'] .industry {
+  --ind-bg: #16191c;
+  --ind-surface: #1f2327;
+  --ind-text: #e7e9ec;
+  --ind-accent: #749dc4;
+  --ind-accent-100: #1d2d3d;
+  --ind-accent-600: #94bce3;
+  --ind-accent-700: #94bce3;
+  --ind-accent-800: #b5d9fd;
+  --ind-accent-900: #d6ebff;
+  --ind-divider: rgba(231, 233, 236, 0.14);
+  --ind-shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.5);
+}
+
 .industry h1,
 .industry h2,
 .industry h3,
@@ -38,7 +53,7 @@
 .industry a { color: var(--ind-accent-700); text-underline-offset: 3px; }
 .industry a:hover { color: var(--ind-accent-900); }
 .industry :focus-visible { outline: 2px solid var(--ind-accent); outline-offset: 2px; }
-.industry ::selection { background: rgba(89, 128, 166, 0.3); color: inherit; }
+.industry ::selection { background: color-mix(in srgb, var(--ind-accent) 30%, transparent); color: inherit; }
 
 /* Blueprint frame: hairline border plus "+" registration marks drawn just outside each corner. */
 .industry .blueprint {
@@ -50,7 +65,7 @@
   position: absolute;
   width: 11px;
   height: 11px;
-  color: rgba(29, 31, 32, 0.55);
+  color: color-mix(in srgb, var(--ind-text) 55%, transparent);
   pointer-events: none;
 }
 .industry .blueprint > .corner::before,
@@ -89,7 +104,8 @@
   border-radius: 0;
 }
 .industry .tag-accent { background: var(--ind-accent-100); color: var(--ind-accent-800); }
-.industry .tag-outline { border: 1px solid var(--ind-accent); color: var(--ind-accent); }
+/* Text one step darker than the border: --ind-accent on the light bg is only 3.7:1. */
+.industry .tag-outline { border: 1px solid var(--ind-accent); color: var(--ind-accent-700); }
 
 .industry .input {
   width: 100%;
@@ -103,9 +119,9 @@
   border: 1px solid var(--ind-divider);
   border-radius: 0;
 }
-.industry .input:hover { border-color: rgba(29, 31, 32, 0.45); }
+.industry .input:hover { border-color: color-mix(in srgb, var(--ind-text) 45%, transparent); }
 .industry .input:focus-visible { outline: none; border-color: var(--ind-accent); }
-.industry .input::placeholder { color: rgba(29, 31, 32, 0.5); }
+.industry .input::placeholder { color: color-mix(in srgb, var(--ind-text) 65%, transparent); }
 
 .industry .btn {
   display: inline-flex;
@@ -128,8 +144,29 @@
 .industry .btn-primary { background: var(--ind-accent); color: var(--ind-bg); border-color: var(--ind-accent); }
 .industry .btn-primary:hover:not(:disabled) { background: var(--ind-accent-600); color: var(--ind-bg); }
 .industry .btn-primary:active:not(:disabled) { background: var(--ind-accent-700); }
-.industry .btn-secondary:hover:not(:disabled) { background: rgba(29, 31, 32, 0.07); color: var(--ind-text); }
-.industry .btn-secondary:active:not(:disabled) { background: rgba(29, 31, 32, 0.14); }
+.industry .btn-secondary:hover:not(:disabled) { background: color-mix(in srgb, var(--ind-text) 7%, transparent); color: var(--ind-text); }
+.industry .btn-secondary:active:not(:disabled) { background: color-mix(in srgb, var(--ind-text) 14%, transparent); }
+
+.industry .theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  cursor: pointer;
+  color: var(--ind-text);
+  background: transparent;
+  border: 1px solid var(--ind-divider);
+  border-radius: 0;
+}
+.industry .theme-toggle:hover { background: color-mix(in srgb, var(--ind-text) 7%, transparent); }
+.industry .theme-toggle:active { background: color-mix(in srgb, var(--ind-text) 14%, transparent); }
+.industry .theme-toggle:focus-visible { outline: 2px solid var(--ind-accent); outline-offset: 2px; }
+/* Both icons are rendered; the attribute picks one, so the server render never mismatches. */
+.industry .theme-toggle .icon-moon { display: none; }
+:root:not([data-theme='dark']) .industry .theme-toggle .icon-sun { display: none; }
+:root:not([data-theme='dark']) .industry .theme-toggle .icon-moon { display: block; }
 
 .industry .label-accent {
   font-size: 11px;
@@ -151,3 +188,10 @@
   0%, 80%, 100% { opacity: 0.25; }
   40% { opacity: 1; }
 }
+
+/* The canvas behind the page (overscroll, below short content) and native controls follow the
+   theme too. Only on the resume page: the Blog and Admin Panel have no dark theme.
+   !important beats the inline white background app/layout.tsx puts on <html>. */
+:root:has(.industry) { background-color: #f2f2f3 !important; }
+:root[data-theme='dark']:has(.industry) { background-color: #16191c !important; color-scheme: dark; }
+:root:has(.industry) body { background-color: transparent; }

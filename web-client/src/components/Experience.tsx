@@ -54,7 +54,7 @@ export function Experience({ entries }: { entries: ExperienceEntry[] }) {
           >
             <div className="flex flex-[1_1_200px] flex-col items-start gap-2">
               <span className="text-sm">{dates}</span>
-              {duration && <span className="text-[13px] opacity-60">{duration}</span>}
+              {duration && <span className="text-[13px] opacity-70">{duration}</span>}
               {index === 0 && <span className="tag tag-accent">Current role</span>}
             </div>
             <div className="flex min-w-0 flex-[3_1_480px] flex-col gap-2">

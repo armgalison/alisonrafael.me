@@ -1,6 +1,7 @@
 import { BLOG_ORIGIN } from '../../blog/url'
 import type { ResumeContent } from '../../content/types'
 import { resumeDownloadUrl } from '../../lib/resumeUrl'
+import { ThemeToggle } from './ThemeToggle'
 
 export function HomeHeader({ content }: { content: ResumeContent }) {
   const parts = content.meta.name.split(' ')
@@ -22,18 +23,19 @@ export function HomeHeader({ content }: { content: ResumeContent }) {
           aria-label={`${content.meta.name}, back to top`}
         >
           {parts[0]} {parts.at(-1)}
-          <span className="text-[13px] font-normal opacity-60 max-[560px]:hidden" style={{ fontFamily: 'var(--ind-body)' }}>
+          <span className="text-[13px] font-normal opacity-70 max-[560px]:hidden" style={{ fontFamily: 'var(--ind-body)' }}>
             {role}
           </span>
         </a>
         {links.map((link) => (
-          <a key={link.href} href={link.href} className="text-(--ind-text)! hover:text-(--ind-accent)! max-[720px]:hidden">
+          <a key={link.href} href={link.href} className="text-(--ind-text)! hover:text-(--ind-accent-700)! max-[720px]:hidden">
             {link.label}
           </a>
         ))}
-        <a href={BLOG_ORIGIN} className="text-(--ind-text)! hover:text-(--ind-accent)!">
+        <a href={BLOG_ORIGIN} className="text-(--ind-text)! hover:text-(--ind-accent-700)!">
           Blog
         </a>
+        <ThemeToggle />
         <a href={resumeDownloadUrl} download className="btn btn-secondary min-h-[34px] px-3">
           Resume ↓
         </a>
