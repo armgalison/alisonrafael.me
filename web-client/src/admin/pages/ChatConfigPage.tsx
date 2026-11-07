@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { RefreshCw, Save, Eye, EyeOff } from 'lucide-react';
 import { easeOut } from '../../lib/motion';
+import { useAdminContent } from '../i18n';
+import { ChatConversationsPanel } from './ChatConversationsPanel';
 
 interface ChatConfig {
   id: string;
@@ -20,7 +22,7 @@ interface Version {
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL as string;
 
-export function ChatConfigPage() {
+function SystemPromptPanel() {
   const [template, setTemplate] = useState('');
   const [preview, setPreview] = useState('');
   const [showPreview, setShowPreview] = useState(false);
@@ -337,6 +339,58 @@ export function ChatConfigPage() {
             </ul>
           </div>
         </motion.div>
+      </div>
+    </div>
+  );
+}
+
+type Tab = 'prompt' | 'conversations';
+
+// The tab lives in ?tab= so a reload keeps it. Read in an effect, not in
+// render, so the server and first client render agree.
+export function ChatConfigPage() {
+  const copy = useAdminContent().chatConversations;
+  const [tab, setTab] = useState<Tab>('prompt');
+
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get('tab') === 'conversations') setTab('conversations');
+  }, []);
+
+  const select = (next: Tab) => {
+    setTab(next);
+    const url = new URL(window.location.href);
+    if (next === 'conversations') url.searchParams.set('tab', next);
+    else url.searchParams.delete('tab');
+    window.history.replaceState(null, '', url);
+  };
+
+  const tabs: { id: Tab; label: string }[] = [
+    { id: 'prompt', label: copy.tabPrompt },
+    { id: 'conversations', label: copy.tabConversations },
+  ];
+
+  return (
+    <div className="space-y-6">
+      <div role="tablist" aria-label="Chat Config" className="flex gap-1 border-b border-line">
+        {tabs.map((t) => (
+          <button
+            key={t.id}
+            type="button"
+            role="tab"
+            id={`chat-tab-${t.id}`}
+            aria-selected={tab === t.id}
+            aria-controls={`chat-panel-${t.id}`}
+            onClick={() => select(t.id)}
+            className={`-mb-px border-b-2 px-3 py-2 text-sm font-medium transition-colors ${
+              tab === t.id ? 'border-ink text-ink' : 'border-transparent text-ink-dim hover:text-ink'
+            }`}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+      <div role="tabpanel" id={`chat-panel-${tab}`} aria-labelledby={`chat-tab-${tab}`}>
+        {tab === 'prompt' ? <SystemPromptPanel /> : <ChatConversationsPanel />}
       </div>
     </div>
   );

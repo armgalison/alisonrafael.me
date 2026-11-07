@@ -14,5 +14,7 @@ import { PageViewsService } from './page-views.service.js';
   ],
   controllers: [PageViewsController],
   providers: [PageViewsService, IpLookupService],
+  // The chat reuses the offline lookup for its sessions' Visitor details.
+  exports: [IpLookupService],
 })
 export class PageViewsModule {}

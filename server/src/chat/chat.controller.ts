@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Logger, Post, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Headers, HttpCode, HttpStatus, Ip, Logger, Post, Res, UseGuards } from '@nestjs/common';
 import type { Response } from 'express';
 import { ChatService } from './chat.service.js';
 import { ChatRateLimitGuard } from './chat-rate-limit.guard.js';
@@ -11,8 +11,8 @@ export class ChatController {
   constructor(private readonly chat: ChatService) {}
 
   @Post('sessions')
-  async createSession() {
-    const session = await this.chat.getOrCreateSession();
+  async createSession(@Ip() ip: string, @Headers('user-agent') userAgent: string | undefined) {
+    const session = await this.chat.createSession(ip, userAgent);
     return { sessionId: session.id };
   }
 

@@ -245,4 +245,27 @@ export interface AdminContent {
   common: {
     loading: string
   }
+  chatConversations: {
+    tabPrompt: string
+    tabConversations: string
+    heading: string
+    subtitle: string
+    loading: string
+    loadError: string
+    empty: string
+    selectHint: string
+    noPreview: string
+    unknownVisitor: string
+    unknownNetwork: string
+    ipLabel: string
+    locationLabel: string
+    networkLabel: string
+    userAgentLabel: string
+    messages: (n: number) => string
+    visitor: string
+    assistant: string
+    previous: string
+    next: string
+    pageOf: (page: number, pages: number, total: number) => string
+  }
 }
