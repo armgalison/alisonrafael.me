@@ -134,6 +134,37 @@ export interface PageViewSummary {
   topNetworks: { asnOrg: string | null; country: string | null; count: number; uniqueIps: number }[]
 }
 
+// A recorded hero-chat conversation — mirrors server/src/chat's admin routes.
+export interface ChatSessionSummary {
+  id: string
+  firstMessageAt: string
+  lastMessageAt: string
+  messageCount: number
+  preview: string
+  ip: string | null
+  country: string | null
+  asnOrg: string | null
+}
+
+export interface ChatSessionList {
+  items: ChatSessionSummary[]
+  total: number
+  page: number
+  pageSize: number
+}
+
+export interface ChatTranscript {
+  id: string
+  firstMessageAt: string
+  lastMessageAt: string
+  ip: string | null
+  userAgent: string | null
+  country: string | null
+  asn: number | null
+  asnOrg: string | null
+  messages: { id: string; role: 'user' | 'assistant'; content: string; createdAt: string }[]
+}
+
 export class ApiError extends Error {
   status: number
 
@@ -307,4 +338,9 @@ export const api = {
 
   getPageViewSummary: (token: string, days: 7 | 30) =>
     request<PageViewSummary>(`/page-views/admin/summary?days=${days}`, {}, token),
+
+  listChatSessions: (token: string, page: number) =>
+    request<ChatSessionList>(`/chat/admin/sessions?page=${page}`, {}, token),
+
+  getChatSession: (token: string, id: string) => request<ChatTranscript>(`/chat/admin/sessions/${id}`, {}, token),
 }
