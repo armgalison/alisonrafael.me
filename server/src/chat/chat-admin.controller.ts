@@ -1,6 +1,7 @@
-import { Controller, DefaultValuePipe, Get, Param, ParseIntPipe, ParseUUIDPipe, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, ParseUUIDPipe, Query, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import { ChatService } from './chat.service.js';
+import { ListChatConversationsQueryDto } from './dto/list-chat-conversations-query.dto.js';
 
 const PAGE_SIZE = 25;
 
@@ -12,9 +13,12 @@ export class ChatAdminController {
   constructor(private readonly chat: ChatService) {}
 
   @Get('sessions')
-  async listSessions(@Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number) {
-    const current = Math.max(1, page);
-    const { items, total } = await this.chat.listSessionsForAdmin(current, PAGE_SIZE);
+  async listSessions(@Query() query: ListChatConversationsQueryDto) {
+    const current = query.page ?? 1;
+    const { items, total } = await this.chat.listSessionsForAdmin(current, PAGE_SIZE, {
+      days: query.days,
+      network: query.network,
+    });
     return { items, total, page: current, pageSize: PAGE_SIZE };
   }
 

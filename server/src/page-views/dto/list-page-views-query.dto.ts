@@ -26,6 +26,13 @@ export class ListPageViewsQueryDto {
   @MaxLength(45)
   ip?: string;
 
+  // Case-insensitive "contains" match on the IP's network/organization
+  // (asnOrg) — "did Company X look at the resume?" (ADR 0019).
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  network?: string;
+
   @IsOptional()
   @Type(() => Number)
   @IsInt()

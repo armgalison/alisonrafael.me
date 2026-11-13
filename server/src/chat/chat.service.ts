@@ -22,6 +22,13 @@ export interface ChatSessionSummary {
   asnOrg: string | null;
 }
 
+export interface ChatConversationFilters {
+  // Only Chat Conversations with a message in the last N days.
+  days?: number;
+  // Case-insensitive "contains" match on the Visitor's network (asnOrg).
+  network?: string;
+}
+
 const PREVIEW_LENGTH = 120;
 
 @Injectable()
@@ -128,10 +135,21 @@ export class ChatService {
   async listSessionsForAdmin(
     page: number,
     pageSize: number,
+    filters: ChatConversationFilters = {},
   ): Promise<{ items: ChatSessionSummary[]; total: number }> {
     const base = this.sessions
       .createQueryBuilder('s')
       .innerJoin(ChatMessage, 'm', 'm.sessionId = s.id');
+    if (filters.days) {
+      base.andWhere(
+        'EXISTS (SELECT 1 FROM chat_messages recent WHERE recent.sessionId = s.id AND recent.createdAt >= :since)',
+        { since: new Date(Date.now() - filters.days * 24 * 60 * 60 * 1000) },
+      );
+    }
+    if (filters.network) {
+      const escaped = filters.network.toLowerCase().replace(/[\\%_]/g, (c) => `\\${c}`);
+      base.andWhere('LOWER(s.asnOrg) LIKE :network', { network: `%${escaped}%` });
+    }
 
     const total = await base.clone().select('COUNT(DISTINCT s.id)', 'n').getRawOne<{ n: string }>();
 

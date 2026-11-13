@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Patch, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Ip, Patch, Post, Req, UseGuards } from '@nestjs/common';
 import type { Request } from 'express';
 import { AuthService } from './auth.service.js';
 import { ChangePasswordDto } from './dto/change-password.dto.js';
@@ -15,8 +15,8 @@ export class AuthController {
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  async login(@Body() dto: LoginDto) {
-    const admin = await this.auth.validateAdmin(dto.email, dto.password);
+  async login(@Body() dto: LoginDto, @Ip() ip: string) {
+    const admin = await this.auth.authenticate(dto.email, dto.password, ip);
     return this.auth.login(admin);
   }
 

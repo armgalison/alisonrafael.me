@@ -10,6 +10,7 @@ import { ChatModule } from './chat/chat.module.js';
 import { CommentsModule } from './comments/comments.module.js';
 import { HealthController } from './health/health.controller.js';
 import { LiveCursorsModule } from './live-cursors/live-cursors.module.js';
+import { McpModule } from './mcp/mcp.module.js';
 import { PageViewsModule } from './page-views/page-views.module.js';
 import { ResumeProfileModule } from './resume-profile/resume-profile.module.js';
 import { ToolsModule } from './tools/tools.module.js';
@@ -41,7 +42,8 @@ import { UploadsModule } from './uploads/uploads.module.js';
         synchronize: true,
       }),
     }),
-    // Page Views' daily retention purge (ADR 0019).
+    // Daily purges: Page Views' retention (ADR 0019), expired Admin MCP
+    // codes/tokens (ADR 0021).
     ScheduleModule.forRoot(),
     ServeStaticModule.forRoot({ rootPath: UPLOADS_DIR, serveRoot: UPLOADS_ROUTE }),
     AuthModule,
@@ -55,6 +57,7 @@ import { UploadsModule } from './uploads/uploads.module.js';
     ResumeProfileModule,
     LiveCursorsModule,
     PageViewsModule,
+    McpModule,
   ],
   controllers: [HealthController],
 })

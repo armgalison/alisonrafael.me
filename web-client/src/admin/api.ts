@@ -122,6 +122,7 @@ export interface PageViewFilters {
   host?: string
   path?: string
   ip?: string
+  network?: string
   page: number
 }
 
@@ -132,6 +133,16 @@ export interface PageViewSummary {
   topPages: { host: string; path: string; count: number }[]
   topReferrers: { host: string; count: number }[]
   topNetworks: { asnOrg: string | null; country: string | null; count: number; uniqueIps: number }[]
+}
+
+// An AI client allowed into the Admin MCP — mirrors server/src/mcp's
+// ConnectedClient (ADR 0021).
+export interface ConnectedClient {
+  id: string
+  clientName: string
+  createdAt: string
+  lastUsedAt: string | null
+  expiresAt: string
 }
 
 // A recorded hero-chat conversation — mirrors server/src/chat's admin routes.
@@ -333,6 +344,7 @@ export const api = {
     if (filters.host) params.set('host', filters.host)
     if (filters.path) params.set('path', filters.path)
     if (filters.ip) params.set('ip', filters.ip)
+    if (filters.network) params.set('network', filters.network)
     return request<PageViewList>(`/page-views/admin?${params}`, {}, token)
   },
 
@@ -343,4 +355,9 @@ export const api = {
     request<ChatSessionList>(`/chat/admin/sessions?page=${page}`, {}, token),
 
   getChatSession: (token: string, id: string) => request<ChatTranscript>(`/chat/admin/sessions/${id}`, {}, token),
+
+  listConnectedClients: (token: string) => request<ConnectedClient[]>('/mcp/admin/clients', {}, token),
+
+  revokeConnectedClient: (token: string, id: string) =>
+    request<void>(`/mcp/admin/clients/${id}`, { method: 'DELETE' }, token),
 }

@@ -17,6 +17,7 @@ export interface AdminContent {
     changePassword: string
     resumeProfile: string
     chatConfig: string
+    connectedClients: string
     openMenu: string
     closeMenu: string
   }
@@ -123,6 +124,7 @@ export interface AdminContent {
     hostPlaceholder: string
     pathPlaceholder: string
     ipPlaceholder: string
+    networkPlaceholder: string
     apply: string
     clear: string
     filterByIp: string
@@ -134,6 +136,21 @@ export interface AdminContent {
     next: string
     pageOf: (page: number, pages: number, total: number) => string
     attribution: string
+  }
+  connectedClients: {
+    heading: string
+    subtitle: string
+    endpointLabel: string
+    loading: string
+    loadError: string
+    empty: string
+    connected: (date: string) => string
+    lastUsed: (date: string) => string
+    neverUsed: string
+    expires: (date: string) => string
+    revoke: string
+    revokeConfirm: (name: string) => string
+    revokeError: string
   }
   settings: {
     heading: string

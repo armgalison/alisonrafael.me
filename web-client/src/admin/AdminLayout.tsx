@@ -12,6 +12,7 @@ import {
   Menu,
   MessageSquare,
   Newspaper,
+  PlugZap,
   Settings as SettingsIcon,
   Sparkles,
   TextIcon,
@@ -205,6 +206,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
         { to: '/admin/settings/password', label: content.nav.changePassword, icon: KeyRound, badge: 0 },
         { to: '/admin/settings/resume-profile', label: content.nav.resumeProfile, icon: UserRoundCog, badge: 0 },
         { to: '/admin/settings/chat-config', label: content.nav.chatConfig, icon: TextIcon, badge: 0 },
+        { to: '/admin/settings/connected-clients', label: content.nav.connectedClients, icon: PlugZap, badge: 0 },
       ],
     },
   ]

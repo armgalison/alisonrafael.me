@@ -29,16 +29,16 @@ Per workspace (`--workspace=<name>` or `cd`): `web-client` has `lint` (oxlint) a
 ## Stack
 
 - **`web-client`**: Next.js 16 (App Router, `output: 'standalone'`) + React 19 + TypeScript + Tailwind v4 + Framer Motion (Admin Panel only). [ADR 0013](./docs/adr/0013-migrate-web-client-to-nextjs-app-router.md).
-- **`server`**: NestJS + TypeORM + MariaDB (`mysql2`) + JWT auth + `class-validator` + `@anthropic-ai/sdk` + Socket.IO. [ADR 0003](./docs/adr/0003-mariadb-typeorm-backend-datastore.md), [0007](./docs/adr/0007-anthropic-api-for-trend-discovery.md).
+- **`server`**: NestJS + TypeORM + MariaDB (`mysql2`) + JWT auth + `class-validator` + `@anthropic-ai/sdk` + Socket.IO + `@modelcontextprotocol/sdk` (the Admin MCP). [ADR 0003](./docs/adr/0003-mariadb-typeorm-backend-datastore.md), [0007](./docs/adr/0007-anthropic-api-for-trend-discovery.md).
 
 ## Where things live
 
 - `web-client/src/app/` — routes only; mostly thin composition or re-exports. `admin/` re-exports `src/admin/`.
 - `web-client/src/components/` — the public site (Server Components). `content/` + `i18n/` — static UI copy. `blog/` — the Blog's API client, URL helpers and client islands. `admin/` — the Admin Panel. `live-cursors/` — the Live Cursor overlay. `page-views/` — the Page View beacon. `proxy.ts` — host routing (below).
-- `server/src/` — one Nest module per folder: `auth`, `blog`, `comments`, `uploads`, `trends`, `tools`, `ats-resume`, `resume-profile`, `live-cursors`, `page-views`, `health`.
+- `server/src/` — one Nest module per folder: `auth`, `blog`, `comments`, `uploads`, `trends`, `tools`, `ats-resume`, `resume-profile`, `live-cursors`, `page-views`, `mcp`, `health`.
 - `shared/src/` — `tech-stack.ts` (the Tech Stack) and `resume.ts` (the Resume Profile type and its seed default).
 
-Feature background: Admin Panel [0005](./docs/adr/0005-admin-panel-in-web-client.md)/[0006](./docs/adr/0006-admin-session-model.md), Comments [0009](./docs/adr/0009-reader-comments-pre-moderated-pseudonymous-one-level-rate-limited.md), View count [0010](./docs/adr/0010-view-counter-intentionally-undeduplicated.md), ATS resume [0014](./docs/adr/0014-ats-resume-generator-replaces-static-download.md), Resume Profile [0015](./docs/adr/0015-resume-profile-becomes-db-backed-and-editable.md), Live Cursors [0017](./docs/adr/0017-live-cursors-unauthenticated-per-room-websocket-gateway.md), Access Log [0019](./docs/adr/0019-access-log-stores-visitor-ips-for-90-days.md), uploads [0004](./docs/adr/0004-local-disk-image-storage.md).
+Feature background: Admin Panel [0005](./docs/adr/0005-admin-panel-in-web-client.md)/[0006](./docs/adr/0006-admin-session-model.md), Comments [0009](./docs/adr/0009-reader-comments-pre-moderated-pseudonymous-one-level-rate-limited.md), View count [0010](./docs/adr/0010-view-counter-intentionally-undeduplicated.md), ATS resume [0014](./docs/adr/0014-ats-resume-generator-replaces-static-download.md), Resume Profile [0015](./docs/adr/0015-resume-profile-becomes-db-backed-and-editable.md), Live Cursors [0017](./docs/adr/0017-live-cursors-unauthenticated-per-room-websocket-gateway.md), Access Log [0019](./docs/adr/0019-access-log-stores-visitor-ips-for-90-days.md), Admin MCP [0021](./docs/adr/0021-admin-mcp-self-hosted-oauth-opaque-revocable-tokens.md), uploads [0004](./docs/adr/0004-local-disk-image-storage.md).
 
 ## Traps — `web-client`
 
@@ -65,6 +65,8 @@ Feature background: Admin Panel [0005](./docs/adr/0005-admin-panel-in-web-client
 - **Claude calls**: system prompts demand a bare JSON reply, parsed with `extractJson()` (`trends.service.ts`). The two trend `POST`s rethrow failures as `BadGatewayException` with Claude's real message — deliberate, this is a single-admin tool. Tools that use resume facts read them live via `ResumeProfileService.get()`. The ATS Resume Generator must never add an employer, title, skill, achievement or date the Resume Profile doesn't contain.
 - **Uploads and `resume.pdf`** live on the persistent volume under `UPLOADS_DIR` (default `./uploads`); the public resume URL is always `GET /resume`.
 - **Page Views hold full Visitor IPs** (ADR 0019): `PAGE_VIEW_RETENTION_DAYS` in `page-views.constants.ts` must match the footer notice (`accessLogNotice` in `web-client`'s `content/en.ts`). The DB-IP Lite databases are downloaded at image build by `server/scripts/fetch-geoip.sh` into `/app/geoip`; locally, run it with `server/geoip` (gitignored) or the API just skips enrichment.
+- **The Admin MCP's OAuth endpoints are raw Express, not Nest routes** ([ADR 0021](./docs/adr/0021-admin-mcp-self-hosted-oauth-opaque-revocable-tokens.md)): `McpModule.onModuleInit` mounts the SDK's `mcpAuthRouter` (`/.well-known/*`, `/authorize`, `/token`, `/register`, `/revoke`) and `POST /mcp` on the Express app, so don't add Nest routes at those paths. Only `POST /oauth/consent` and `/mcp/admin/clients` are Nest controllers. MCP tokens are opaque and checked in `mcp_grants`, so a `JwtAuthGuard` route rejects them and `/mcp` rejects the Admin Panel's JWT. Keep it that way, and keep every tool read-only. `API_PUBLIC_URL` (default `https://api.alisonrafael.me`) is the OAuth issuer; set it locally. Changing the Admin password revokes every Connected client through `AuthService.onPasswordChanged`.
+- **Every Admin login goes through `AuthService.authenticate()`**: the shared per-IP failed-login limit (`LoginRateLimiter`) covers `POST /auth/login` and the Admin MCP's consent page together.
 - **The comment rate limit is a hardcoded constant.** If it ever becomes configurable, update both `.env.example` files, `docker-compose.yml`'s `api` env block, `deploy.yml`'s `.env` heredoc and the GitHub secret together.
 
 ## Deployment
