@@ -55,7 +55,7 @@ export function AccessLogPage() {
   const [list, setList] = useState<PageViewList | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [filters, setFilters] = useState<Omit<PageViewFilters, 'days' | 'page'>>({})
-  const [draft, setDraft] = useState({ host: '', path: '', ip: '' })
+  const [draft, setDraft] = useState({ host: '', path: '', ip: '', network: '' })
   const [page, setPage] = useState(1)
 
   useEffect(() => {
@@ -98,6 +98,7 @@ export function AccessLogPage() {
       host: next.host.trim() || undefined,
       path: next.path.trim() || undefined,
       ip: next.ip.trim() || undefined,
+      network: next.network.trim() || undefined,
     })
     setPage(1)
   }
@@ -230,10 +231,16 @@ export function AccessLogPage() {
           value={draft.ip}
           onChange={(e) => setDraft({ ...draft, ip: e.target.value })}
         />
+        <input
+          className={input}
+          placeholder={copy.networkPlaceholder}
+          value={draft.network}
+          onChange={(e) => setDraft({ ...draft, network: e.target.value })}
+        />
         <button type="submit" className={neutralBtn}>
           {copy.apply}
         </button>
-        <button type="button" className={neutralBtn} onClick={() => applyFilters({ host: '', path: '', ip: '' })}>
+        <button type="button" className={neutralBtn} onClick={() => applyFilters({ host: '', path: '', ip: '', network: '' })}>
           {copy.clear}
         </button>
       </form>

@@ -11,15 +11,20 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
 import { Admin } from './entities/admin.entity.js';
+import { LoginRateLimiter } from './login-rate-limiter.js';
+
+type PasswordChangedListener = (adminId: string) => Promise<void>;
 
 @Injectable()
 export class AuthService implements OnModuleInit {
   private readonly logger = new Logger(AuthService.name);
+  private readonly passwordChangedListeners: PasswordChangedListener[] = [];
 
   constructor(
     @InjectRepository(Admin) private readonly admins: Repository<Admin>,
     private readonly jwt: JwtService,
     private readonly config: ConfigService,
+    private readonly loginLimiter: LoginRateLimiter,
   ) {}
 
   // Seed a single admin from env vars on first boot only — never overwrites
@@ -49,6 +54,26 @@ export class AuthService implements OnModuleInit {
     return admin;
   }
 
+  // validateAdmin behind the shared failed-login limit — the entry point for
+  // every login form (the Admin Panel's and the Admin MCP's OAuth page).
+  async authenticate(email: string, password: string, ip: string | undefined): Promise<Admin> {
+    this.loginLimiter.assertAllowed(ip);
+    try {
+      const admin = await this.validateAdmin(email, password);
+      this.loginLimiter.recordSuccess(ip);
+      return admin;
+    } catch (err) {
+      if (err instanceof UnauthorizedException) this.loginLimiter.recordFailure(ip);
+      throw err;
+    }
+  }
+
+  // Lets another module react to a password change without AuthModule
+  // depending on it — the Admin MCP revokes every Connected client here.
+  onPasswordChanged(listener: PasswordChangedListener): void {
+    this.passwordChangedListeners.push(listener);
+  }
+
   login(admin: Admin) {
     const payload = { sub: admin.id, email: admin.email };
     return { accessToken: this.jwt.sign(payload) };
@@ -67,5 +92,6 @@ export class AuthService implements OnModuleInit {
     }
     admin.passwordHash = await bcrypt.hash(newPassword, 12);
     await this.admins.save(admin);
+    for (const listener of this.passwordChangedListeners) await listener(admin.id);
   }
 }

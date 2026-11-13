@@ -93,6 +93,9 @@ export class PageViewsService {
     if (query.host) qb.andWhere('pv.host = :host', { host: query.host });
     if (query.path) qb.andWhere('pv.path LIKE :path', { path: `${this.escapeLike(query.path)}%` });
     if (query.ip) qb.andWhere('pv.ip = :ip', { ip: query.ip });
+    if (query.network) {
+      qb.andWhere('LOWER(pv.asnOrg) LIKE :network', { network: `%${this.escapeLike(query.network.toLowerCase())}%` });
+    }
 
     const [items, total] = await qb.getManyAndCount();
     return { items, total, page, pageSize };

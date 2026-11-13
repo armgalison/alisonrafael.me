@@ -7,6 +7,7 @@ import { AuthController } from './auth.controller.js';
 import { AuthService } from './auth.service.js';
 import { Admin } from './entities/admin.entity.js';
 import { JwtStrategy } from './jwt.strategy.js';
+import { LoginRateLimiter } from './login-rate-limiter.js';
 
 @Module({
   imports: [
@@ -26,7 +27,7 @@ import { JwtStrategy } from './jwt.strategy.js';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy],
+  providers: [AuthService, JwtStrategy, LoginRateLimiter],
   // PassportModule is re-exported so other modules can just import
   // AuthModule to use JwtAuthGuard, instead of each re-registering
   // PassportModule with the same 'jwt' default strategy themselves.

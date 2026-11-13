@@ -25,8 +25,24 @@ The single account (Alison himself) authorized to manage Blog content via the AP
 _Avoid_: User — there is no multi-user account system, just this one operator.
 
 **Admin Panel**:
-The authoring UI for the Admin — routes under `/admin/*` inside `web-client` (not a separate app/deploy). Lets the Admin log in, manage their password, and create/edit/publish Posts with a markdown editor. Navigated from a sidebar of collapsible groups: Blog (Posts, Comments), Observability (Access Log), Tools, and Settings (Change Password, Resume Profile). Not reachable by a Visitor without the Admin's credentials, and it doesn't render public Blog reading pages — that's a separate concern, the Blog reading UI (see [ADR 0005](./docs/adr/0005-admin-panel-in-web-client.md)).
+The authoring UI for the Admin — routes under `/admin/*` inside `web-client` (not a separate app/deploy). Lets the Admin log in, manage their password, and create/edit/publish Posts with a markdown editor. Navigated from a sidebar of collapsible groups: Blog (Posts, Comments), Observability (Access Log), Tools, and Settings (Change Password, Resume Profile, Chat Config, Connected clients). Not reachable by a Visitor without the Admin's credentials, and it doesn't render public Blog reading pages — that's a separate concern, the Blog reading UI (see [ADR 0005](./docs/adr/0005-admin-panel-in-web-client.md)).
 _Avoid_: Dashboard, CMS — this codebase's term is Admin Panel.
+
+**Chat Session**:
+One Visitor's chat with the resume's assistant, opened when a public page with the chat loads. Most are never used and hold no messages.
+_Avoid_: Conversation — reserved for a Chat Session that actually has messages.
+
+**Chat Conversation**:
+A Chat Session with at least one message, as the Admin sees it: its messages, when they were sent, and the Visitor's country, network and IP. Empty Chat Sessions never appear as Chat Conversations, in the Admin Panel or in the Admin MCP.
+_Avoid_: Chat log, transcript (except for the messages themselves), thread.
+
+**Admin MCP**:
+A read-only MCP server that lets the Admin query the Access Log (summaries, individual Page Views, and "did this company visit?") and recent Chat Conversations from an AI client — claude.ai or Claude Code — instead of opening the Admin Panel. Only the Admin can connect, and it can never change anything. It shows the same data the Admin Panel shows, full Visitor IPs included.
+_Avoid_: Analytics MCP, insights — like the Access Log, this is not an analytics product; and "MCP" alone, which names the protocol, not this server.
+
+**Connected client**:
+One AI client (one claude.ai connector, one Claude Code install) that the Admin has allowed into the Admin MCP. The Admin sees each one under Settings, with when it was allowed and when it was last used, and can revoke it, which cuts its access immediately. Changing the Admin password revokes every Connected client. See [ADR 0021](./docs/adr/0021-admin-mcp-self-hosted-oauth-opaque-revocable-tokens.md).
+_Avoid_: Integration, app, session — a Connected client is one grant, and it outlives any single login.
 
 **Blog reading UI**:
 The Visitor-facing counterpart to the Admin Panel: `/blog` (a list of published Posts) and `/blog/:slug` (one Post's full reading view), routes inside `web-client`'s Next.js app (`src/app/blog/`), reading `server`'s public `/posts` routes. Server-rendered — the post list and a post's content are fetched and rendered on the server per request, not loaded client-side after an empty shell — with the comment form, share buttons, and view-count registration as client-side islands within that server-rendered page (see [ADR 0013](./docs/adr/0013-migrate-web-client-to-nextjs-app-router.md)).
