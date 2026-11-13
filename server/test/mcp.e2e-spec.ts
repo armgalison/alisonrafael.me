@@ -44,7 +44,8 @@ describe('Admin MCP (e2e)', () => {
     await app.close();
   });
 
-  async function register(redirectUris = [REDIRECT_URI]) {
+  // Not async: callers chain supertest's .expect() on the returned request.
+  function register(redirectUris = [REDIRECT_URI]) {
     return request(http)
       .post('/register')
       .send({
